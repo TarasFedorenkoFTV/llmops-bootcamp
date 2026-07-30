@@ -6,8 +6,9 @@
 
 | Компонент | Дається готовим | Студент добудовує |
 |---|---|---|
-| Chat UI (Angular) | готовий тонкий UI | не змінює |
+| UI (Angular) | готові в'юхи: Chat + Console/Observability | не змінює |
 | App service (.NET) | skeleton | control plane: routing, fallback, cost, policies |
+| Observability API (.NET) | skeleton | агрегати з Postgres (traces, p95, cost, error-taxonomy) у Console-в'юху |
 | Gateway (LiteLLM) | базовий конфіг | моделі/провайдери, порядок fallback |
 | Mock provider | готовий | використовує для тестів і failure-сценаріїв |
 | Postgres | базова схема | розширює під logs / cost / prompt records |
