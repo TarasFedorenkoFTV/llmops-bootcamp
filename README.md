@@ -44,7 +44,7 @@ Routing, fallback, cost і policies студент пише в сервісі.
 
 ## Структура
 
-- `docs/` — архітектура, request flow, тижневі outcomes, failure scenarios
+- `docs/` — архітектура, request flow, тижневі outcomes, failure scenarios, [optional і згадки](docs/optional-and-mentions.md)
 - `starter/` — те, що клонує студент: каркас, mock provider, базові конфіги
 
 ## Мінімальний стек для запуску
