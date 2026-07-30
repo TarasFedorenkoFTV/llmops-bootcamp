@@ -1,4 +1,9 @@
 services:
+  ui:
+    build: ./ui
+    ports: ["4200:4200"]
+    depends_on: [service]
+
   service:
     build: ./service
     ports: ["8080:8080"]
@@ -13,8 +18,11 @@ services:
     ports: ["4000:4000"]
     volumes:
       - ./gateway/litellm-config.yaml:/app/config.yaml:ro
-    env_file:
-      - ./gateway/.env
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - AZURE_API_BASE=${AZURE_API_BASE:-}
+      - AZURE_API_KEY=${AZURE_API_KEY:-}
+    depends_on: [mock-provider]
 
   mock-provider:
     build: ./mock-provider
@@ -31,7 +39,7 @@ services:
       - ./db/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
       - pgdata:/var/lib/postgresql/data
 
-  # --- optional (advanced), вмикати профілем: docker compose --profile advanced up ---
+  # --- optional (advanced): docker compose --profile advanced up ---
   redis:
     image: redis:7
     profiles: ["advanced"]

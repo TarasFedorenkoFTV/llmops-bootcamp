@@ -1,5 +1,6 @@
 name: eval-gate
-# Блокує prompt/model regression на pull request.
+# Шаблон для студентського репозиторію (корінь = вміст starter/).
+# Піднімає стек, ганяє evals проти сервісу, блокує regression на pull request.
 on:
   pull_request:
 
@@ -8,8 +9,31 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Up stack
+        run: docker compose up -d --build
+
+      - name: Wait for service
+        run: |
+          for i in $(seq 1 40); do
+            curl -sf http://localhost:8080/health && exit 0
+            sleep 5
+          done
+          echo "service did not become healthy" && exit 1
+
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: pip install -r starter/evals/requirements.txt
-      - run: python starter/evals/run.py --dataset starter/evals/golden.jsonl --threshold 30
+
+      - name: Evals
+        env:
+          SERVICE_URL: http://localhost:8080
+        run: python evals/run.py --dataset evals/golden.jsonl --threshold 5
+
+      - name: Logs on failure
+        if: failure()
+        run: docker compose logs
+
+      - name: Down
+        if: always()
+        run: docker compose down -v

@@ -9,4 +9,4 @@ OpenAI-сумісний фейковий ендпоінт (`/v1/chat/completions
 
 Реальний ключ провайдера потрібен лише для model-based evals (оцінка справжньої якості), не для core.
 
-TODO: додати реалізацію (FastAPI або Node) + Dockerfile.
+Реалізація готова: `Program.cs` (.NET minimal API) + `Dockerfile`. Збої — через `?fail=503&delay=2000&garbage=1` або маркери в повідомленні (`__fail_503`, `__delay`, `__garbage`), щоб працювало й крізь gateway.

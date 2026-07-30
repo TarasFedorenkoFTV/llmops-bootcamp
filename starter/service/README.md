@@ -12,4 +12,4 @@
 
 LiteLLM викликається лише для самого запиту до обраної моделі.
 
-TODO: додати .NET skeleton (Program.cs, Dockerfile) до першого заняття.
+Skeleton готовий: `Program.cs` (`/chat` + API-контракт `/observability` `/cost` `/prompts` `/health` `/approvals`), `Service.csproj`, `Dockerfile`. Місця для дороблення позначені `TODO(student)`.

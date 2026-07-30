@@ -19,11 +19,12 @@
 ## Запуск (мінімальний стек)
 
 ```sh
-cp gateway/.env.example gateway/.env   # ключі провайдерів (для mock не потрібні)
-docker compose up
+docker compose up --build
 ```
 
-Піднімаються: сервіс, LiteLLM, Postgres, mock provider. Redis і дашборди — опційні (профілі compose).
+Піднімаються: UI (`:4200`), сервіс (`:8080`), LiteLLM (`:4000`), Postgres, mock provider.
+Для mock реальні ключі не потрібні. Redis і дашборди — опційні: `docker compose --profile advanced up`.
+Для оцінки якості (model-based evals): `cp gateway/.env.example gateway/.env` і заповнити ключі.
 
 ## Власник репозиторію
 
