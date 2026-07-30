@@ -9,26 +9,22 @@ import { ConsoleComponent } from './console.component';
   imports: [CommonModule, ChatComponent, ConsoleComponent],
   template: `
     <div class="wrap">
-      <nav class="tabs">
-        <button [class.active]="tab === 'chat'" (click)="tab = 'chat'">Чат</button>
-        <button [class.active]="tab === 'console'" (click)="tab = 'console'">Консоль</button>
-      </nav>
-      <app-chat *ngIf="tab === 'chat'"></app-chat>
-      <app-console *ngIf="tab === 'console'"></app-console>
+      <header class="top">SupportGW — LLMOps capstone</header>
+      <div class="cols">
+        <section class="col"><app-chat></app-chat></section>
+        <section class="col"><app-console></app-console></section>
+      </div>
     </div>
   `,
   styles: [
     `
-      .wrap { max-width: 760px; margin: 24px auto; padding: 0 12px; }
-      .tabs { display: flex; gap: 8px; margin-bottom: 16px; }
-      .tabs button {
-        padding: 8px 16px; border: 1px solid #ddd; background: #fff;
-        border-radius: 8px; cursor: pointer; font: inherit;
+      .wrap { max-width: 1180px; margin: 20px auto; padding: 0 16px; }
+      .top { font-weight: 700; font-size: 18px; margin-bottom: 16px; }
+      .cols { display: grid; grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr); gap: 20px; align-items: start; }
+      @media (max-width: 880px) {
+        .cols { grid-template-columns: 1fr; }
       }
-      .tabs button.active { background: #4038c4; color: #fff; border-color: #4038c4; }
     `,
   ],
 })
-export class AppComponent {
-  tab: 'chat' | 'console' = 'chat';
-}
+export class AppComponent {}
