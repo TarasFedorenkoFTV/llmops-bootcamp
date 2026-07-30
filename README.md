@@ -17,7 +17,11 @@
 
 ![Request flow](docs/request-flow.png)
 
-Джерела діаграм (mermaid, рендеряться на GitHub): [docs/architecture.md](docs/architecture.md) · [docs/request-flow.md](docs/request-flow.md).
+**Навантаження студента (на тиждень)**
+
+![Навантаження студента](docs/student-load.png)
+
+Джерела діаграм (mermaid, рендеряться на GitHub): [docs/architecture.md](docs/architecture.md) · [docs/request-flow.md](docs/request-flow.md) · [docs/student-load.md](docs/student-load.md).
 
 ## Стек
 
