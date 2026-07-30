@@ -21,7 +21,11 @@
 
 ![Навантаження студента](docs/student-load.png)
 
-Джерела діаграм (mermaid, рендеряться на GitHub): [docs/architecture.md](docs/architecture.md) · [docs/request-flow.md](docs/request-flow.md) · [docs/student-load.md](docs/student-load.md).
+**Контрол-плейн: хто що пише**
+
+![Контрол-плейн](docs/control-plane.png)
+
+Джерела діаграм (mermaid, рендеряться на GitHub): [architecture](docs/architecture.md) · [request-flow](docs/request-flow.md) · [student-load](docs/student-load.md) · [control-plane](docs/control-plane.md).
 
 ## Стек
 

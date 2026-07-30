@@ -34,3 +34,5 @@ flowchart LR
 - **Redis** — кеш (опційно, з уроку про caching).
 - **Eval runner (Python, студент)** — golden dataset, graders, пороги.
 - **GitHub Actions** — eval gate, блокує regression.
+
+Межа «Angular готовий ↔ .NET студента через API-контракт» детально: [control-plane.md](control-plane.md).
