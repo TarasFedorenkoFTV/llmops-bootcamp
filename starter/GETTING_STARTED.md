@@ -1,0 +1,249 @@
+# Getting started — гайд для студента
+
+Це стартовий репозиторій capstone-проєкту: **бот служби підтримки з LLM control plane**.
+Ти отримуєш готовий каркас і дороблюєш у ньому control plane (routing, fallback, cost,
+guardrails, HITL, observability, evals). Цей документ пояснює вимоги, запуск і кожну папку.
+
+> Правило стека: **ти пишеш .NET + конфіг + Python-evals. Фронтенд (Angular) даємо готовим — його не чіпаєш.**
+> Control plane живе в `service/` (.NET), а LiteLLM — лише адаптер до провайдерів.
+
+---
+
+## 1. Вимоги
+
+### Обов'язково (рекомендований шлях — усе в контейнерах)
+
+| Інструмент | Версія | Навіщо |
+|---|---|---|
+| Docker Desktop **або** Rancher Desktop | Docker Engine 24+, Compose v2 | піднімає весь стек |
+| Git | будь-яка сучасна | клонувати репо |
+
+Перевір: `docker version` і `docker compose version` (саме `compose` без дефіса).
+Треба ~4 ГБ вільного місця під образи і ~4 ГБ RAM для контейнерів.
+
+**Вільні порти на хості:** `4200` (UI), `8080` (service), `4000` (gateway), `5432` (Postgres).
+Mock-провайдер працює лише всередині docker-мережі, хостовий порт йому не потрібен.
+Якщо якийсь порт зайнятий — див. [Troubleshooting](#8-troubleshooting).
+
+### Опційно (лише якщо розробляєш компонент поза контейнером)
+
+- **.NET 8 SDK** — щоб білдити / запускати `service` чи `mock-provider` локально без Docker.
+- **Node 20 + npm** — щоб запускати `ui` локально (Angular CLI підтягнеться з `devDependencies`).
+- **Python 3.12** — щоб ганяти `evals` з хоста (у стеку і CI окремо не потрібен).
+
+### Реальний ключ провайдера
+
+Потрібен **тільки** для model-based evals (оцінка справжньої якості відповіді, окремий тиждень).
+Увесь core проходиться на **mock — без ключа, безкоштовно**.
+
+---
+
+## 2. Швидкий старт
+
+```bash
+# якщо це окремий starter-репо — ти вже в його корені
+docker compose up --build
+```
+
+Перший запуск довгий: тягне образи (LiteLLM, Postgres) і білдить .NET + Angular. Далі — швидко.
+
+Що маєш побачити в логах:
+
+- `ui` → `Application bundle generation complete` і `➜  Local:   http://localhost:4200/`
+- решта контейнерів у статусі `Up`.
+
+Відкрий у браузері:
+
+```
+http://localhost:4200
+```
+
+Побачиш чат «Підтримка». Напиши «Як скинути пароль?» — відповідь піде повним шляхом
+UI → service → LiteLLM → mock і повернеться в чат.
+
+**Зупинити:**
+
+```bash
+docker compose down        # зупинити стек
+docker compose down -v     # + стерти дані Postgres (чистий старт)
+```
+
+---
+
+## 3. Структура репозиторію
+
+```
+.
+├─ docker-compose.yml          # весь стек одним файлом
+├─ .github/workflows/
+│  └─ eval-gate.yml            # CI: піднімає стек, ганяє evals, блокує regression на PR
+│
+├─ ui/                         # Angular-чат — ДАЄТЬСЯ ГОТОВИМ, не змінюєш
+│  ├─ src/app/app.component.ts #   сам чат-компонент (standalone)
+│  ├─ src/main.ts              #   bootstrap застосунку
+│  ├─ src/index.html, styles.css
+│  ├─ proxy.conf.json          #   dev-proxy: /api → service:8080
+│  ├─ angular.json, tsconfig*.json, package.json
+│  └─ Dockerfile
+│
+├─ service/                    # .NET сервіс = CONTROL PLANE — ТУТ ТИ ПРАЦЮЄШ
+│  ├─ Program.cs               #   /chat + API-контракт; seam'и позначені TODO(student)
+│  ├─ Service.csproj, appsettings.json
+│  └─ Dockerfile
+│
+├─ gateway/                    # LiteLLM — провайдер-адаптер (конфіг, не код)
+│  ├─ litellm-config.yaml      #   список моделей: mock, gpt-4o-mini, gpt-4o, azure
+│  └─ .env.example             #   ключі провайдерів (для mock не потрібні)
+│
+├─ mock-provider/              # фейковий OpenAI-провайдер — ДАЄТЬСЯ ГОТОВИМ
+│  ├─ Program.cs               #   канонічні відповіді + інжекція збоїв
+│  ├─ MockProvider.csproj
+│  └─ Dockerfile
+│
+├─ db/
+│  └─ schema.sql               # таблиці requests, prompts (створюються при старті Postgres)
+│
+└─ evals/                      # оцінювання якості — ТУТ ТИ ПРАЦЮЄШ
+   ├─ run.py                   #   rule-based eval runner
+   ├─ golden.jsonl             #   тест-кейси (вхід + очікування)
+   └─ requirements.txt         #   stdlib-only
+```
+
+### Що робить кожна частина
+
+- **`ui/` (Angular, готове).** Тонкий чат. Ходить у сервіс через dev-proxy `/api` → `service:8080`
+  (див. `proxy.conf.json`). Ти його **не змінюєш** — уся твоя робота на бекенді.
+- **`service/` (.NET, твоє).** Це control plane. Ендпоінт `/chat` приймає повідомлення,
+  обирає модель, кличе LiteLLM, логує в Postgres. Тут ти реалізуєш routing, fallback, cost,
+  guardrails, HITL. Ендпоінти `/observability` `/cost` `/prompts` `/health` `/approvals` —
+  це **API-контракт** для готової консолі; ти наповнюєш їх даними.
+- **`gateway/` (LiteLLM).** Єдиний вихід до провайдерів. Ти лише додаєш моделі/провайдерів у
+  `litellm-config.yaml`. Рішення (яку модель, коли fallback) приймає **сервіс**, не gateway.
+- **`mock-provider/` (готове).** OpenAI-сумісний фейк. Дає безкоштовні детерміновані відповіді
+  і вміє на замовлення падати — це основа для reliability і evals без реального ключа.
+- **`db/schema.sql`.** Базова схема; ти розширюєш під власні логи/cost/prompt records.
+- **`evals/` (твоє).** `run.py` б'є по сервісу кейсами з `golden.jsonl` і рахує, скільки пройшло.
+  CI використовує це як гейт: якщо пройшло менше за поріг — merge блокується.
+
+---
+
+## 4. Як усе працює разом
+
+```mermaid
+sequenceDiagram
+  actor U as Користувач
+  participant UI as UI (Angular)
+  participant S as service (.NET)
+  participant GW as LiteLLM
+  participant P as mock / провайдер
+  participant DB as Postgres
+
+  U->>UI: повідомлення
+  UI->>S: POST /api/chat  (proxy → /chat)
+  S->>S: routing (яку модель)
+  S->>GW: виклик обраної моделі
+  GW->>P: provider call
+  P-->>GW: відповідь + usage
+  GW-->>S: нормалізована відповідь
+  S->>DB: лог (request_id, model, latency, tokens, cost)
+  S-->>UI: відповідь
+  Note over S,P: при 429 / збої — fallback (реалізуєш ти)
+```
+
+---
+
+## 5. Перевірка, що працює
+
+```bash
+# статус контейнерів
+docker compose ps
+
+# health сервісу
+curl http://localhost:8080/health          # -> {"status":"ok"}
+
+# чат напряму (ASCII, щоб не було проблем із кодуванням у терміналі)
+curl -X POST http://localhost:8080/chat \
+  -H "Content-Type: application/json" \
+  -d '{"message":"please check my order"}'
+
+# логи
+docker compose logs -f service
+docker compose logs mock-provider
+```
+
+> На Windows у Git Bash кирилиця в аргументах `curl` може псуватися. Для перевірки
+> української краще користуйся самим чатом на http://localhost:4200 або шли ASCII.
+
+---
+
+## 6. Evals і eval-гейт
+
+Eval прогоняє кейси з `golden.jsonl` через сервіс і рахує пройдені.
+
+**Рекомендований спосіб — усередині docker-мережі** (так само, як у CI; оминає хостові
+порти й корпоративний проксі):
+
+```bash
+docker run --rm --network <project>_default \
+  -e SERVICE_URL=http://service:8080 -e PYTHONUTF8=1 \
+  -v "$(pwd)/evals:/e:ro" python:3.12-slim \
+  python /e/run.py --dataset /e/golden.jsonl --threshold 5
+```
+
+`<project>` — префікс мережі (звичайно ім'я папки; глянь `docker network ls`).
+
+Або з хоста (якщо `8080` вільний і без проксі):
+
+```bash
+SERVICE_URL=http://localhost:8080 python evals/run.py --dataset evals/golden.jsonl --threshold 5
+```
+
+Вихід: `eval: 6/6 passed, threshold 5`, код виходу `0` (green) або `1` (red).
+
+**Як гейт ловить регресію:** сервіс шле system-промпт зі словом «support» → mock віддає
+канонічні відповіді → evals зелені. Зламай промпт (прибери «support») → mock почне
+відповідати «не знаю» → частина кейсів впаде → пройдено менше за поріг → **гейт червоний**.
+Спробуй сам: зміни промпт у `service/Program.cs`, `docker compose up --build -d service`, прожени evals.
+
+---
+
+## 7. Симуляція збоїв (для reliability)
+
+Mock падає на замовлення — двома способами:
+
+- **Маркер у повідомленні** (працює і крізь gateway): напиши в чат/запит `__fail_503`,
+  `__fail_429`, `__delay`, `__garbage`.
+- **Query до mock напряму** (усередині мережі): `?fail=503`, `?delay=2000`, `?garbage=1`.
+
+На цьому ти будуєш fallback, retry, circuit breaker і graceful degradation.
+
+---
+
+## 8. Troubleshooting
+
+| Симптом | Причина / фікс |
+|---|---|
+| `port is already allocated` при `up` | Порт зайнятий іншим процесом. Звільни його або перемап у `docker-compose.yml` (напр. `"8090:8080"`), тоді звертайся на новий порт. |
+| `curl localhost:8080` дає чужу відповідь / 404 | На хості вже щось слухає цей порт (напр. локальний Apache/pgAdmin). Перемап порт або тестуй усередині мережі. |
+| Python/скрипт дає 404 на `localhost`, а curl — ок | Різний резолв `localhost` (IPv4/IPv6) або **корпоративний проксі** ганяє `localhost`. Використай `127.0.0.1`, постав `NO_PROXY=localhost,127.0.0.1`, або ганяй усередині docker-мережі. |
+| Перший `/chat` повільний або порожній | Gateway (LiteLLM) холодний на першому виклику. Повтори — далі швидко. |
+| Кирилиця в `curl -d` перетворюється на `?` | Git Bash на Windows псує non-ASCII в аргументах. Шли через чат/UI, з файлу (`--data @file.json`) або з Linux-контейнера. |
+| `ui` не відкривається | Дочекайся `Application bundle generation complete` в `docker compose logs ui`; перший білд Angular довгий. |
+| Треба чистий старт | `docker compose down -v` (стирає дані Postgres), потім `up --build`. |
+
+---
+
+## 9. Що будуєш ти (seam'и)
+
+Шукай `TODO(student)` у `service/Program.cs` — це місця, які дороблюєш:
+
+- **routing** — яку модель обрати під задачу;
+- **fallback** — порядок провайдерів при 429/5xx;
+- **cost** — облік токенів і вартості, budget-alert;
+- **guardrails** — PII / prompt injection;
+- **HITL** — approval перед незворотною дією (tool-call);
+- **API-контракт** — наповнити `/observability` `/cost` `/prompts` `/approvals` даними для консолі;
+- **evals** — свої graders і кейси в `evals/`.
+
+Порядок по тижнях і обсяг — у матеріалах курсу (weekly outcomes). Core усього цього
+проходиться на mock; реальний ключ вмикається лише на тижні оцінки якості.
