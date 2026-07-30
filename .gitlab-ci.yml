@@ -1,0 +1,13 @@
+# Eval gate. Блокує prompt/model regression перед merge.
+# Це шаблон CI для студентського репозиторію (W6).
+stages:
+  - eval
+
+eval-gate:
+  stage: eval
+  image: python:3.12-slim
+  script:
+    - pip install -r starter/evals/requirements.txt
+    - python starter/evals/run.py --dataset starter/evals/golden.jsonl --threshold 30
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
