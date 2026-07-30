@@ -1,0 +1,15 @@
+name: eval-gate
+# Блокує prompt/model regression на pull request.
+on:
+  pull_request:
+
+jobs:
+  eval:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r starter/evals/requirements.txt
+      - run: python starter/evals/run.py --dataset starter/evals/golden.jsonl --threshold 30

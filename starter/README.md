@@ -12,7 +12,7 @@
 | Mock provider | готовий | використовує для тестів і failure-сценаріїв |
 | Postgres | базова схема | розширює під logs / cost / prompt records |
 | Eval runner (Python) | skeleton | dataset, graders, пороги |
-| CI (GitLab CI) | шаблон `.gitlab-ci.yml` | eval gate |
+| CI (GitHub Actions) | шаблон `.github/workflows/eval-gate.yml` | eval gate |
 | Redis / дашборди | опційний шаблон | advanced extension |
 
 ## Запуск (мінімальний стек)

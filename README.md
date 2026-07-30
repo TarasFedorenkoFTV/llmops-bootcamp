@@ -12,7 +12,7 @@
 | Gateway | LiteLLM — провайдер-адаптер (єдиний виклик + нормалізація) |
 | Evals | Python |
 | Сховище / кеш | Postgres + Redis |
-| CI | GitLab CI — eval gate |
+| CI | GitHub Actions — eval gate |
 | Рантайм | Docker Compose (локально) |
 
 LiteLLM виступає провайдер-адаптером: єдиний виклик до моделей і нормалізація провайдерів.

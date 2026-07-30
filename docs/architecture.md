@@ -15,7 +15,7 @@ flowchart LR
   SVC --> RED[(Redis · cache)]
   SVC -. дані .-> OBS[Обзервабіліті<br/>розділ у продукті]
   EV[Eval runner · Python] --> PG
-  CI[GitLab CI<br/>eval gate] --> EV
+  CI[GitHub Actions<br/>eval gate] --> EV
 ```
 
 ## Хто що робить
@@ -26,4 +26,4 @@ flowchart LR
 - **Postgres** — логи запитів (`request_id`, model, latency, tokens, cost, prompt_version), prompt registry, cost records.
 - **Redis** — кеш (опційно, з уроку про caching).
 - **Eval runner (Python)** — golden dataset, graders, пороги.
-- **GitLab CI** — eval gate, блокує regression.
+- **GitHub Actions** — eval gate, блокує regression.

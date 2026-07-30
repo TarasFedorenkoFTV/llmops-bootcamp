@@ -7,5 +7,5 @@
 - розширює `golden.jsonl` репрезентативними кейсами;
 - пороги під свій сценарій.
 
-CI (`.gitlab-ci.yml`) запускає `run.py` на merge request і блокує regression.
+CI (`.github/workflows/eval-gate.yml`) запускає `run.py` на pull request і блокує regression.
 Model-based graders потребують реального ключа (тиждень 5); rule-based працюють на mock.
