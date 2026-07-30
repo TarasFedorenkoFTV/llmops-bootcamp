@@ -3,6 +3,22 @@
 Матеріали наскрізного capstone-проєкту курсу: **support / helpdesk bot з LLM control plane**.
 Студент отримує готовий каркас і добудовує control plane до production-рівня.
 
+## Огляд
+
+**Як виглядатиме застосунок**
+
+![Макет капстоуна](docs/capstone-mockup.png)
+
+**Архітектура**
+
+![Архітектура](docs/architecture.png)
+
+**Request flow**
+
+![Request flow](docs/request-flow.png)
+
+Джерела діаграм (mermaid, рендеряться на GitHub): [docs/architecture.md](docs/architecture.md) · [docs/request-flow.md](docs/request-flow.md).
+
 ## Стек
 
 | Шар | Технологія |
