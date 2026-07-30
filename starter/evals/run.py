@@ -6,13 +6,16 @@ import urllib.request
 
 BASE = os.environ.get("SERVICE_URL", "http://localhost:8080")
 
+# Внутрішній сервіс — повз будь-який проксі (інакше localhost іде через корп-проксі → 404).
+_opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
+
 
 def call(message):
     data = json.dumps({"message": message}).encode("utf-8")
     req = urllib.request.Request(
         BASE + "/chat", data=data, headers={"Content-Type": "application/json"}
     )
-    with urllib.request.urlopen(req, timeout=30) as r:
+    with _opener.open(req, timeout=30) as r:
         return json.loads(r.read()).get("content", "")
 
 
