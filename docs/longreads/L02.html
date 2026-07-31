@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Урок 2 · Prompt lifecycle: промпт як production-артефакт</title>
+<style>
+  :root{
+    --bg:#f6f7f9; --card:#ffffff; --ink:#1b1d23; --soft:#565c6b; --faint:#8a90a0;
+    --line:#e4e6ec; --accent:#4038c4; --accent-bg:#ecebfb;
+    --good:#177245; --good-bg:#e9f3ee; --warn:#9a5b12; --warn-bg:#f8f0e2; --crit:#b3261e; --crit-bg:#f9e9e8;
+    --mono:ui-monospace,"Cascadia Code",Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:860px;margin:0 auto;padding:48px 20px 90px}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:600}
+  h1{font-size:clamp(28px,5vw,40px);line-height:1.12;letter-spacing:-.02em;margin:10px 0 8px}
+  .lead{font-size:18px;color:var(--soft);max-width:64ch;margin:0}
+  .chain{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:26px 0 0;font-family:var(--mono);font-size:12px}
+  .chain span{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:4px 11px;color:var(--soft)}
+  .chain span.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+  .chain i{color:var(--faint);font-style:normal}
+  section{margin-top:52px}
+  .shead{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .num{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:10px;background:var(--accent-bg);color:var(--accent);font-family:var(--mono);font-weight:700;font-size:14px}
+  .track{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:3px 9px;border-radius:20px;font-weight:700}
+  .track.opt{background:var(--warn-bg);color:var(--warn)}
+  h2{font-size:24px;letter-spacing:-.01em;margin:0 0 12px}
+  h3{font-size:17px;margin:22px 0 8px}
+  p{margin:0 0 12px;max-width:70ch}
+  ul,ol{margin:0 0 12px;padding-left:22px;max-width:70ch}
+  li{margin-bottom:6px}
+  strong{font-weight:650}
+  code{font-family:var(--mono);font-size:.88em;background:var(--accent-bg);color:var(--accent);padding:1px 6px;border-radius:5px;white-space:nowrap}
+  pre{background:#14161c;color:#e8e9ed;border-radius:12px;padding:14px 18px;overflow-x:auto;font-family:var(--mono);font-size:13.5px;line-height:1.6;max-width:100%}
+  pre code{background:none;color:inherit;padding:0;white-space:pre}
+  .call{border-radius:12px;padding:13px 16px;margin:14px 0;max-width:70ch;border:1px solid var(--line);background:var(--card)}
+  .call b{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.09em;text-transform:uppercase;margin-bottom:5px}
+  .call.principle{background:var(--good-bg);border-color:transparent}
+  .call.principle b{color:var(--good)}
+  .call.mistake{background:var(--crit-bg);border-color:transparent}
+  .call.mistake b{color:var(--crit)}
+  .call.tip{background:var(--warn-bg);border-color:transparent}
+  .call.tip b{color:var(--warn)}
+  .call.note{background:var(--accent-bg);border-color:transparent}
+  .call.note b{color:var(--accent)}
+  table{border-collapse:collapse;width:100%;font-size:14.5px;background:var(--card);border-radius:12px;overflow:hidden;border:1px solid var(--line)}
+  th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);background:#fafafc}
+  tr:last-child td{border-bottom:none}
+  .flow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-family:var(--mono);font-size:13px;margin:14px 0}
+  .flow span{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:7px 12px}
+  .flow span.hl{border-color:var(--accent);color:var(--accent);font-weight:600}
+  .flow i{color:var(--faint);font-style:normal}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin:14px 0}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  .card h4{margin:0 0 6px;font-size:14.5px}
+  .card p{font-size:14px;color:var(--soft);margin:0}
+  .steps{counter-reset:s;margin:14px 0;padding:0;list-style:none;max-width:72ch}
+  .steps li{counter-increment:s;position:relative;padding:0 0 14px 44px;margin:0}
+  .steps li::before{content:counter(s);position:absolute;left:0;top:0;width:28px;height:28px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-family:var(--mono);font-size:13px;font-weight:700}
+  .steps li.opt::before{background:var(--warn)}
+  .check{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 18px;max-width:72ch}
+  .check ul{margin:0;padding-left:20px}
+  .links a{color:var(--accent);text-decoration:none;border-bottom:1px solid var(--accent-bg)}
+  .links a:hover{border-bottom-color:var(--accent)}
+  .map{margin:14px 0;padding:0;list-style:none;max-width:72ch}
+  .map li{display:flex;gap:12px;padding:8px 0;border-bottom:1px dashed var(--line);font-size:14.5px}
+  .map li:last-child{border-bottom:none}
+  .map .n{font-family:var(--mono);color:var(--accent);font-weight:700;min-width:26px}
+  .hw{background:var(--card);border:2px solid var(--accent);border-radius:14px;padding:20px 22px;margin-top:16px}
+  .hw h2{margin-top:0}
+  .hw h3{margin-top:14px}
+  footer{margin-top:60px;border-top:1px solid var(--line);padding-top:16px;font-family:var(--mono);font-size:12px;color:var(--faint)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">Урок 2 · SupportGW · LLMOps Bootcamp</div>
+  <h1>Prompt lifecycle: промпт як production-артефакт</h1>
+  <p class="lead">Одне речення в промпті може зробити більше шкоди, ніж поганий деплой коду, — бо деплой хоча б лишає слід. Сьогодні промпт переїжджає з коду в реєстр із версіями, promote і rollback, а в лозі з'являється поле, з якого починається кожне розслідування якості.</p>
+  <div class="chain">
+    <span class="on">W1 Основа + промпти</span><i>→</i>
+    <span>W2 Routing + cost</span><i>→</i>
+    <span>W3 Кеш + tools</span><i>→</i>
+    <span>W4 Надійність + безпека</span><i>→</i>
+    <span>W5 Observability + evals</span><i>→</i>
+    <span>W6 CI + фінал</span>
+  </div>
+</header>
+
+<section>
+  <div class="shead"><div class="num">01</div></div>
+  <h2>Проблема: git чистий, система зламана</h2>
+  <p>Код у вас версіонується, проходить рев'ю і котиться через CI. А промпт? У більшості команд він живе хардкодом у коді або, ще гірше, у спільному документі. Його правлять «на живу», без сліду, без відкату і без розуміння, яка версія зараз обслуговує користувачів.</p>
+  <p>Сценарій, який я бачив не раз. У п'ятницю хтось «трохи уточнив формулювання» — здається, дрібниця, навіть не деплой. У понеділок підтримка тоне у скаргах: бот став відповідати не по темі. Команда відкриває git — він чистий. Останній деплой був тиждень тому і давно перевірений. Що змінилося, коли саме і як повернути «як було» — невідомо. Це <strong>регресія без коміта</strong>: система зламана, а жоден із звичних інструментів розслідування навіть не бачить події.</p>
+  <p>З першого уроку ми знаємо, чому так: промпт впливає на поведінку системи так само сильно, як код, але живе поза всіма механізмами контролю, які ми будували для коду десятиліттями. Висновок з цього один — і він сьогоднішній урок: <strong>раз вплив як у коду, то і життєвий цикл має бути як у коду</strong>. Версії, аудит, promote, rollback.</p>
+  <div class="call note"><b>Навіщо цей шар</b>Регресія без коміта — друга з чотирьох властивостей LLM-систем з уроку 1. Проти неї безсилі і git, і класичний моніторинг: HTTP-метрики зелені, помилок немає — просто відповіді стали гіршими. Захист будується з двох частин: реєстр версій (сьогодні) і автоматична перевірка якості (тиждень 5–6).</div>
+</section>
+
+<section>
+  <div class="shead"><div class="num">02</div></div>
+  <h2>Промпт — model-adjacent артефакт</h2>
+  <p>Порівняймо чесно, як живе код і як живе типовий промпт:</p>
+  <table>
+    <tr><th>Питання</th><th>Код</th><th>Промпт у типовій команді</th></tr>
+    <tr><td>Хто і коли міняв?</td><td>git blame</td><td>ніхто не знає</td></tr>
+    <tr><td>Що саме змінилося?</td><td>diff у PR</td><td>«та я трохи переформулював»</td></tr>
+    <tr><td>Яка версія в проді?</td><td>тег релізу</td><td>та, що зараз у коді… мабуть</td></tr>
+    <tr><td>Як відкотити?</td><td>revert + деплой</td><td>згадати, як було, і вписати назад</td></tr>
+  </table>
+  <p style="margin-top:12px">Права колонка — це не карикатура, це стан за замовчуванням. Реєстр промптів закриває всі чотири рядки трьома механізмами: <strong>історія</strong> (кожна версія збережена, з датою), <strong>атомарний promote</strong> (активна версія перемикається однією операцією) і <strong>миттєвий rollback</strong> (та сама операція в інший бік — за секунди, без деплою).</p>
+  <div class="call principle"><b>Принцип</b>Зміна промпта — це реліз. Якщо реліз не можна відкотити — це не реліз, а рулетка. Все, що змінює поведінку системи, мусить мати версію, слід у лозі та кнопку «повернути як було».</div>
+</section>
+
+<section>
+  <div class="shead"><div class="num">03</div></div>
+  <h2>Реєстр у базі: розтин таблиці prompts</h2>
+  <p>Механізм навмисно мінімальний — одна таблиця в <code>starter/db/schema.sql</code>:</p>
+  <pre><code>CREATE TABLE IF NOT EXISTS prompts (
+    name        TEXT NOT NULL,
+    version     TEXT NOT NULL,
+    body        TEXT NOT NULL,
+    active      BOOLEAN NOT NULL DEFAULT false,
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
+    PRIMARY KEY (name, version)
+);</code></pre>
+  <p>Чотири змістові поля. <code>name</code> — який саме промпт (у SupportGW він поки один: <code>support-system</code>, але схема одразу готова до кількох). <code>version</code> — довільна мітка версії. <code>body</code> — сам текст. <code>active</code> — прапорець «ця версія зараз у роботі». Первинний ключ по парі <code>(name, version)</code> — тобто та сама версія не може існувати у двох варіантах, і це не випадковість, а дисципліна: версія незмінна після створення.</p>
+  <p>Стартова міграція одразу кладе в реєстр дві версії: <code>v1</code> — «You are an assistant.» і <code>v2</code> — «You are a support assistant. Be concise and helpful.», активна — v2. Це не просто демо-дані: v1 зумисне «погана» (чому — побачите в блоці 06), і саме на ній ми сьогодні наживо відтворимо регресію.</p>
+  <div class="call tip"><b>Лайфхак</b>Реєстр — це не обов'язково окремий сервіс чи інструмент. Таблиця на чотири поля закриває 90% потреби: історія, активна версія, відкат. Почніть із таблиці; окремий продукт для керування промптами купуйте тоді, коли впретеся в межі таблиці, а не до того.</div>
+</section>
+
+<section>
+  <div class="shead"><div class="num">04</div></div>
+  <h2>Сервіс читає реєстр — і пише версію в лог</h2>
+  <p>У стартері system-промпт захардкоджений рядком у <code>service/Program.cs</code>. Після сьогоднішньої лаби це місце виглядає так:</p>
+  <pre><code>// [W1] промпт беремо з реєстру — активну версію, а не хардкод
+var (promptVersion, systemPrompt) = await GetActivePrompt(dbConn);</code></pre>
+  <p>А сам <code>GetActivePrompt</code> — один запит до бази:</p>
+  <pre><code>SELECT version, body FROM prompts
+WHERE active = true
+ORDER BY created_at DESC LIMIT 1</code></pre>
+  <p>Зверніть увагу на дві операційні дрібниці, які легко пропустити. Перша: якщо реєстр порожній або база недоступна, функція повертає розумний дефолт (<code>"none"</code> + базовий промпт) — чат продовжує працювати, а в лозі чесно видно, що версія не з реєстру. Друга: версія тепер їде в кожен рядок лога — <code>LogRequest(…, promptVersion, …)</code> заповнює поле <code>prompt_version</code>, яке з уроку 1 стояло порожнім.</p>
+  <p>Саме це поле перетворює скаргу «вчора ввечері бот верз дурниці» з ворожіння на SQL-запит: дивимось, які <code>prompt_version</code> обслуговували запити в той час, і одразу бачимо, чи збігається сплеск скарг із активацією нової версії.</p>
+  <pre><code>SELECT model, prompt_version, created_at
+FROM requests ORDER BY created_at DESC LIMIT 3;</code></pre>
+  <div class="call note"><b>Версія в лозі — трасування якості</b>Реєстр без поля в лозі — половина механізму. Історія каже, які версії існували; лог каже, яка версія відповідала конкретному користувачу конкретної хвилини. Розслідування якості завжди починається з другого.</div>
+</section>
+
+<section>
+  <div class="shead"><div class="num">05</div></div>
+  <h2>Promote і rollback — одна операція</h2>
+  <p>Другий шматок сьогоднішньої роботи — два ендпоінти. <code>GET /prompts</code> віддає список версій (консоль уже вміє його малювати — картка Prompt registry оживає одразу). <code>POST /prompts/{version}/activate</code> — і promote, і rollback одночасно, бо це та сама дія: зробити активною задану версію. Серце ендпоінта — один SQL-рядок:</p>
+  <pre><code>UPDATE prompts SET active = (version = @v)
+WHERE name = 'support-system';</code></pre>
+  <p>Придивіться: це не «вимкнути стару, потім увімкнути нову» двома запитами. Один <code>UPDATE</code> проходить по всіх версіях і виставляє <code>active</code> у <code>true</code> лише тій, що збіглася. Перемикання <strong>атомарне</strong>: не існує моменту, коли активні дві версії або жодна. На нашому трафіку це виглядає педантизмом; на проді вікно між двома запитами — це реальні запити користувачів, які полетіли без system-промпта.</p>
+  <p>Rollback тепер — не «згадати, як було, і вписати назад», а <code>POST /prompts/v2/activate</code>. Секунди замість розкопок. І окремий бонус: активація — це подія з міткою часу в базі, тобто розслідування «що змінилося о 19:42» має за що зачепитися.</p>
+  <div class="call mistake"><b>Типова помилка</b>Прочитати промпт із бази один раз на старті сервісу «щоб не ходити в базу на кожен запит». Активація нової версії перестає діяти до рестарту — і ви отримуєте систему, де кнопка rollback «натиснута», а стара версія ще годину обслуговує людей. Читайте активну версію на кожен запит; коли це стане дорого — на тижні 3 з'явиться кеш, і ви розв'яжете це правильно.</div>
+</section>
+
+<section>
+  <div class="shead"><div class="num">06</div></div>
+  <h2>Чому mock відчуває промпт</h2>
+  <p>Пам'ятаєте з уроку 1 другу суперсилу mock-провайдера — «реагує на промпт»? Сьогодні вона працює на нас. Всередині mock є один рядок:</p>
+  <pre><code>// «розумні» відповіді — тільки коли промпт правильний
+var promptOk = system.Contains("support", StringComparison.OrdinalIgnoreCase);</code></pre>
+  <p>Якщо system-промпт містить маркер «support» — mock відповідає по суті. Якщо ні — чесно каже «не знаю». Тепер зрозуміло, чому v1 у реєстрі «погана»: у «You are an assistant.» маркера немає. Активуєте v1 — і бот на очах деградує.</p>
+  <p>Так, це навчальний трюк. Але він чесно моделює реальність: гірша версія промпта → гірші відповіді, і ця залежність <strong>має бути видимою для перевірок</strong>, а не тільки для користувачів. У реальних системах зв'язок «промпт → якість» розмитіший і ловиться на наборі тестових питань — саме це ми збудуємо на тижні 5. Механіка ж однакова: є вхід, є очікування щодо відповіді, є версія промпта в лозі, яка каже, кого звинувачувати.</p>
+</section>
+
+<section>
+  <div class="shead"><div class="num">07</div></div>
+  <h2>Дисципліна версій: що вважати новою версією</h2>
+  <p>Коротка відповідь: <strong>будь-яку змістову зміну</strong>. Переставили речення, додали вимогу відповідати коротко, прибрали приклад — нова версія. Дисципліна одна і проста:</p>
+  <ul>
+    <li><strong>Активну версію не редагуємо ніколи.</strong> Створюємо нову і promote'имо її.</li>
+    <li>Стара версія лишається в історії — для порівняння («що саме змінили?») і для відкату.</li>
+    <li>Правка друкарської помилки — теж нова версія. Дешевше мати зайвий рядок у таблиці, ніж з'ясовувати, чому «та сама v3» поводиться по-різному в понеділок і четвер.</li>
+  </ul>
+  <p>Це та сама логіка, за якою ви не переписуєте опублікований git-тег і не перезаливаєте той самий номер версії пакета. Версія — це обіцянка незмінності; порушите її раз — і історія версій перестає бути доказом.</p>
+  <div class="call principle"><b>Принцип</b>Версія незмінна після створення. Змінюється лише те, котра з версій активна. Ця пара правил — весь секрет надійного відкату: rollback повертає саме той текст, що працював, а не «приблизно той».</div>
+</section>
+
+<section>
+  <div class="shead"><div class="num">08</div><span class="track opt">опційно</span></div>
+  <h2>Audit trail: хто, коли, що активував</h2>
+  <p>Наш реєстр знає, які версії існують і котра активна. Чого він поки не знає — <strong>історії активацій</strong>: хто і коли перемикав. Для навчального стека це прийнятно; на проді питання «хто активував v1 у п'ятницю о 18:50» звучить у кожному розборі інциденту.</p>
+  <p>Опційне розширення (воно ж — опційна частина hw1): окрема таблиця активацій, куди <code>POST /prompts/{version}/activate</code> дописує рядок — версія, час, хто. Активна версія тоді обчислюється як «остання активація», а сама таблиця стає незмінним журналом подій.</p>
+  <p>Друга опційна ідея з тієї ж родини — версії з міткою часу (<code>2024-06-14T19-42</code>) замість ручних <code>v1/v2</code>: назва версії сама каже, коли її створили, і ніколи не конфліктує. Обидві ідеї — еволюція тієї самої таблиці, а не новий механізм: якщо базовий реєстр зроблений чисто, вони додаються за вечір.</p>
+</section>
+
+<section>
+  <div class="shead"><div class="num">09</div></div>
+  <h2>Лабораторна: чотири частини</h2>
+  <ol class="steps">
+    <li><strong>Подивитися на реєстр.</strong> Відкрити <code>starter/db/schema.sql</code>, знайти таблицю <code>prompts</code> і seed із двома версіями. Виконати <code>SELECT * FROM prompts</code> — побачити v1 (неактивна) і v2 (активна).</li>
+    <li><strong>Прибрати хардкод.</strong> У <code>service/Program.cs</code> замінити захардкоджений промпт викликом <code>GetActivePrompt</code>; версію передати в <code>LogRequest</code>. Перевірити: <code>SELECT model, prompt_version FROM requests ORDER BY created_at DESC LIMIT 3</code> — поле заповнене.</li>
+    <li><strong>Оживити консоль.</strong> Реалізувати <code>GET /prompts</code> і <code>POST /prompts/{version}/activate</code> з атомарним UPDATE. Картка Prompt registry у консолі показує обидві версії і позначає активну.</li>
+    <li><strong>Відтворити регресію.</strong> Активувати v1 — написати боту «Як скинути пароль?» — отримати «не знаю». Повернути v2 тим самим ендпоінтом — переконатися, що відповіді полагодилися. Подумки зафіксувати: щойно ви зловили регресію промпта очима; на тижні 5–6 це робитиме гейт.</li>
+    <li class="opt"><strong>Опційно: журнал активацій.</strong> Додати таблицю активацій і дописувати в неї подію з кожного activate — заготовка під опційну частину hw1.</li>
+  </ol>
+  <div class="check"><strong>Перевір себе (обов'язкова доріжка):</strong>
+    <ul>
+      <li>промпт живе в БД; у коді сервісу хардкоду більше немає;</li>
+      <li>у свіжих рядках лога заповнений <code>prompt_version</code>;</li>
+      <li>активація v1 ламає відповіді, повернення v2 — лагодить, і це відтворюється;</li>
+      <li>консоль показує список версій з активною.</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <div class="shead"><div class="num">10</div></div>
+  <h2>Антипатерни тижня</h2>
+  <ul>
+    <li><strong>Правити активний промпт «на живу».</strong> Кожна така правка знищує можливість порівняти «до» і «після». Нова версія коштує один INSERT.</li>
+    <li><strong>Промпт у коді, у спільному документі або в голові тімліда.</strong> Всі три варіанти означають одне: система не знає, що нею керує.</li>
+    <li><strong>Лог без <code>prompt_version</code>.</strong> Реєстр є, а розслідування все одно наосліп: знаєте, які версії існували, але не знаєте, котра відповідала користувачу.</li>
+    <li><strong>«Достатньо git-історії».</strong> Git скаже, як текст змінювався в репозиторії. Він не скаже, яка версія була активна в проді о 19:42 — а це єдине питання, що має значення під час інциденту.</li>
+  </ul>
+</section>
+
+<section>
+  <h2 style="font-size:20px">Карта уроку</h2>
+  <ul class="map">
+    <li><span class="n">01</span><span>Регресія без коміта: git чистий, система зламана</span></li>
+    <li><span class="n">02</span><span>Промпт = артефакт: історія, атомарний promote, миттєвий rollback</span></li>
+    <li><span class="n">03</span><span>Таблиця prompts: чотири поля, які закривають 90% потреби</span></li>
+    <li><span class="n">04</span><span>GetActivePrompt + prompt_version у лозі — трасування якості</span></li>
+    <li><span class="n">05</span><span>Activate: одна атомарна операція на promote і rollback</span></li>
+    <li><span class="n">06</span><span>Чому mock відчуває промпт — і що це моделює</span></li>
+    <li><span class="n">07</span><span>Дисципліна: версія незмінна, змінюється лише активна</span></li>
+    <li><span class="n">08</span><span>Опційно: audit trail активацій, версії з міткою часу</span></li>
+    <li><span class="n">09</span><span>Лаба: реєстр → сервіс → консоль → регресія наживо</span></li>
+    <li><span class="n">10</span><span>Антипатерни тижня</span></li>
+  </ul>
+</section>
+
+<section class="hw">
+  <h2>📝 Домашнє завдання</h2>
+  <h3>ДЗ тижня — hw1: логування + prompt registry</h3>
+  <p><a class="links" href="https://github.com/TarasFedorenkoFTV/llmops-bootcamp/blob/main/starter/homework/hw1.md">starter/homework/hw1.md</a> (PR у своєму репозиторії). Це рівно те, що ми пройшли за два уроки: у лабах ви зробили більшу частину руками, вдома — доводите до чистого стану і здаєте.</p>
+  <p>Критерії приймання коротко: стек піднімається однією командою; промпт живе в базі, сервіс бере активну версію; у кожному лог-рядку заповнений <code>prompt_version</code>; <code>GET /prompts</code> і activate працюють, відкат на «поганий» промпт відтворювано ламає відповіді. Повні критерії — у файлі ДЗ.</p>
+  <h3>Опційно (не оцінюється)</h3>
+  <ul>
+    <li>audit trail: окрема таблиця активацій — хто, коли, яку версію активував;</li>
+    <li>версії з міткою часу замість ручних v1/v2.</li>
+  </ul>
+</section>
+
+<section>
+  <h2 style="font-size:20px">Що далі</h2>
+  <p>Реєстр захищає від поганих версій промпта. А від поганого дня провайдера — ні: модель у нас досі одна, і будь-яка її проблема — це проблема всієї системи. Наступний тиждень — маршрутизація: чому «одна модель на все» — це дорого і крихко, як адаптер ховає від сервісу провайдерські причуди і як розкладати трафік між моделями свідомо, а не «як історично склалося».</p>
+</section>
+
+<footer>SupportGW · LLMOps Bootcamp · Урок 2 з 12 · матеріал уроку — основа для відео (~30 хв)</footer>
+</div>
+</body>
+</html>
