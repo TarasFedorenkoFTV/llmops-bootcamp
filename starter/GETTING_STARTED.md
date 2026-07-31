@@ -1,11 +1,11 @@
 # Getting started — гайд для студента
 
-Це стартовий репозиторій capstone-проєкту: **бот служби підтримки з LLM control plane**.
-Ти отримуєш готовий каркас і дороблюєш у ньому control plane (routing, fallback, cost,
-guardrails, HITL, observability, evals). Цей документ пояснює вимоги, запуск і кожну папку.
+Це каркас твого capstone — бота підтримки з LLM control plane. Каркас готовий і
+запускається однією командою; твоя робота — дописати control plane (routing, fallback,
+cost, guardrails, HITL, observability, evals). Нижче — вимоги, запуск і що в кожній папці.
 
-> Правило стека: **ти пишеш .NET + конфіг + Python-evals. Фронтенд (Angular) даємо готовим — його не чіпаєш.**
-> Control plane живе в `service/` (.NET), а LiteLLM — лише адаптер до провайдерів.
+Коротко про поділ праці: **пишеш .NET + конфіг + Python-evals; Angular не чіпаєш — він готовий.**
+Уся логіка (control plane) — у `service/`, а LiteLLM просто ходить у провайдерів.
 
 ---
 
