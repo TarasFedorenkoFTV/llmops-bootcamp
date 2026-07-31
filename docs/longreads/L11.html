@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Урок 11 · CI/CD quality gates, canary і rollback</title>
+<style>
+  :root{
+    --bg:#f6f7f9; --card:#ffffff; --ink:#1b1d23; --soft:#565c6b; --faint:#8a90a0;
+    --line:#e4e6ec; --accent:#4038c4; --accent-bg:#ecebfb;
+    --good:#177245; --good-bg:#e9f3ee; --warn:#9a5b12; --warn-bg:#f8f0e2; --crit:#b3261e; --crit-bg:#f9e9e8;
+    --mono:ui-monospace,"Cascadia Code",Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:860px;margin:0 auto;padding:48px 20px 90px}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:600}
+  h1{font-size:clamp(28px,5vw,40px);line-height:1.12;letter-spacing:-.02em;margin:10px 0 8px}
+  .lead{font-size:18px;color:var(--soft);max-width:64ch;margin:0}
+  .chain{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:26px 0 0;font-family:var(--mono);font-size:12px}
+  .chain span{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:4px 11px;color:var(--soft)}
+  .chain span.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+  .chain i{color:var(--faint);font-style:normal}
+  section{margin-top:52px}
+  .shead{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .num{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:10px;background:var(--accent-bg);color:var(--accent);font-family:var(--mono);font-weight:700;font-size:14px}
+  .track{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:3px 9px;border-radius:20px;font-weight:700}
+  .track.opt{background:var(--warn-bg);color:var(--warn)}
+  h2{font-size:24px;letter-spacing:-.01em;margin:0 0 12px}
+  h3{font-size:17px;margin:22px 0 8px}
+  p{margin:0 0 12px;max-width:70ch}
+  ul,ol{margin:0 0 12px;padding-left:22px;max-width:70ch}
+  li{margin-bottom:6px}
+  strong{font-weight:650}
+  code{font-family:var(--mono);font-size:.88em;background:var(--accent-bg);color:var(--accent);padding:1px 6px;border-radius:5px;white-space:nowrap}
+  pre{background:#14161c;color:#e8e9ed;border-radius:12px;padding:14px 18px;overflow-x:auto;font-family:var(--mono);font-size:13.5px;line-height:1.6;max-width:100%}
+  pre code{background:none;color:inherit;padding:0;white-space:pre}
+  .call{border-radius:12px;padding:13px 16px;margin:14px 0;max-width:70ch;border:1px solid var(--line);background:var(--card)}
+  .call b{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.09em;text-transform:uppercase;margin-bottom:5px}
+  .call.principle{background:var(--good-bg);border-color:transparent}
+  .call.principle b{color:var(--good)}
+  .call.mistake{background:var(--crit-bg);border-color:transparent}
+  .call.mistake b{color:var(--crit)}
+  .call.tip{background:var(--warn-bg);border-color:transparent}
+  .call.tip b{color:var(--warn)}
+  .call.note{background:var(--accent-bg);border-color:transparent}
+  .call.note b{color:var(--accent)}
+  table{border-collapse:collapse;width:100%;font-size:14.5px;background:var(--card);border-radius:12px;overflow:hidden;border:1px solid var(--line)}
+  th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);background:#fafafc}
+  tr:last-child td{border-bottom:none}
+  .flow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-family:var(--mono);font-size:13px;margin:14px 0}
+  .flow span{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:7px 12px}
+  .flow span.hl{border-color:var(--accent);color:var(--accent);font-weight:600}
+  .flow i{color:var(--faint);font-style:normal}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin:14px 0}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  .card h4{margin:0 0 6px;font-size:14.5px}
+  .card p{font-size:14px;color:var(--soft);margin:0}
+  .steps{counter-reset:s;margin:14px 0;padding:0;list-style:none;max-width:72ch}
+  .steps li{counter-increment:s;position:relative;padding:0 0 14px 44px;margin:0}
+  .steps li::before{content:counter(s);position:absolute;left:0;top:0;width:28px;height:28px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-family:var(--mono);font-size:13px;font-weight:700}
+  .steps li.opt::before{background:var(--warn)}
+  .check{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 18px;max-width:72ch}
+  .check ul{margin:0;padding-left:20px}
+  .links a{color:var(--accent);text-decoration:none;border-bottom:1px solid var(--accent-bg)}
+  .links a:hover{border-bottom-color:var(--accent)}
+  .map{margin:14px 0;padding:0;list-style:none;max-width:72ch}
+  .map li{display:flex;gap:12px;padding:8px 0;border-bottom:1px dashed var(--line);font-size:14.5px}
+  .map li:last-child{border-bottom:none}
+  .map .n{font-family:var(--mono);color:var(--accent);font-weight:700;min-width:26px}
+  .hw{background:var(--card);border:2px solid var(--accent);border-radius:14px;padding:20px 22px;margin-top:16px}
+  .hw h2{margin-top:0}
+  .hw h3{margin-top:14px}
+  footer{margin-top:60px;border-top:1px solid var(--line);padding-top:16px;font-family:var(--mono);font-size:12px;color:var(--faint)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">Урок 11 · SupportGW · LLMOps Bootcamp</div>
+  <h1>CI/CD quality gates, canary і rollback</h1>
+  <p class="lead">Зміна промпта — це реліз, повторюємо ми з другого уроку. Сьогодні вона нарешті почне проходити релізний процес: eval-гейт на кожен PR, який фізично не пускає регресію в main. Плюс чесні історії про те, як CI відрізняється від локальної машини, — і rollback-критерії, які пишуться до пожежі.</p>
+  <div class="chain">
+    <span>W1 Основа + промпти</span><i>→</i>
+    <span>W2 Routing + cost</span><i>→</i>
+    <span>W3 Кеш + tools</span><i>→</i>
+    <span>W4 Надійність + безпека</span><i>→</i>
+    <span>W5 Observability + evals</span><i>→</i>
+    <span class="on">W6 CI + фінал</span>
+  </div>
+</header>
+
+<section>
+  <div class="shead"><div class="num">01</div></div>
+  <h2>Проблема: перевірка, що залежить від дисципліни</h2>
+  <p>У вас уже є eval, який ловить регресію, — минулий урок закінчився саме цим. Але поки його треба запускати руками — його не запускатимуть. Не зі зла: п'ятниця, дедлайн, «та я ж одне слово поміняв». Усі найгірші регресії заїжджають у main саме так — через маленькі зміни, які «не потребували перевірки». Що менша зміна, то менше бажання її перевіряти — і то важче потім знайти, що саме зламалося.</p>
+  <p>Гейт у CI знімає це питання назавжди, бо прибирає з ланцюга саме слабку ланку: перевірка більше <strong>не залежить від дисципліни</strong>. PR зі зламаним промптом фізично не мержиться — не тому, що хтось пильний, а тому, що кнопка merge заблокована. І це змінює не лише якість — це змінює культуру: промпт остаточно стає кодом з усіма наслідками, від рев'ю до заблокованого мержа.</p>
+  <p>Друга тема сьогодні — про яку рідко думають до першого болю — <strong>порядок викочування</strong> (блок 06): зміна з зеленими тестами все одно може покласти систему, якщо її компоненти виїхали в неправильній послідовності.</p>
+  <div class="call principle"><b>Принцип</b>Усе, що тримається на «не забути», колись буде забуто — питання лише, наскільки дорого. Перевірки, від яких залежить прод, мають запускатися механізмом, а не людиною. Людині лишається найважче: вирішувати, що робити з результатом.</div>
+</section>
+
+<section>
+  <div class="shead"><div class="num">02</div></div>
+  <h2>Гейт = ваш eval + exit code + CI</h2>
+  <p>Хороша новина: сьогодні ми майже нічого не пишемо. Всі складники гейта вже існують: <code>run.py</code> повертає 0/1 (урок 10), стек піднімається однією командою <code>docker compose up</code> (урок 1), поріг обраний і обґрунтований. CI-система лише виконує це у чистому середовищі на кожен PR і фарбує кнопку merge у колір exit code.</p>
+  <div class="flow">
+    <span>PR відкрито</span><i>→</i><span>стек у CI</span><i>→</i><span>очікування готовності</span><i>→</i><span class="hl">python run.py → exit 0/1</span><i>→</i><span class="hl">merge дозволено / заблоковано</span>
+  </div>
+  <p>Уся цінність — у словах «на кожен PR». Той самий прогін, який ви робили руками, тепер відбувається завжди: для зміни промпта, для правки роутера, для «я тільки README поправив» (так, і для нього — і це правильно: ви здивуєтесь, скільки разів «правка README» насправді чіпала щось поруч).</p>
+  <p>Зверніть увагу на архітектурну красу: гейт нічого не знає про LLM. Він знає про exit code. Уся LLM-специфіка — датасет, grader, поріг — інкапсульована в eval-контурі, який ви збудували минулого тижня. Це означає, що гейт не треба буде переписувати, коли зміниться модель, промпт чи навіть провайдер.</p>
+</section>
+
+<section>
+  <div class="shead"><div class="num">03</div></div>
+  <h2>Розтин workflow: кожен крок — це граблі</h2>
+  <p>Відкрийте <code>.github/workflows/eval-gate.yml</code> у стартері. Читаємо як послідовність відповідей на конкретні болі:</p>
+  <pre><code>- name: Up stack (без UI — для evals не потрібен)
+  run: docker compose up -d --build service
+
+- name: Wait for service
+  run: |
+    for i in $(seq 1 40); do
+      if curl -sf http://localhost:8080/health; then exit 0; fi
+      sleep 5
+    done
+    echo "service did not become healthy"; docker compose logs; exit 1
+
+- name: Wait for gateway (холодний LiteLLM дає 500 на перший запит)
+  run: |
+    # POST-проба у /v1/chat/completions, поки не прийде 200
+
+- name: Evals
+  env: { SERVICE_URL: http://localhost:8080 }
+  run: python evals/run.py --dataset evals/golden.jsonl --threshold 5
+
+- name: Logs on failure
+  if: failure()
+  run: docker compose logs
+
+- name: Down
+  if: always()
+  run: docker compose down -v</code></pre>
+  <p>Пройдімося: стек піднімається <em>без UI</em> — evals ходять в API, збирати фронтенд у CI — марні хвилини. Очікування сервісу — цикл із 40 спроб, і всередині <code>if curl; then</code>, а не <code>curl && exit</code> — чому саме так, розповість блок 04. Окреме очікування gateway — теж не з теорії. <code>Logs on failure</code> — бо червоний прогін без логів це загадка, а з логами — діагноз. <code>Down з if: always()</code> — прибрати за собою навіть після падіння.</p>
+</section>
+
+<section>
+  <div class="shead"><div class="num">04</div></div>
+  <h2>CI — це інше середовище, і воно вас здивує</h2>
+  <p>Чесна історія з підготовки цього курсу. Локально гейт працював ідеально. Перший запуск у GitHub Actions упав за 57 секунд. Причина виявилася в тому, що Actions виконує кроки з <code>bash -e</code>: перший же невдалий <code>curl</code> у циклі очікування вбивав крок цілком — хоча локально той самий цикл спокійно ретраїв, поки сервіс прокидався. Звідси та сама форма <code>if curl; then</code> у workflow — невдала проба стає умовою, а не помилкою.</p>
+  <p>Другий сюрприз: холодний старт LiteLLM у CI давав 500 на найперший запит — локально ви цього не бачите, бо поки відкриваєте браузер, gateway встигає прогрітися. У CI між <code>up</code> і першим запитом — мілісекунди. Довелося додати явне очікування готовності gateway — POST-пробу до самого ендпоінта, а не просто health-check.</p>
+  <p>В історії PR нашого репозиторію так і лишилися: два червоні прогони, потім зелений. Це не сором — це процес: гейт теж код, і він теж проходить налагодження. Мораль одна:</p>
+  <div class="call tip"><b>Лайфхак</b>Гейт треба прогнати на реальному CI до того, як він комусь заблокує реліз. «Працює локально» для CI-конфіга означає рівно нічого: інший шел-режим, інші тайминги, холодні старти. Відкрийте тестовий PR і подивіться на прогін — п'ятнадцять хвилин, які збережуть вам довіру команди до гейта.</div>
+</section>
+
+<section>
+  <div class="shead"><div class="num">05</div></div>
+  <h2>Червоний гейт — подарунок</h2>
+  <p>Тепер про культуру. Червоний гейт на вашому PR — це неприємно: ви поспішали, а вас зупинили. Правильна рамка: гейт щойно <em>зловив регресію до користувачів</em>, а не після. Він зробив за секунди те, що інакше зробила б підтримка за тиждень скарг: знайшов, що «маленька правка» ламає поведінку. Червоне — це найдешевший момент дізнатися.</p>
+  <p>Але культурна рівновага тут крихка, і руйнується вона одним способом:</p>
+  <div class="call mistake"><b>Типова помилка</b>Змержити повз червоний гейт «бо терміново». Одна така історія — і гейта немає: наступний, кому червоно і терміново, згадає прецедент, і за місяць гейт — це прапорець, який усі обходять. Якщо гейт справді помилково червоний — лагодьте гейт (флейковий кейс, поріг), у тому ж PR або окремим. Обхід — ніколи; винятки з правила «якість блокує merge» не масштабуються.</div>
+  <p>І дзеркальне правило для авторів гейта: тримайте його швидким і чесним. Гейт, що йде двадцять хвилин або падає через флейки, викликає законне роздратування — і його знесуть з аргументом «він заважає працювати». Швидкий, стабільний, зрозумілий у падінні — три властивості, які купують гейту довге життя.</p>
+</section>
+
+<section>
+  <div class="shead"><div class="num">06</div></div>
+  <h2>Порядок викочування — частина релізу</h2>
+  <p>Зелений гейт каже: «цей стан системи здоровий». Він не каже: «шлях від старого стану до нового безпечний». Якщо зміна зачіпає кілька компонентів, деплой у неправильному порядку ламає систему навіть з ідеальними тестами: компонент А вже шле нове поле, компонент Б ще не вміє його читати — і привіт, помилки на проді при двох «здорових» версіях.</p>
+  <p>У нашому стеку це питання виникає, щойно зміна перетинає межі: нова колонка в БД + код, що її пише (спершу міграція, потім код); нове ім'я моделі в конфізі gateway + роутер, що на нього шле (спершу конфіг, потім роутер); новий формат відповіді сервісу + консоль, що його читає (спершу сервіс із сумісністю, потім споживач).</p>
+  <div class="call note"><b>Правило сумісності</b>Загальний шаблон: спершу деплоїться той, хто <em>читає</em> (навчений розуміти і старе, і нове), потім той, хто <em>пише</em> нове. Проміжний стан — коли в системі живуть обидві версії — має бути робочим, бо ви в ньому обов'язково побудете: хвилину при штатному релізі або годину при відкаті половини.</div>
+</section>
+
+<section>
+  <div class="shead"><div class="num">07</div><span class="track opt">опційно</span></div>
+  <h2>Canary для промптів</h2>
+  <p>Гейт перевіряє зміну <em>до</em> релізу на золотому наборі. Але золотий набір — це 10–20 кейсів, а прод — тисячі живих запитів. Опційна техніка для обережних релізів — canary: нова версія промпта отримує 10% трафіку, стара — 90%. Далі порівнюєте метрики двох груп — а метрики у вас є з тижня 5: error rate, fallback, вартість, і скарги як фінальний суддя. Добре — розкатуєте на всіх; погано — rollback однією командою, якою ви володієте з тижня 1.</p>
+  <p>Найприємніше — скільки тут <em>нового</em> коду: майже нуль. Механіка розподілу трафіку — той самий routing з уроку 3, тільки критерій не «тип задачі», а «відсоток запитів» (найпростіше — за хешем ідентифікатора сесії, щоб той самий користувач стабільно бачив ту саму версію). Версії промпта — реєстр з уроку 2. Порівняння метрик — зрізи по <code>prompt_version</code> у лозі, який ви ведете з уроку 1. Canary — це не інструмент, який купують; це композиція механізмів, які ви вже збудували.</p>
+  <p>План (розділення трафіку, метрики порівняння, критерії promote/rollback) — опційна частина hw6; реалізація — для найзавзятіших.</p>
+</section>
+
+<section>
+  <div class="shead"><div class="num">08</div></div>
+  <h2>Rollback-критерії пишуться заздалегідь</h2>
+  <p>Останній шматок релізної дисципліни — найдешевший і найчастіше пропущений. Перед викочуванням будь-якої значущої зміни відповідь на питання «коли смикаємо назад» має бути <em>записана</em>. Формула проста:</p>
+  <pre><code>Відкочуємо, якщо:
+  eval pass rate < 5/6            (прогін після деплою)
+  або fallback_events зростає     протягом 15 хв
+  або error rate > 5%             протягом 15 хв
+Хто смикає: черговий, без погоджень.
+Як: POST /prompts/{stara}/activate — одна команда.</code></pre>
+  <p>Чому заздалегідь: під час інциденту думати пізно — під час інциденту треба <strong>виконувати</strong>. Записаний критерій знімає найдорожчу розмову поганого вечора: «може, ще почекаємо? ніби вирівнюється...». Не вирівнюється. Критерій пробитий — відкат, розбір завтра. А «одна команда» в останньому рядку — це вимога до архітектури, яку ви вже виконали: rollback за секунди існує з уроку 2.</p>
+</section>
+
+<section>
+  <div class="shead"><div class="num">09</div></div>
+  <h2>Лабораторна: гейт у бою</h2>
+  <ol class="steps">
+    <li><strong>Розібрати workflow.</strong> Прочитати <code>eval-gate.yml</code> крок за кроком: checkout → compose up без UI → wait service → wait gateway (тепер ви знаєте чому) → evals → логи при падінні → down. Пояснити собі кожен крок.</li>
+    <li><strong>Червоний прогін.</strong> Гілка зі зламаним промптом → PR → Actions червоніє. Подивитися лог прогону в CI: ті самі 3/6, що ви бачили локально на минулому уроці, — тепер їх бачить кнопка merge.</li>
+    <li><strong>Зелений прогін.</strong> Полагодити промпт у тій самій гілці → пуш → гейт зеленіє → merge. В історії PR лишаються обидва прогони — це і є доказ, що гейт працює (і рівно це ментор перевірятиме у hw6).</li>
+    <li><strong>Rollback-критерії.</strong> Написати свої: три умови, хто смикає, якою командою. Покласти поруч із fallback-порядком і budget-політикою — ваша папка операційних рішень майже зібрана.</li>
+    <li class="opt"><strong>Опційно: canary на папері.</strong> План: як розділити трафік 90/10 своїм роутером, які метрики порівнювати між групами, критерії promote/rollback.</li>
+  </ol>
+  <div class="check"><strong>Перевір себе (обов'язкова доріжка):</strong>
+    <ul>
+      <li>у твоєму репо є червоний і зелений прогін гейта;</li>
+      <li>можеш пояснити кожен крок workflow — і навіщо окреме очікування gateway;</li>
+      <li>rollback-критерії записані до викочування, з командою відкату;</li>
+      <li>розумієш, чому порядок деплою залежних компонентів — частина релізу.</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <div class="shead"><div class="num">10</div></div>
+  <h2>Антипатерни тижня</h2>
+  <ul>
+    <li><strong>Eval, який запускають руками «коли не забудуть».</strong> Його не запускатимуть — див. блок 01.</li>
+    <li><strong>Мержити повз червоний гейт «бо терміново».</strong> Одна така історія — і гейта немає.</li>
+    <li><strong>Гейт, ніколи не проганяний на реальному CI.</strong> Перший запуск — на чужому терміновому PR. Дякуємо, не треба.</li>
+    <li><strong>Викочування без rollback-критеріїв.</strong> Під час інциденту треба виконувати, а не дискутувати.</li>
+    <li><strong>Ігнорувати порядок деплою залежних компонентів.</strong> Зелені тести не рятують від неправильної послідовності.</li>
+  </ul>
+</section>
+
+<section>
+  <h2 style="font-size:20px">Карта уроку</h2>
+  <ul class="map">
+    <li><span class="n">01</span><span>Ручні перевірки не виживають; гейт прибирає дисципліну з ланцюга</span></li>
+    <li><span class="n">02</span><span>Гейт = eval + exit code + CI; цінність у «кожен PR»</span></li>
+    <li><span class="n">03</span><span>Розтин eval-gate.yml: кожен крок — відповідь на граблі</span></li>
+    <li><span class="n">04</span><span>CI ≠ локальна машина: bash -e, холодний gateway, два червоні прогони</span></li>
+    <li><span class="n">05</span><span>Червоне — подарунок; обхід гейта не масштабується</span></li>
+    <li><span class="n">06</span><span>Порядок викочування: читач деплоїться перед писарем</span></li>
+    <li><span class="n">07</span><span>Опційно: canary — композиція routing + registry + лога</span></li>
+    <li><span class="n">08</span><span>Rollback-критерії: записані до пожежі, відкат однією командою</span></li>
+    <li><span class="n">09</span><span>Лаба: workflow → червоний → зелений → критерії</span></li>
+    <li><span class="n">10</span><span>Антипатерни тижня</span></li>
+  </ul>
+</section>
+
+<section class="hw">
+  <h2>📝 Домашнє завдання</h2>
+  <h3>Обов'язково — до наступного уроку (без здачі)</h3>
+  <ul>
+    <li>закріпити лабу: у своєму репозиторії — червоний і зелений прогін гейта в історії Actions;</li>
+    <li>записати rollback-критерії для своєї системи (умови, хто, якою командою);</li>
+    <li>переконатися, що гейт швидкий і його падіння зрозуміле з логів.</li>
+  </ul>
+  <h3>Опційно</h3>
+  <ul>
+    <li>canary-план: розподіл 90/10 своїм роутером, метрики порівняння, критерії promote/rollback.</li>
+  </ul>
+  <h3>ДЗ тижня — після наступного уроку</h3>
+  <p>Фінальне ДЗ (hw6) збирає все: CI-гейт із сьогоднішньої лаби, інцидент-демо в README і повна збірка системи з чистого клону. Після наступного уроку — критерії і здача; сьогоднішній гейт — його найбільша частина, і вона вже готова.</p>
+</section>
+
+<section>
+  <h2 style="font-size:20px">Що далі</h2>
+  <p>Останній урок — збираємо все докупи: повний прогін системи від точки А до точки Б, інцидент-демо наживо за runbook'ом — і розмова про те, як принести LLMOps у свою команду. Курс закінчується, а ваш gateway тільки починає жити.</p>
+</section>
+
+<footer>SupportGW · LLMOps Bootcamp · Урок 11 з 12 · матеріал уроку — основа для відео (~30 хв)</footer>
+</div>
+</body>
+</html>
