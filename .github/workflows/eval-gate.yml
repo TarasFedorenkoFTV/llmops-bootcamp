@@ -1,12 +1,16 @@
 name: eval-gate
-# Шаблон для студентського репозиторію (корінь = вміст starter/).
-# Піднімає стек, ганяє evals проти сервісу, блокує regression на pull request.
+# Гейт курсового репо: на PR піднімає starter-стек і ганяє evals.
+# Це та сама перевірка, що в студентському шаблоні (starter/.github/workflows/),
+# тільки з working-directory, бо тут starter — підпапка.
 on:
   pull_request:
 
 jobs:
   eval:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: starter
     steps:
       - uses: actions/checkout@v4
 
