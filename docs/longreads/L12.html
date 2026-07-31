@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Урок 12 · Фінал: LLMOps operating model</title>
+<style>
+  :root{
+    --bg:#f6f7f9; --card:#ffffff; --ink:#1b1d23; --soft:#565c6b; --faint:#8a90a0;
+    --line:#e4e6ec; --accent:#4038c4; --accent-bg:#ecebfb;
+    --good:#177245; --good-bg:#e9f3ee; --warn:#9a5b12; --warn-bg:#f8f0e2; --crit:#b3261e; --crit-bg:#f9e9e8;
+    --mono:ui-monospace,"Cascadia Code",Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:860px;margin:0 auto;padding:48px 20px 90px}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:600}
+  h1{font-size:clamp(28px,5vw,40px);line-height:1.12;letter-spacing:-.02em;margin:10px 0 8px}
+  .lead{font-size:18px;color:var(--soft);max-width:64ch;margin:0}
+  .chain{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:26px 0 0;font-family:var(--mono);font-size:12px}
+  .chain span{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:4px 11px;color:var(--soft)}
+  .chain span.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+  .chain i{color:var(--faint);font-style:normal}
+  section{margin-top:52px}
+  .shead{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .num{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:10px;background:var(--accent-bg);color:var(--accent);font-family:var(--mono);font-weight:700;font-size:14px}
+  .track{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:3px 9px;border-radius:20px;font-weight:700}
+  .track.opt{background:var(--warn-bg);color:var(--warn)}
+  h2{font-size:24px;letter-spacing:-.01em;margin:0 0 12px}
+  h3{font-size:17px;margin:22px 0 8px}
+  p{margin:0 0 12px;max-width:70ch}
+  ul,ol{margin:0 0 12px;padding-left:22px;max-width:70ch}
+  li{margin-bottom:6px}
+  strong{font-weight:650}
+  code{font-family:var(--mono);font-size:.88em;background:var(--accent-bg);color:var(--accent);padding:1px 6px;border-radius:5px;white-space:nowrap}
+  pre{background:#14161c;color:#e8e9ed;border-radius:12px;padding:14px 18px;overflow-x:auto;font-family:var(--mono);font-size:13.5px;line-height:1.6;max-width:100%}
+  pre code{background:none;color:inherit;padding:0;white-space:pre}
+  .call{border-radius:12px;padding:13px 16px;margin:14px 0;max-width:70ch;border:1px solid var(--line);background:var(--card)}
+  .call b{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.09em;text-transform:uppercase;margin-bottom:5px}
+  .call.principle{background:var(--good-bg);border-color:transparent}
+  .call.principle b{color:var(--good)}
+  .call.mistake{background:var(--crit-bg);border-color:transparent}
+  .call.mistake b{color:var(--crit)}
+  .call.tip{background:var(--warn-bg);border-color:transparent}
+  .call.tip b{color:var(--warn)}
+  .call.note{background:var(--accent-bg);border-color:transparent}
+  .call.note b{color:var(--accent)}
+  table{border-collapse:collapse;width:100%;font-size:14.5px;background:var(--card);border-radius:12px;overflow:hidden;border:1px solid var(--line)}
+  th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);background:#fafafc}
+  tr:last-child td{border-bottom:none}
+  .flow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-family:var(--mono);font-size:13px;margin:14px 0}
+  .flow span{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:7px 12px}
+  .flow span.hl{border-color:var(--accent);color:var(--accent);font-weight:600}
+  .flow i{color:var(--faint);font-style:normal}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin:14px 0}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  .card h4{margin:0 0 6px;font-size:14.5px}
+  .card p{font-size:14px;color:var(--soft);margin:0}
+  .steps{counter-reset:s;margin:14px 0;padding:0;list-style:none;max-width:72ch}
+  .steps li{counter-increment:s;position:relative;padding:0 0 14px 44px;margin:0}
+  .steps li::before{content:counter(s);position:absolute;left:0;top:0;width:28px;height:28px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-family:var(--mono);font-size:13px;font-weight:700}
+  .steps li.opt::before{background:var(--warn)}
+  .check{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 18px;max-width:72ch}
+  .check ul{margin:0;padding-left:20px}
+  .links a{color:var(--accent);text-decoration:none;border-bottom:1px solid var(--accent-bg)}
+  .links a:hover{border-bottom-color:var(--accent)}
+  .map{margin:14px 0;padding:0;list-style:none;max-width:72ch}
+  .map li{display:flex;gap:12px;padding:8px 0;border-bottom:1px dashed var(--line);font-size:14.5px}
+  .map li:last-child{border-bottom:none}
+  .map .n{font-family:var(--mono);color:var(--accent);font-weight:700;min-width:26px}
+  .hw{background:var(--card);border:2px solid var(--accent);border-radius:14px;padding:20px 22px;margin-top:16px}
+  .hw h2{margin-top:0}
+  .hw h3{margin-top:14px}
+  footer{margin-top:60px;border-top:1px solid var(--line);padding-top:16px;font-family:var(--mono);font-size:12px;color:var(--faint)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">Урок 12 · SupportGW · LLMOps Bootcamp</div>
+  <h1>Фінал: LLMOps operating model</h1>
+  <p class="lead">Система зібрана. Останній крок — переконатися, що ви вмієте нею володіти: прогнати все наскрізь із чистого клону, відпрацювати інцидент за ранбуком і розповісти про систему мовою, за яку дають бюджет. Це урок не про нову фічу — про володіння.</p>
+  <div class="chain">
+    <span>W1 Основа + промпти</span><i>→</i>
+    <span>W2 Routing + cost</span><i>→</i>
+    <span>W3 Кеш + tools</span><i>→</i>
+    <span>W4 Надійність + безпека</span><i>→</i>
+    <span>W5 Observability + evals</span><i>→</i>
+    <span class="on">W6 CI + фінал</span>
+  </div>
+</header>
+
+<section>
+  <div class="shead"><div class="num">01</div></div>
+  <h2>Від трьох рядків до контуру</h2>
+  <p>Шість тижнів тому у вас було три рядки коду, які викликають модель, — і чотири питання без відповідей: гроші, надійність, якість, видимість. Сьогодні у вас production-контур: routing, cost-облік, кеш, інструменти з HITL, fallback із деградацією (і circuit breaker для тих, хто пішов у опційну доріжку), guardrails, повна спостережуваність, eval-гейт у CI. Це і був план — точка Б з першого уроку, до якої ми йшли по шару на урок.</p>
+  <p>Фінальний урок — про три вміння, які відрізняють «зробив курсовий проєкт» від «володію системою»:</p>
+  <ul>
+    <li><strong>Прогнати все наскрізь</strong> — упевнено, відтворювано, з чистого клону, без «зараз, тут треба ще одну змінну».</li>
+    <li><strong>Відпрацювати інцидент за ранбуком</strong> — виявити, деградувати, відновити, зафіксувати.</li>
+    <li><strong>Розповісти про систему</strong> — через наслідки для грошей, користувачів і ризику, а не через список технологій.</li>
+  </ul>
+  <div class="call note"><b>Чому це не «зайвий» урок</b>Системами не користуються — ними володіють. Різниця проявляється у два моменти: коли щось ламається (руки знають ранбук чи гуглять?) і коли треба захистити бюджет (є KPI-мова чи тільки терміни?). Обидва моменти настануть — готуємось сьогодні.</div>
+</section>
+
+<section>
+  <div class="shead"><div class="num">02</div></div>
+  <h2>Точка Б: один сценарій наскрізь</h2>
+  <p>Ось повний шлях, який має проходити ваша система — без зупинок і підглядань у нотатки:</p>
+  <div class="flow">
+    <span>питання в чат</span><i>→</i><span>routing → модель</span><i>→</i><span>кеш?</span><i>→</i><span>відповідь + версія промпта</span><i>→</i><span>лог</span><i>→</i><span class="hl">консоль: $, p95, cache-hit</span>
+  </div>
+  <div class="flow">
+    <span>«поверніть гроші»</span><i>→</i><span class="hl">заявка в /approvals</span><i>→</i><span>approve → тікет</span><i>·</i><span>__fail_503</span><i>→</i><span class="hl">fallback → заглушка → відновлення</span><i>·</i><span>PR з промптом</span><i>→</i><span class="hl">гейт</span>
+  </div>
+  <p>Кожна ланка цього ланцюга — конкретний урок курсу: registry — L02, routing — L03, вартість — L04, кеш — L05, інструменти — L06, fallback — L07, HITL — L08, консоль — L09, evals — L10, гейт — L11. Це зручна самодіагностика перед фінальним ДЗ: пройдіть сценарій і відмітьте, де спіткнулися, — номер уроку, який варто переглянути, обчислюється автоматично. Ще є час підтягнути.</p>
+</section>
+
+<section>
+  <div class="shead"><div class="num">03</div></div>
+  <h2>Incident runbook — сценарій, а не есе</h2>
+  <p>У репозиторії еталона лежить <code>INCIDENT_RUNBOOK.md</code> — і його головна якість не в змісті, а у форматі. Runbook — це не опис архітектури і не роздуми про надійність. Це сценарій із чотирьох тактів на кожен симптом:</p>
+  <table>
+    <tr><th>Такт</th><th>Питання</th><th>У нашому інциденті</th></tr>
+    <tr><td><strong>Симптом</strong></td><td>що видно?</td><td>скарги «бот вибачається», error rate росте</td></tr>
+    <tr><td><strong>Підтвердити</strong></td><td>яка плитка / який лог?</td><td><code>/observability</code>: fallback_events↑, статуси 503 у лозі</td></tr>
+    <tr><td><strong>Дія</strong></td><td>що робити?</td><td>нічого руками: fallback і деградація вже працюють; стежити</td></tr>
+    <tr><td><strong>Переконатися</strong></td><td>як зрозуміти, що відпустило?</td><td>звичайне питання відповідає; fallback перестав рости</td></tr>
+  </table>
+  <p style="margin-top:12px">Зверніть увагу на третій рядок: у добре збудованій системі найчастіша «дія» під час інциденту — <em>переконатися, що автоматика відпрацювала</em>, і не заважати. Руки потрібні там, де автоматики немає: rollback поганого промпта (одна команда, L02), вимкнення фічі, комунікація.</p>
+  <div class="call principle"><b>Принцип</b>Runbook, який жодного разу не проганяли руками, — це література, а не інструмент. Цінність ранбука створюється не написанням, а прогоном: саме там з'ясовується, що плитка називається інакше, команда вимагає інших прав, а «очевидний» крок неочевидний о третій ночі.</div>
+</section>
+
+<section>
+  <div class="shead"><div class="num">04</div></div>
+  <h2>Інцидент наживо: таймлайн</h2>
+  <p>Наш навчальний інцидент повністю відтворюваний — mock падає на замовлення, і це остання суперсила, якою ми користуємось:</p>
+  <pre><code>10:00  норма: «Як скинути пароль?» → нормальна відповідь
+10:02  ІНЦИДЕНТ: __fail_503 → спроби провайдера падають
+       → користувач бачить ввічливу заглушку (не 500)
+       → /observability: fallback_events росте, error rate росте
+10:05  (опційна доріжка: circuit відкрився, запити не чекають таймаутів;
+        half-open пробує провайдера кожні ~5 секунд)
+10:08  ВІДНОВЛЕННЯ: «Як скинути пароль?» → нормальна відповідь
+       → fallback перестав рости; інцидент закритий</code></pre>
+  <p>Фіксуйте таймлайн так, як робили б у постмортемі: коли почалося, як виявили, що бачив користувач, коли відпустило. На нашому «інциденті» це виглядає грою — але саме ця гра ставить руки. Формат постмортема з реального життя нічим не відрізняється, лише цифри більші і нервів більше; хай перший раз буде тут, де ставки нульові.</p>
+</section>
+
+<section>
+  <div class="shead"><div class="num">05</div></div>
+  <h2>KPI-мова: за що дають бюджет</h2>
+  <p>«Ми використовуємо circuit breaker з half-open probe» — нікому поза командою не цікаво. Це чесна, точна і абсолютно марна фраза для розмови з тими, хто вирішує про бюджет. Переклад кожної плитки консолі бізнес-мовою:</p>
+  <table>
+    <tr><th>Інженерне</th><th>KPI-мовою</th></tr>
+    <tr><td>fallback + degradation</td><td>падіння провайдера користувач не помічає</td></tr>
+    <tr><td>cache-hit 30%</td><td>третина запитів — безкоштовні й миттєві</td></tr>
+    <tr><td>routing mini/strong</td><td>дорога модель — тільки складним задачам; вартість запиту керована</td></tr>
+    <tr><td>eval-гейт у CI</td><td>регресія якості фізично не потрапляє в прод</td></tr>
+    <tr><td>HITL-черга</td><td>жодна незворотна дія не виконується без людини</td></tr>
+    <tr><td>вартість/бюджет на консолі</td><td>витрати видно сьогодні, а не в рахунку через місяць</td></tr>
+  </table>
+  <div class="call tip"><b>Лайфхак</b>Сила цих формулювань у тому, що кожне підкріплене артефактом: плиткою консолі, історією CI, чергою approvals. Розповідаючи, показуйте: «падіння не помічає — ось графік інциденту без єдиної 500-ки». Твердження з доказом коштує вдесятеро дорожче за твердження з ентузіазмом.</div>
+</section>
+
+<section>
+  <div class="shead"><div class="num">06</div></div>
+  <h2>30-day rollout: як принести це в команду</h2>
+  <p>Найчастіше питання після курсу: «з чого почати у своєму проєкті, де вже є LLM-виклики і немає нічого навколо них?» Реалістичний план на місяць:</p>
+  <ul>
+    <li><strong>Тиждень 1: unified logging + вартість.</strong> Один лог-рядок на запит, cost із usage. Найшвидший видимий ефект: уже за тиждень ви вперше знаєте, скільки що коштує, — і маєте дані для всіх подальших розмов.</li>
+    <li><strong>Тиждень 2: реєстр промптів.</strong> Промпти з коду — в реєстр, версія — в лог. Rollback за секунди замість археології.</li>
+    <li><strong>Тиждень 3: evals на критичні сценарії.</strong> 10–15 кейсів на те, що страшно зламати. Перший повторюваний вимір якості.</li>
+    <li><strong>Тиждень 4: гейт у CI.</strong> Exit code вже є — лишилося повісити на PR і ввімкнути required check.</li>
+  </ul>
+  <p>Помітьте: це той самий порядок, яким ішов курс, — і він не випадковий. Кожен шар спирається на попередній: без лога нема вартості, без реєстру нема чистого відкату, без evals нема гейта. Спокуса «впровадимо все одразу» закінчується тим, що не впроваджено нічого; шар на тиждень — темп, який виживає в реальному спринті.</p>
+</section>
+
+<section>
+  <div class="shead"><div class="num">07</div><span class="track opt">опційно</span></div>
+  <h2>/metrics і зовнішні дашборди</h2>
+  <p>Опційна надбудова фінального тижня — індустріальна вітрина. Ідея: сервіс віддає свої лічильники у стандартному текстовому форматі на <code>GET /metrics</code>, а стек Prometheus + Grafana (місце під нього закладене в compose-профілі <code>advanced</code> ще з першого уроку) збирає їх за розкладом і малює графіки з історією, алертами і всім звичним арсеналом.</p>
+  <p>Коли це варте зусиль: коли сервісів стає більше одного, коли потрібні алерти з маршрутизацією на чергового, коли тренди хочеться зберігати місяцями. Зверніть увагу, що самі <em>дані</em> не змінюються: ті самі лічильники, той самий лог — міняється лише вітрина. Це пряме продовження принципу з уроку 9: налагодьте джерело, а вітрин може бути скільки завгодно. Якщо беретеся — почніть з експорту трьох цифр (requests, fallback, cache-hit) і одного графіка; повний дашборд виростає ітераціями, а не проєктом на квартал.</p>
+</section>
+
+<section>
+  <div class="shead"><div class="num">08</div></div>
+  <h2>Що далі — за межами курсу</h2>
+  <p>Чесний список того, що ми свідомо лишили за дужками — і що тепер, з контуром у руках, береться як надбудова, а не з нуля:</p>
+  <ul>
+    <li><strong>Multi-turn діалог і streaming</strong> — історія розмови (і її вартість — пам'ятаєте урок 4), потік токенів, time-to-first-token.</li>
+    <li><strong>RAG</strong> — пошук по базі знань як джерело фактів для відповідей; окремий капстоун сам по собі.</li>
+    <li><strong>Semantic cache</strong> — Redis уже чекає в advanced-профілі (урок 5).</li>
+    <li><strong>Canary в коді</strong> — план з уроку 11 доведений до механізму.</li>
+    <li><strong>Реальний хмарний деплой, autoscaling, мультитенантність</strong> — свідомо поза курсом: у нас локальний runtime і план rollout, не деплой.</li>
+  </ul>
+  <p>Спільна риса всіх пунктів: жоден не вимагає переробляти контур. Лог прийме нові поля, роутер — нові критерії, evals — нові кейси, гейт не зміниться взагалі. Саме це і було метою: збудувати не набір фіч, а операційну модель, яка витримує ріст.</p>
+</section>
+
+<section>
+  <div class="shead"><div class="num">09</div></div>
+  <h2>Лабораторна: фінальний прогін</h2>
+  <ol class="steps">
+    <li><strong>Повний прогін.</strong> Чистий клон свого репозиторію → <code>docker compose up --build</code> → наскрізний сценарій з блоку 02. Без підглядань: де спіткнулися — там і доопрацювання.</li>
+    <li><strong>Інцидент за ранбуком.</strong> Серія <code>__fail_503</code> → консоль (fallback↑, error rate↑, користувачу — заглушка) → відновлення → підтвердити нормальну роботу. Зафіксувати таймлайн, як у постмортемі.</li>
+    <li><strong>KPI-огляд.</strong> Кожну плитку консолі перекласти бізнес-мовою: що це число означає для грошей, користувачів, ризику. П'ять хвилин, які варті більше за годину технічних деталей.</li>
+    <li><strong>Свій 30-day план.</strong> Начерк для власної команди: що переносите першим і чому. Це не формальність — це найкорисніший артефакт для вашого наступного робочого тижня.</li>
+    <li class="opt"><strong>Опційно: /metrics.</strong> Експортувати лічильники у Prometheus-форматі і підняти дашборд поверх advanced-профілю.</li>
+  </ol>
+  <div class="check"><strong>Перевір себе (обов'язкова доріжка):</strong>
+    <ul>
+      <li>система піднімається з чистого клону і проходить наскрізний сценарій;</li>
+      <li>інцидент відпрацьований за ранбуком, з таймлайном;</li>
+      <li>можеш за 3 хвилини пояснити систему людині без інженерного бекграунду;</li>
+      <li>є начерк 30-day rollout для своєї команди.</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <div class="shead"><div class="num">10</div></div>
+  <h2>Антипатерни фіналу</h2>
+  <ul>
+    <li><strong>Демо, яке працює лише на машині автора.</strong> «Чистий клон» — єдиний чесний тест збірки; ментор побачить рівно те, що побачить чистий клон.</li>
+    <li><strong>Runbook написаний, але не програний.</strong> Література. Прогін — половина цінності.</li>
+    <li><strong>Розповідь списком технологій замість списку наслідків.</strong> Технології — ваша кухня; наслідки — спільна мова.</li>
+    <li><strong>«Впровадимо все одразу».</strong> Місяць по шару на тиждень б'є квартал грандіозного плану.</li>
+  </ul>
+</section>
+
+<section>
+  <h2 style="font-size:20px">Карта уроку</h2>
+  <ul class="map">
+    <li><span class="n">01</span><span>Від трьох рядків до контуру; три вміння володіння</span></li>
+    <li><span class="n">02</span><span>Точка Б: наскрізний сценарій, кожна ланка — урок</span></li>
+    <li><span class="n">03</span><span>Runbook: симптом → підтвердити → дія → переконатися</span></li>
+    <li><span class="n">04</span><span>Інцидент наживо з таймлайном — перший постмортем без ставок</span></li>
+    <li><span class="n">05</span><span>KPI-мова: кожне твердження підкріплене артефактом</span></li>
+    <li><span class="n">06</span><span>30-day rollout: лог → реєстр → evals → гейт</span></li>
+    <li><span class="n">07</span><span>Опційно: /metrics + Prometheus/Grafana поверх advanced</span></li>
+    <li><span class="n">08</span><span>За межами курсу: надбудови, які не ламають контур</span></li>
+    <li><span class="n">09</span><span>Лаба: прогін → інцидент → KPI → свій план</span></li>
+    <li><span class="n">10</span><span>Антипатерни фіналу</span></li>
+  </ul>
+</section>
+
+<section class="hw">
+  <h2>📝 Домашнє завдання</h2>
+  <h3>ДЗ тижня — hw6: фінальний PR</h3>
+  <p><a class="links" href="https://github.com/TarasFedorenkoFTV/llmops-bootcamp/blob/main/starter/homework/hw6.md">starter/homework/hw6.md</a> — останнє ДЗ, і воно ж ваш зібраний капстоун.</p>
+  <p>Критерії приймання коротко: CI-гейт увімкнений, в історії Actions — червоний прогін (регресія) і зелений (фікс); у README — інцидент-демо з командами відтворення; система збирається <code>docker compose up --build</code> з чистого клону, всі плитки консолі живі. Повні критерії — у файлі ДЗ.</p>
+  <h3>Опційно (не оцінюється)</h3>
+  <ul>
+    <li>canary-план: розподіл трафіку 90/10 між версіями промпта і метрики для promote/rollback;</li>
+    <li><code>/metrics</code> + зовнішній дашборд поверх advanced-профілю.</li>
+  </ul>
+</section>
+
+<section>
+  <h2 style="font-size:20px">Що далі</h2>
+  <p>Далі — ваша система у ваших руках. Додавайте реальний ключ, підключайте справжніх провайдерів, тягніть практики в робочі проєкти — по шару на тиждень, як у rollout-плані. Контур, який ви збудували, — не навчальний макет, а зменшена копія того, як LLM-системи експлуатують у проді; різниця тільки в масштабі. Дякую за курс — і хай ваші фолбеки ніколи не знадобляться. Але будуть готові.</p>
+</section>
+
+<footer>SupportGW · LLMOps Bootcamp · Урок 12 з 12 · матеріал уроку — основа для відео (~30 хв)</footer>
+</div>
+</body>
+</html>
