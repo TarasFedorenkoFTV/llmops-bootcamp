@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Урок 5 · Кешування: точний кеш, метрика і semantic cache</title>
+<style>
+  :root{
+    --bg:#f6f7f9; --card:#ffffff; --ink:#1b1d23; --soft:#565c6b; --faint:#8a90a0;
+    --line:#e4e6ec; --accent:#4038c4; --accent-bg:#ecebfb;
+    --good:#177245; --good-bg:#e9f3ee; --warn:#9a5b12; --warn-bg:#f8f0e2; --crit:#b3261e; --crit-bg:#f9e9e8;
+    --mono:ui-monospace,"Cascadia Code",Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:860px;margin:0 auto;padding:48px 20px 90px}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:600}
+  h1{font-size:clamp(28px,5vw,40px);line-height:1.12;letter-spacing:-.02em;margin:10px 0 8px}
+  .lead{font-size:18px;color:var(--soft);max-width:64ch;margin:0}
+  .chain{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:26px 0 0;font-family:var(--mono);font-size:12px}
+  .chain span{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:4px 11px;color:var(--soft)}
+  .chain span.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+  .chain i{color:var(--faint);font-style:normal}
+  section{margin-top:52px}
+  .shead{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .num{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:10px;background:var(--accent-bg);color:var(--accent);font-family:var(--mono);font-weight:700;font-size:14px}
+  .track{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:3px 9px;border-radius:20px;font-weight:700}
+  .track.opt{background:var(--warn-bg);color:var(--warn)}
+  h2{font-size:24px;letter-spacing:-.01em;margin:0 0 12px}
+  h3{font-size:17px;margin:22px 0 8px}
+  p{margin:0 0 12px;max-width:70ch}
+  ul,ol{margin:0 0 12px;padding-left:22px;max-width:70ch}
+  li{margin-bottom:6px}
+  strong{font-weight:650}
+  code{font-family:var(--mono);font-size:.88em;background:var(--accent-bg);color:var(--accent);padding:1px 6px;border-radius:5px;white-space:nowrap}
+  pre{background:#14161c;color:#e8e9ed;border-radius:12px;padding:14px 18px;overflow-x:auto;font-family:var(--mono);font-size:13.5px;line-height:1.6;max-width:100%}
+  pre code{background:none;color:inherit;padding:0;white-space:pre}
+  .call{border-radius:12px;padding:13px 16px;margin:14px 0;max-width:70ch;border:1px solid var(--line);background:var(--card)}
+  .call b{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.09em;text-transform:uppercase;margin-bottom:5px}
+  .call.principle{background:var(--good-bg);border-color:transparent}
+  .call.principle b{color:var(--good)}
+  .call.mistake{background:var(--crit-bg);border-color:transparent}
+  .call.mistake b{color:var(--crit)}
+  .call.tip{background:var(--warn-bg);border-color:transparent}
+  .call.tip b{color:var(--warn)}
+  .call.note{background:var(--accent-bg);border-color:transparent}
+  .call.note b{color:var(--accent)}
+  table{border-collapse:collapse;width:100%;font-size:14.5px;background:var(--card);border-radius:12px;overflow:hidden;border:1px solid var(--line)}
+  th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);background:#fafafc}
+  tr:last-child td{border-bottom:none}
+  .flow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-family:var(--mono);font-size:13px;margin:14px 0}
+  .flow span{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:7px 12px}
+  .flow span.hl{border-color:var(--accent);color:var(--accent);font-weight:600}
+  .flow i{color:var(--faint);font-style:normal}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin:14px 0}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  .card h4{margin:0 0 6px;font-size:14.5px}
+  .card p{font-size:14px;color:var(--soft);margin:0}
+  .steps{counter-reset:s;margin:14px 0;padding:0;list-style:none;max-width:72ch}
+  .steps li{counter-increment:s;position:relative;padding:0 0 14px 44px;margin:0}
+  .steps li::before{content:counter(s);position:absolute;left:0;top:0;width:28px;height:28px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-family:var(--mono);font-size:13px;font-weight:700}
+  .steps li.opt::before{background:var(--warn)}
+  .check{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 18px;max-width:72ch}
+  .check ul{margin:0;padding-left:20px}
+  .links a{color:var(--accent);text-decoration:none;border-bottom:1px solid var(--accent-bg)}
+  .links a:hover{border-bottom-color:var(--accent)}
+  .map{margin:14px 0;padding:0;list-style:none;max-width:72ch}
+  .map li{display:flex;gap:12px;padding:8px 0;border-bottom:1px dashed var(--line);font-size:14.5px}
+  .map li:last-child{border-bottom:none}
+  .map .n{font-family:var(--mono);color:var(--accent);font-weight:700;min-width:26px}
+  .hw{background:var(--card);border:2px solid var(--accent);border-radius:14px;padding:20px 22px;margin-top:16px}
+  .hw h2{margin-top:0}
+  .hw h3{margin-top:14px}
+  footer{margin-top:60px;border-top:1px solid var(--line);padding-top:16px;font-family:var(--mono);font-size:12px;color:var(--faint)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">Урок 5 · SupportGW · LLMOps Bootcamp</div>
+  <h1>Кешування: точний кеш, метрика і semantic cache</h1>
+  <p class="lead">Найшвидша і найдешевша відповідь — та, по яку не треба йти в модель. Сьогодні обгорнемо виклик моделі кешем, зберемо ключ, який не бреше, увімкнемо лічильники з першої ж хвилини — і розберемося, коли кешувати заборонено, а коли варто дивитися в бік semantic cache.</p>
+  <div class="chain">
+    <span>W1 Основа + промпти</span><i>→</i>
+    <span>W2 Routing + cost</span><i>→</i>
+    <span class="on">W3 Кеш + tools</span><i>→</i>
+    <span>W4 Надійність + безпека</span><i>→</i>
+    <span>W5 Observability + evals</span><i>→</i>
+    <span>W6 CI + фінал</span>
+  </div>
+</header>
+
+<section>
+  <div class="shead"><div class="num">01</div></div>
+  <h2>Проблема: подвійний податок на повтори</h2>
+  <p>У трафіку підтримки повно повторів. «Як скинути пароль?» прилітає сотні разів на день майже однаковими словами — і без кешу ви щоразу платите двічі: грошима (минулий урок якраз навчив їх бачити в кожному рядку лога) і часом очікування користувача. Однакове питання, однакова відповідь, а токени і сотні мілісекунд — щоразу нові.</p>
+  <p>Але з кешем є пастка, у яку заходить більшість команд: його вмикають — і не міряють. «Ну, кеш же є, значить економимо». Скільки? На яких запитах? А чи не віддаємо ми застарілі відповіді після зміни промпта? Без цифр ці питання повисають у повітрі, і кеш перетворюється з механізму на талісман.</p>
+  <p>Тому в цьому уроці правило <strong>measure-first</strong>: лічильники hit/miss з'являються разом із кешем, в один урок і в один діф. Не «спершу заведемо, потім якось поміряємо» — миттю, коли з'являється механізм, з'являється і його метрика.</p>
+  <div class="call note"><b>Навіщо цей шар</b>Кеш — третій механізм контуру вартості після routing і cost-обліку, і єдиний, що заодно ріже latency. А ще це перший механізм курсу, у якого є власна метрика ефективності — hit ratio. На тижні 5 вона стане плиткою консолі; сьогодні — двома лічильниками.</div>
+</section>
+
+<section>
+  <div class="shead"><div class="num">02</div></div>
+  <h2>Що кешувати можна — а що заборонено</h2>
+  <p>Перш ніж писати код, треба провести межу, бо кеш — це механізм із наслідками для коректності. Ідеальний кандидат на кешування — відповідь <strong>детермінована</strong> (на це питання завжди відповідаємо так) і <strong>не-персональна</strong> (відповідь однакова для всіх). «Як скинути пароль?», «Які у вас тарифи?» — класика.</p>
+  <p>А ось що кешувати заборонено:</p>
+  <ul>
+    <li><strong>Персональні відповіді.</strong> «Де моє замовлення?» — у кожного своє. Закешували відповідь одного користувача — віддали її іншому. Це вже не баг продуктивності, це інцидент із чужими даними.</li>
+    <li><strong>Результати tool-викликів.</strong> Відповідь зібрана зі стану зовнішньої системи в конкретну мить — статус замовлення, залишок на складі. За годину вона бреше.</li>
+    <li><strong>Все, що залежить від швидкозмінного стану.</strong> Ціни під час розпродажу, статус інциденту, наявність місць — свіжість тут і є продуктом.</li>
+  </ul>
+  <p>Зверніть увагу: межа проходить не по «дорогих» чи «частих» запитах, а по <em>природі відповіді</em>. Часте і дороге — аргумент кешувати; персональне і мінливе — заборона, яка сильніша за будь-який аргумент.</p>
+</section>
+
+<section>
+  <div class="shead"><div class="num">03</div></div>
+  <h2>Ключ кешу — це контракт коректності</h2>
+  <p>Ключ у нашому кеші — конкатенація трьох речей:</p>
+  <pre><code>var cacheKey = $"{model}|{systemPrompt}|{body.Message}";</code></pre>
+  <p>Повідомлення в ключі — очевидно. Модель — теж зрозуміло: mini і strong відповідають по-різному, змішувати їхні відповіді не можна. А от третій компонент — <strong>сам текст system-промпта</strong> — це найважливіше рішення сьогоднішнього уроку.</p>
+  <p>Уявіть, що промпта в ключі немає. Ви закешували сотню відповідей, потім зробили promote нової версії промпта (урок 2) — а кеш продовжує віддавати відповіді, згенеровані старою. Або дзеркальний сценарій, ще підступніший: активна версія виявилася поганою, ви зробили rollback, регресію полагодили — а користувачі ще годину бачать закешовану стару поведінку. «Полагодили, а воно працює по-старому» — це класичний слід кешу з неповним ключем.</p>
+  <p>Промпт у ключі робить інвалідацію <em>автоматичною</em>: нова версія промпта — інший текст — інші ключі — старі записи просто перестають знаходитись. Жодного коду інвалідації писати не треба; коректність вбудована в саму адресацію.</p>
+  <div class="call principle"><b>Принцип</b>У ключі кешу мусить бути все, що впливає на відповідь: модель, промпт, повідомлення — сьогодні; температура, версія інструментів, локаль — щойно з'являться. Неповний ключ — це не «менше влучань», це віддавання неправильних відповідей із виглядом упевненості.</div>
+</section>
+
+<section>
+  <div class="shead"><div class="num">04</div></div>
+  <h2>Розтин коду: обгортка навколо виклику</h2>
+  <p>Механізм — навмисно найпростіший з робочих: словник у пам'яті сервісу і два лічильники поруч:</p>
+  <pre><code>// [W3] простий in-memory кеш + лічильники
+var cache = new ConcurrentDictionary&lt;string, string&gt;();
+var stats = new Stats();</code></pre>
+  <p>А в <code>/chat</code> виклик моделі перестає бути безумовним — він стає гілкою «miss»:</p>
+  <pre><code>if (cache.TryGetValue(cacheKey, out var cached))
+{
+    answer = cached;
+    Interlocked.Increment(ref stats.CacheHits);
+}
+else
+{
+    Interlocked.Increment(ref stats.CacheMisses);
+    // ... виклик моделі, парсинг, як раніше ...
+    if (status == 200) cache[cacheKey] = answer;
+}</code></pre>
+  <p>Три операційні рішення, зашиті в ці рядки. Перше: зберігаємо тільки успішні відповіді (<code>status == 200</code>) — закешована помилка означала б, що збій провайдера «залипає» у системі і відтворюється навіть після його одужання. Друге: лічильники інкрементуються атомарно і <em>всередині</em> відповідних гілок — цифра чесна за конструкцією, її неможливо забути оновити. Третє: кеш-хіт усе одно пише рядок у лог — із нульовими токенами і нульовою вартістю. Економія не зникає з видимості, а стає в ній видимою: рядок є, грошей немає.</p>
+  <p>У фінальному еталоні умова збереження суворіша: <code>ok && status == 200 && toolCall == null</code> — відповіді з tool-викликами в кеш не потрапляють. Це та сама межа з блоку 02, виражена одним предикатом; на наступному уроці, коли з'являться інструменти, ви впишете її власноруч.</p>
+</section>
+
+<section>
+  <div class="shead"><div class="num">05</div></div>
+  <h2>Метрика: що рахуємо і що з цим робимо</h2>
+  <p>Два лічильники дають першу похідну метрику курсу — <strong>hit ratio</strong>: частку запитів, які обійшлися без моделі. З неї випливають одразу три операційні цифри:</p>
+  <ul>
+    <li><strong>Зекономлені виклики</strong> — просто кількість хітів. Помножте на середню вартість misss-запиту з лога — отримаєте економію в доларах, порахованих, а не заявлених.</li>
+    <li><strong>Latency до/після</strong> — хіт відповідає за ~0 мс проти сотень мілісекунд походу в модель. Для користувача це найвідчутніший ефект.</li>
+    <li><strong>Профіль трафіку</strong> — низький hit ratio на трафіку підтримки — привід подивитися в лог: або питання справді унікальні, або ключ занадто чутливий до дрібниць формулювання.</li>
+  </ul>
+  <p>Сьогодні лічильники живуть у пам'яті і читаються через логи чи дебагер; на тижні 5 вони поїдуть у <code>/observability</code> і стануть плиткою Cache-hit у консолі. Порядок знову той самий: механізм і метрика — разом, вітрина — коли з'явиться шар вітрини.</p>
+  <div class="call tip"><b>Лайфхак</b>Перш ніж вмикати кеш, витягніть із лога топ повторюваних повідомлень: <code>SELECT count(*) FROM requests GROUP BY ...</code> по тексту, якщо ви його логуєте, або просто подивіться на трафік за день. Якщо топ-10 питань — це 60% запитів, кеш окупиться в перший же день; якщо всі запити унікальні — почніть з іншого механізму.</div>
+</section>
+
+<section>
+  <div class="shead"><div class="num">06</div></div>
+  <h2>Інвалідація: коли кеш має вмерти</h2>
+  <p>«У комп'ютерних науках є дві найважчі задачі: інвалідація кешу і найменування» — жарт старий, бо правдивий. Наш мінімальний набір інвалідації складається з двох механізмів:</p>
+  <ul>
+    <li><strong>Зміна промпта</strong> — вже працює, безкоштовно, через ключ (блок 03). Найнебезпечніший сценарій застарівання закритий архітектурно.</li>
+    <li><strong>TTL</strong> — відповіді старіють за часом. У нашому in-memory кеші його поки немає: записи живуть до рестарту сервісу. Для навчального контуру це чесний компроміс; додати TTL — опційна частина hw3.</li>
+  </ul>
+  <p>Відповідь «як у проді» звучить так: винесене сховище (Redis уже лежить у compose під профілем <code>advanced</code>) з TTL на кожному записі. Винесений кеш переживає рестарти і ділиться між репліками сервісу — але приносить мережевий хоп і власні режими відмови. Класична драбина: почніть із процесної пам'яті, переходьте на винесене сховище, коли реплік стане більше однієї.</p>
+  <div class="call mistake"><b>Типова помилка</b>Інвалідація «вручну і потім»: кеш чистять рестартом сервісу, коли хтось помітив дивну відповідь. Це означає, що межа свіжості вашої системи — «коли хтось помітить». TTL і промпт-у-ключі коштують годину роботи і прибирають цілий клас «привидів» назавжди.</div>
+</section>
+
+<section>
+  <div class="shead"><div class="num">07</div><span class="track opt">опційно</span></div>
+  <h2>Semantic cache: окрема ліга</h2>
+  <p>Точний збіг ключа не зловить пару «Як скинути пароль?» і «забув пароль, що робити?» — а для людини це те саме питання. Semantic cache порівнює не рядки, а embedding'и: запит перетворюється на вектор, шукається найближчий збережений, і якщо схожість вища за поріг — віддається його відповідь.</p>
+  <p>Звучить як строго краща версія кешу — але подивіться, що приходить у комплекті:</p>
+  <ul>
+    <li><strong>Поріг схожості</strong> — новий операційний параметр. Занизький — кеш майже не влучає; зависокий — <em>хибні влучання</em>: «як змінити пароль» і «як змінити тариф» ближчі у векторному просторі, ніж хотілося б, і користувач отримує впевнену відповідь не на своє питання.</li>
+    <li><strong>Вартість embedding-викликів</strong> — кожен запит тепер потребує векторизації. Дешевше за генерацію, але не безкоштовно — і має падати у ваш cost-облік (правило з L04: рахується все).</li>
+    <li><strong>Окреме сховище</strong> — векторний пошук потребує відповідної бази, її деплою, моніторингу і бекапів.</li>
+  </ul>
+  <p>Тому в курсі semantic cache — опційна доріжка (Redis з advanced-профілю + порівняння за схожістю, hw3). Порядок рішень завжди однаковий: спершу виміряйте, скільки дає точний кеш на вашому трафіку. Часто виявляється, що люди формулюють часті питання одноманітніше, ніж здається, — і точного кешу досить.</p>
+</section>
+
+<section>
+  <div class="shead"><div class="num">08</div></div>
+  <h2>Лабораторна: чотири частини</h2>
+  <ol class="steps">
+    <li><strong>Обгорнути виклик.</strong> Ключ → пошук у кеші → hit віддає збережене, miss іде в модель і зберігає (тільки при <code>status == 200</code>). Лічильники hits/misses — у тому самому діфі.</li>
+    <li><strong>Побачити ефект руками.</strong> Те саме питання двічі: перший запит — сотні мілісекунд, другий — ~0. У лозі два рядки, але другий — з нульовими токенами: виклику моделі не було. Оце і є економія — виміряна, а не заявлена.</li>
+    <li><strong>Довести, що промпт у ключі працює.</strong> Закешувати відповідь → зробити rollback промпта на «поганий» v1 (урок 2) → спитати знову. Кеш не віддає стару відповідь — іде новий (чесно поганий) виклик. Подумки видаліть промпт із ключа і проговоріть, який баг ви щойно уникли.</li>
+    <li><strong>Промацати межі.</strong> Спитати «Де моє замовлення #10482?» і проговорити, чому таку відповідь кешувати не можна (персональний стан, tool-виклик). Знайти у фінальному еталоні умову <code>toolCall == null</code> — на наступному уроці вона стане вашою.</li>
+    <li class="opt"><strong>Опційно: TTL.</strong> Додати до записів час створення і термін життя; прострочений запис — це miss. Заготовка під опційну частину hw3.</li>
+  </ol>
+  <div class="check"><strong>Перевір себе (обов'язкова доріжка):</strong>
+    <ul>
+      <li>повторний запит віддається з кешу (~0 мс) і не породжує виклик моделі;</li>
+      <li>лічильники hit/miss ростуть правильно — і ти бачив це на власні очі;</li>
+      <li>можеш пояснити, чому промпт — частина ключа і який баг це прибирає;</li>
+      <li>знаєш, які відповіді кешувати заборонено — і чому.</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <div class="shead"><div class="num">09</div></div>
+  <h2>Антипатерни тижня</h2>
+  <ul>
+    <li><strong>Кеш без лічильника.</strong> «Здається, допомагає» — це не метрика. Механізм без цифри неможливо ні захистити, ні вимкнути обґрунтовано.</li>
+    <li><strong>Ключ без версії промпта.</strong> Стара поведінка переживає rollback — і розслідування «чому воно досі відповідає по-старому» з'їдає день.</li>
+    <li><strong>Кешувати персональні відповіді й результати tool-викликів.</strong> Перше — витік чужих даних, друге — впевнена брехня про застарілий стан.</li>
+    <li><strong>Починати з semantic cache, не виміривши точний.</strong> Складність, сховище і хибні влучання — в обмін на приріст, якого ви ще не порахували.</li>
+  </ul>
+</section>
+
+<section>
+  <h2 style="font-size:20px">Карта уроку</h2>
+  <ul class="map">
+    <li><span class="n">01</span><span>Подвійний податок на повтори; правило measure-first</span></li>
+    <li><span class="n">02</span><span>Межі: детерміноване й не-персональне — так; tool і мінливе — ні</span></li>
+    <li><span class="n">03</span><span>Ключ = модель + промпт + повідомлення; авто-інвалідація версій</span></li>
+    <li><span class="n">04</span><span>Розтин: гілка miss, тільки 200 у кеш, хіт видно в лозі</span></li>
+    <li><span class="n">05</span><span>Hit ratio і що з нього випливає; вітрина — на W5</span></li>
+    <li><span class="n">06</span><span>Інвалідація: промпт-у-ключі + TTL; in-memory → Redis</span></li>
+    <li><span class="n">07</span><span>Опційно: semantic cache — поріг, вартість, сховище</span></li>
+    <li><span class="n">08</span><span>Лаба: обгортка → ефект → rollback-тест → межі</span></li>
+    <li><span class="n">09</span><span>Антипатерни тижня</span></li>
+  </ul>
+</section>
+
+<section class="hw">
+  <h2>📝 Домашнє завдання</h2>
+  <h3>Обов'язково — до наступного уроку (без здачі)</h3>
+  <ul>
+    <li>закріпити лабу: повторний запит — ~0 мс, лічильники ростуть;</li>
+    <li>перевірити на своєму стеку rollback-експеримент із блоку 08 — промпт у ключі рятує;</li>
+    <li>сформулювати для себе список «що в моїй системі кешувати заборонено».</li>
+  </ul>
+  <h3>Опційно</h3>
+  <ul>
+    <li>TTL для записів кешу;</li>
+    <li>подивитися на Redis у профілі <code>advanced</code> — місце для винесеного кешу.</li>
+  </ul>
+  <h3>ДЗ тижня — після наступного уроку</h3>
+  <p>Тижневе ДЗ (hw3) об'єднує кеш та інструменти: сьогоднішня частина вже у вас в руках, після наступного уроку додадуться tool-виклики з таймаутом та ідемпотентністю — і тиждень здається одним PR. Критерії — у файлі ДЗ після наступного уроку.</p>
+</section>
+
+<section>
+  <h2 style="font-size:20px">Що далі</h2>
+  <p>Досі бот тільки говорив — і найгірше, що він міг зробити, це відповісти неправильно. Наступний урок він почне <strong>діяти</strong>: tool-виклики, зовнішні інтеграції, реальні side-effect'и. Дія, на відміну від слова, потребує schema, таймаута, ідемпотентності — а незворотна дія ще й людини, яка скаже «так». Саме там кеш-межа «tool-відповіді не кешуємо» перестане бути теорією.</p>
+</section>
+
+<footer>SupportGW · LLMOps Bootcamp · Урок 5 з 12 · матеріал уроку — основа для відео (~30 хв)</footer>
+</div>
+</body>
+</html>
