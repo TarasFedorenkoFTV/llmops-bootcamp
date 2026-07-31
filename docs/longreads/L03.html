@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Урок 3 · Мультипровайдерний gateway і маршрутизація моделей</title>
+<style>
+  :root{
+    --bg:#f6f7f9; --card:#ffffff; --ink:#1b1d23; --soft:#565c6b; --faint:#8a90a0;
+    --line:#e4e6ec; --accent:#4038c4; --accent-bg:#ecebfb;
+    --good:#177245; --good-bg:#e9f3ee; --warn:#9a5b12; --warn-bg:#f8f0e2; --crit:#b3261e; --crit-bg:#f9e9e8;
+    --mono:ui-monospace,"Cascadia Code",Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:860px;margin:0 auto;padding:48px 20px 90px}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:600}
+  h1{font-size:clamp(28px,5vw,40px);line-height:1.12;letter-spacing:-.02em;margin:10px 0 8px}
+  .lead{font-size:18px;color:var(--soft);max-width:64ch;margin:0}
+  .chain{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:26px 0 0;font-family:var(--mono);font-size:12px}
+  .chain span{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:4px 11px;color:var(--soft)}
+  .chain span.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+  .chain i{color:var(--faint);font-style:normal}
+  section{margin-top:52px}
+  .shead{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .num{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:10px;background:var(--accent-bg);color:var(--accent);font-family:var(--mono);font-weight:700;font-size:14px}
+  .track{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:3px 9px;border-radius:20px;font-weight:700}
+  .track.opt{background:var(--warn-bg);color:var(--warn)}
+  h2{font-size:24px;letter-spacing:-.01em;margin:0 0 12px}
+  h3{font-size:17px;margin:22px 0 8px}
+  p{margin:0 0 12px;max-width:70ch}
+  ul,ol{margin:0 0 12px;padding-left:22px;max-width:70ch}
+  li{margin-bottom:6px}
+  strong{font-weight:650}
+  code{font-family:var(--mono);font-size:.88em;background:var(--accent-bg);color:var(--accent);padding:1px 6px;border-radius:5px;white-space:nowrap}
+  pre{background:#14161c;color:#e8e9ed;border-radius:12px;padding:14px 18px;overflow-x:auto;font-family:var(--mono);font-size:13.5px;line-height:1.6;max-width:100%}
+  pre code{background:none;color:inherit;padding:0;white-space:pre}
+  .call{border-radius:12px;padding:13px 16px;margin:14px 0;max-width:70ch;border:1px solid var(--line);background:var(--card)}
+  .call b{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.09em;text-transform:uppercase;margin-bottom:5px}
+  .call.principle{background:var(--good-bg);border-color:transparent}
+  .call.principle b{color:var(--good)}
+  .call.mistake{background:var(--crit-bg);border-color:transparent}
+  .call.mistake b{color:var(--crit)}
+  .call.tip{background:var(--warn-bg);border-color:transparent}
+  .call.tip b{color:var(--warn)}
+  .call.note{background:var(--accent-bg);border-color:transparent}
+  .call.note b{color:var(--accent)}
+  table{border-collapse:collapse;width:100%;font-size:14.5px;background:var(--card);border-radius:12px;overflow:hidden;border:1px solid var(--line)}
+  th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);background:#fafafc}
+  tr:last-child td{border-bottom:none}
+  .flow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-family:var(--mono);font-size:13px;margin:14px 0}
+  .flow span{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:7px 12px}
+  .flow span.hl{border-color:var(--accent);color:var(--accent);font-weight:600}
+  .flow i{color:var(--faint);font-style:normal}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin:14px 0}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  .card h4{margin:0 0 6px;font-size:14.5px}
+  .card p{font-size:14px;color:var(--soft);margin:0}
+  .steps{counter-reset:s;margin:14px 0;padding:0;list-style:none;max-width:72ch}
+  .steps li{counter-increment:s;position:relative;padding:0 0 14px 44px;margin:0}
+  .steps li::before{content:counter(s);position:absolute;left:0;top:0;width:28px;height:28px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-family:var(--mono);font-size:13px;font-weight:700}
+  .steps li.opt::before{background:var(--warn)}
+  .check{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 18px;max-width:72ch}
+  .check ul{margin:0;padding-left:20px}
+  .links a{color:var(--accent);text-decoration:none;border-bottom:1px solid var(--accent-bg)}
+  .links a:hover{border-bottom-color:var(--accent)}
+  .map{margin:14px 0;padding:0;list-style:none;max-width:72ch}
+  .map li{display:flex;gap:12px;padding:8px 0;border-bottom:1px dashed var(--line);font-size:14.5px}
+  .map li:last-child{border-bottom:none}
+  .map .n{font-family:var(--mono);color:var(--accent);font-weight:700;min-width:26px}
+  .hw{background:var(--card);border:2px solid var(--accent);border-radius:14px;padding:20px 22px;margin-top:16px}
+  .hw h2{margin-top:0}
+  .hw h3{margin-top:14px}
+  footer{margin-top:60px;border-top:1px solid var(--line);padding-top:16px;font-family:var(--mono);font-size:12px;color:var(--faint)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">Урок 3 · SupportGW · LLMOps Bootcamp</div>
+  <h1>Мультипровайдерний gateway і маршрутизація моделей</h1>
+  <p class="lead">Одна модель на все — найдорожчий і найкрихкіший спосіб жити. Сьогодні сервіс навчиться обирати модель під задачу: розберемо конфіг адаптера, напишемо роутер, побачимо розподіл трафіку в базі — і зрозуміємо, чому додати нового провайдера має коштувати рядків у YAML, а не рефакторингу.</p>
+  <div class="chain">
+    <span>W1 Основа + промпти</span><i>→</i>
+    <span class="on">W2 Routing + cost</span><i>→</i>
+    <span>W3 Кеш + tools</span><i>→</i>
+    <span>W4 Надійність + безпека</span><i>→</i>
+    <span>W5 Observability + evals</span><i>→</i>
+    <span>W6 CI + фінал</span>
+  </div>
+</header>
+
+<section>
+  <div class="shead"><div class="num">01</div></div>
+  <h2>Проблема: три біди однієї моделі</h2>
+  <p><strong>Перша — гроші.</strong> «Як скинути пароль?» і розбір скарги на повернення коштів — різні задачі, але платите ви за них однією топовою моделлю. На масовому трафіку підтримки різниця між дешевою і сильною моделлю — це порядок вартості, тобто не «трохи дорожче», а вдесятеро. Ганяти FAQ через флагманську модель — все одно що викликати таксі бізнес-класу, щоб винести сміття.</p>
+  <p><strong>Друга — залежність.</strong> Один провайдер — це одна точка відмови, яка вам не належить. Ліміти запитів, деградації, зміни API — все це трапляється регулярно і, за законом жанру, у ваш найгірший момент. Поки модель у системі одна, будь-яка її проблема — проблема всієї системи, і плану Б не існує навіть теоретично.</p>
+  <p><strong>Третя, про яку рідко попереджають, — несумісність у дрібницях.</strong> Провайдери «сумісні за стандартом», але розходяться в деталях: одне й те саме поле конфігурації один приймає, інший відкидає з помилкою. На одному проді я бачив, як цілий канал ліг просто тому, що апстрім відхиляв поле, яке «мало бути валідним», — а клієнтський код слав його всім однаково. Хтось у ланцюгу має згладжувати ці розбіжності. І це точно не ваш прикладний код.</p>
+  <div class="call note"><b>Навіщо цей шар</b>Маршрутизація — перший механізм тижня «гроші»: вона розводить трафік так, щоб дороге діставалося тільки складному. А заодно закладає фундамент надійності: система, яка вміє обирати між моделями, за один крок від системи, яка вміє переживати падіння однієї з них (тиждень 4).</div>
+</section>
+
+<section>
+  <div class="shead"><div class="num">02</div></div>
+  <h2>Розподіл ролей: сервіс вирішує, адаптер виконує</h2>
+  <p>З уроку 1 у нас є головна межа архітектури: <strong>вирішує</strong> сервіс, <strong>виконує</strong> адаптер. Сьогодні ця межа вперше працює по-справжньому. LiteLLM-адаптер дає єдиний виклик до десятків провайдерів: ваш код каже «виклич модель X» — і не знає, що в X інший формат помилок, інша автентифікація чи інший ліміт на поля. Нормалізація цих розбіжностей — робота адаптера, і саме тому третя біда з блоку 01 лікується конфігом, а не патчами по всьому коду.</p>
+  <p>А от <strong>рішення</strong>, яку модель викликати, живе в сервісі — свідомо. LiteLLM уміє і роутити, і фейлитись сам, через свій конфіг. Ми це не вмикаємо, і це принципова позиція курсу, а не обмеження інструмента.</p>
+  <div class="call principle"><b>Принцип</b>Рішення — це код: його можна прочитати, протестувати, залогувати і пояснити на розборі інциденту. Конфіг стороннього інструмента — це рішення, яке ви орендуєте: воно працює, поки ви користуєтесь цим інструментом, і зникає з переходом на інший. Механізми переносяться, прапорці — ні.</div>
+  <div class="call mistake"><b>Типова помилка</b>Побачити в документації адаптера розділ про routing і fallback — і перенести туди все: «навіщо писати код, якщо є галочка». Через півроку ніхто в команді не може відповісти, чому запит пішов саме на цю модель: логіка розмазана між YAML, дефолтами інструмента і його версією. Контур керування має бути там, де ви можете його прочитати.</div>
+</section>
+
+<section>
+  <div class="shead"><div class="num">03</div></div>
+  <h2>Розтин конфіга: дві «моделі» на одному mock</h2>
+  <p>Відкриймо <code>gateway/litellm-config.yaml</code>. Перший рядок коментаря задає тон: «тут лише список моделей і ключі». Ось робочий фрагмент тижня:</p>
+  <pre><code>model_list:
+  # [W2] дві "моделі" на mock, щоб routing мав із чого обирати
+  - model_name: mock-mini
+    litellm_params:
+      model: openai/mock
+      api_base: http://mock-provider:9000/v1
+      api_key: "sk-mock"
+  - model_name: mock-strong
+    litellm_params:
+      model: openai/mock
+      api_base: http://mock-provider:9000/v1
+      api_key: "sk-mock"
+
+litellm_settings:
+  drop_params: true
+  num_retries: 0   # хай збої йдуть у сервіс, а не ретраяться приховано</code></pre>
+  <p><code>mock-mini</code> і <code>mock-strong</code> — обидві вказують на той самий mock-провайдер. Це не халтура, а навчальний прийом: механіка маршрутизації справжня — сервіс реально обирає між двома іменами, база реально показує розподіл, — а рахунок нульовий. Коли з'явиться реальний ключ, зміняться лише праві частини цього YAML.</p>
+  <p>Дві дрібниці в <code>litellm_settings</code> варті окремого погляду. <code>drop_params: true</code> — адаптер мовчки відкидає поля, які конкретний провайдер не приймає: це і є та сама страховка від «валідного поля, що кладе канал». <code>num_retries: 0</code> — адаптер не ретраїть збої сам: помилка долітає до сервісу, який <em>вирішує</em>, що з нею робити. Приховані ретраї — це рішення, які хтось ухвалює за вас і без сліду в лозі.</p>
+</section>
+
+<section>
+  <div class="shead"><div class="num">04</div></div>
+  <h2>Route(): роутер на десять рядків</h2>
+  <p>Уся сьогоднішня «магія» в сервісі — одна функція і один рядок у <code>/chat</code>:</p>
+  <pre><code>// [W2] routing: ескалація -> сильна модель, решта -> дешева
+var model = Route(body.Message, defaultModel);
+
+static string Route(string message, string def)
+{
+    if (def != "mock") return def;  // реальний ключ: беремо задану модель
+    var u = message.ToLowerInvariant();
+    bool escalation = u.Contains("поверн") || u.Contains("терміново")
+                   || u.Contains("refund") || u.Contains("скарг");
+    return escalation ? "mock-strong" : "mock-mini";
+}</code></pre>
+  <p>Прочитаймо його як операційне рішення, а не як код. Перше: жорстка змінна <code>MODEL</code> зникла зі шляху рішення — вона лишилася тільки дефолтом для сценарію з реальним ключем. Друге: політика явна і вміщається в одне речення — «повернення, скарги і термінове йдуть на сильну модель, решта — на дешеву». Третє: обрана модель уже їде в лог (поле <code>model</code> пишеться з першого дня), тобто кожне рішення роутера — задокументована подія, яку можна порахувати.</p>
+  <p>Так, це правила по ключових словах, і на проді ви швидко впретеся в їхні межі. Але зверніть увагу, <em>що саме</em> тут важливо: не спосіб класифікації, а те, що в системі з'явилася <strong>одна точка, де ухвалюється рішення про модель</strong>. Помінявши нутрощі <code>Route()</code>, ви не чіпаєте більше нічого.</p>
+</section>
+
+<section>
+  <div class="shead"><div class="num">05</div></div>
+  <h2>Маршрут — за задачею, не за текстом-в-лоб</h2>
+  <p>Куди ця функція росте в дорослих системах? Три типові щаблі:</p>
+  <ul>
+    <li><strong>Правила за ключовими словами</strong> — наш сьогоднішній рівень. Дешево, прозоро, зрозуміло на розборі; ламається на перефразуваннях.</li>
+    <li><strong>Класифікація інтенту</strong> — маленька дешева модель першим кроком визначає тип задачі, і вже тип вирішує маршрут. Парадокс тільки на перший погляд: витратити копійку на класифікацію, щоб зекономити гривню на генерації.</li>
+    <li><strong>Маршрут за контекстом</strong> — тенант, фіча, пріоритет клієнта, ліміт бюджету. Текст повідомлення — лише один із сигналів.</li>
+  </ul>
+  <p>На якому щаблі ви б не були, незмінним лишається одне:</p>
+  <div class="call principle"><b>Принцип</b>Дешеве — дешевій моделі, складне — сильній, рішення — задокументоване. Якщо ви не можете за хвилину пояснити, чому конкретний запит пішов на конкретну модель, у вас не маршрутизація, а лотерея з логами.</div>
+</section>
+
+<section>
+  <div class="shead"><div class="num">06</div></div>
+  <h2>Fallback-порядок: політика, яку ми сьогодні лише оголосимо</h2>
+  <p>Поруч із питанням «куди йде запит» живе питання «хто підхопить, якщо основна модель впала». Це теж політика, і задається вона тим самим набором імен з конфіга: для нашого стека природний порядок — <code>mock-strong → mock-mini</code>, тобто у разі збою сильної моделі краще відповісти дешевшою, ніж не відповісти взагалі.</p>
+  <p>Сьогодні ми цю чергу лише фіксуємо як рішення — записуємо поруч із роутером, обговорюємо з командою. Оживе вона на тижні 4, коли з'явиться механізм fallback і керовані збої. Такий порядок не випадковий: політика без механізму — це просто текст, але механізм без заздалегідь продуманої політики — це імпровізація під час інциденту, тобто найгірший момент для ухвалення рішень.</p>
+  <div class="call note"><b>Чому черга — вниз, а не вбік</b>Fallback на рівноцінну модель іншого провайдера — теж варіант (і на проді поширений), але він потребує другого реального провайдера. Деградація на дешевшу модель — універсальніший перший крок: вона завжди доступна і чесно втілює пріоритет «відповісти хоч якось краще, ніж не відповісти».</div>
+</section>
+
+<section>
+  <div class="shead"><div class="num">07</div></div>
+  <h2>Додати провайдера — без зміни коду</h2>
+  <p>Перевірка, що архітектура зібрана правильно: скільки коштує підключити реального провайдера, наприклад хмарний деплой тієї ж моделі? Відповідь — один блок у YAML:</p>
+  <pre><code>  - model_name: azure-gpt-4o
+    litellm_params:
+      model: azure/gpt-4o
+      api_base: os.environ/AZURE_API_BASE
+      api_key: os.environ/AZURE_API_KEY</code></pre>
+  <p>І, якщо хочемо пустити на нього трафік, — рядок у <code>Route()</code> або у fallback-порядку. Код виклику, парсинг відповіді, логування — не змінюються взагалі: для сервісу це просто ще одне ім'я моделі. Ключ, зверніть увагу, живе у змінних середовища gateway — рівно за принципом з уроку 1: секрети не перетинають межу адаптера.</p>
+  <div class="call tip"><b>Лайфхак</b>Називайте моделі в конфізі за роллю (<code>mini</code>, <code>strong</code>), а не за вендором. Тоді «переїхати з провайдера А на провайдера Б» — це заміна правої частини YAML при незмінних іменах, і жоден рядок сервісу, лога чи дашборда не дізнається про переїзд.</div>
+</section>
+
+<section>
+  <div class="shead"><div class="num">08</div><span class="track opt">опційно</span></div>
+  <h2>Третій маршрут: tier-система</h2>
+  <p>Два маршрути — мінімум, з якого все починається. Наступний природний крок (він же — опційна частина hw2): три рівні замість двох. Наприклад: <strong>FAQ-tier</strong> — типові питання, найдешевша модель або взагалі заготовлені відповіді; <strong>standard-tier</strong> — звичайний діалог, робоча модель; <strong>escalation-tier</strong> — скарги, повернення, юридично чутливе — найсильніша модель.</p>
+  <p>Механічно це ще одна гілка в <code>Route()</code> і ще одне ім'я в конфізі. Змістовно — вправа на політику: де провести межі між рівнями і як сформулювати їх так, щоб рішення можна було захистити цифрами (частка трафіку і вартість кожного tier — усе вже є в лозі). Почніть із розподілу <code>SELECT model, count(*)</code> за кілька днів: якщо 80% трафіку — три однакові питання, FAQ-tier окупається одразу.</p>
+</section>
+
+<section>
+  <div class="shead"><div class="num">09</div></div>
+  <h2>Лабораторна: чотири частини</h2>
+  <ol class="steps">
+    <li><strong>Прочитати конфіг.</strong> Відкрити <code>gateway/litellm-config.yaml</code>: знайти <code>mock-mini</code> і <code>mock-strong</code>, переконатися, що обидві дивляться на той самий mock. Звернути увагу на <code>drop_params</code> і <code>num_retries: 0</code> — і пояснити собі, навіщо вони.</li>
+    <li><strong>Написати роутер.</strong> Додати <code>Route(message)</code> у сервіс: ескалаційні маркери («поверн», «терміново», «скарг», «refund») → <code>mock-strong</code>, решта → <code>mock-mini</code>. Жорсткий <code>MODEL</code> лишити тільки як дефолт для реального ключа.</li>
+    <li><strong>Побачити розподіл.</strong> Надіслати кілька звичайних питань і кілька ескалацій, потім <code>SELECT model, count(*) FROM requests GROUP BY model</code> — дві моделі, різні лічильники. Це перший операційний доказ, що routing працює: не «код написаний», а «трафік розведений».</li>
+    <li><strong>Додати «третього провайдера» на папері.</strong> Виписати YAML-блок для хмарного провайдера і місце, де він став би у fallback-порядку. Переконатися, що код сервісу не змінився б узагалі — у цьому й сенс адаптера.</li>
+    <li class="opt"><strong>Опційно: накидати tier-політику.</strong> Сформулювати межі трьох рівнів для свого трафіку і прикинути по лозі, яка частка запитів впаде в кожен.</li>
+  </ol>
+  <div class="check"><strong>Перевір себе (обов'язкова доріжка):</strong>
+    <ul>
+      <li>routing розводить запити по двох моделях — і це видно в БД;</li>
+      <li>можеш пояснити, чому рішення в сервісі, а виконання — в адаптері;</li>
+      <li>можеш пояснити, як додати реального провайдера без зміни коду сервісу;</li>
+      <li>fallback-порядок сформульований і записаний — чекає на тиждень 4.</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <div class="shead"><div class="num">10</div></div>
+  <h2>Антипатерни тижня</h2>
+  <ul>
+    <li><strong>Топова модель на весь трафік «щоб напевно».</strong> «Напевно» коштує порядок грошей і не дає жодної гарантії якості на простих задачах.</li>
+    <li><strong>Routing і fallback у конфізі gateway'я.</strong> Працює — але ви збудували не механізм, а залежність від прапорців конкретного інструмента.</li>
+    <li><strong>Слати всім провайдерам однаковий запит</strong> і дивуватися різним помилкам. Нормалізація — робота адаптера; переконайтеся, що вона увімкнена, а не понадіялися на стандарт.</li>
+    <li><strong>Хардкод назв моделей по всьому коду.</strong> Ім'я моделі має зустрічатися в сервісі один раз — у точці рішення. Все інше — розповзання політики по кодовій базі.</li>
+  </ul>
+</section>
+
+<section>
+  <h2 style="font-size:20px">Карта уроку</h2>
+  <ul class="map">
+    <li><span class="n">01</span><span>Три біди однієї моделі: гроші, залежність, несумісність у дрібницях</span></li>
+    <li><span class="n">02</span><span>Сервіс вирішує, адаптер виконує — і чому routing не в YAML</span></li>
+    <li><span class="n">03</span><span>Конфіг: mock-mini/mock-strong, drop_params, num_retries: 0</span></li>
+    <li><span class="n">04</span><span>Route(): одна точка рішення, політика в одному реченні</span></li>
+    <li><span class="n">05</span><span>Еволюція маршруту: ключові слова → інтент → контекст</span></li>
+    <li><span class="n">06</span><span>Fallback-порядок: оголошуємо сьогодні, оживляємо на W4</span></li>
+    <li><span class="n">07</span><span>Новий провайдер = блок YAML; секрети не перетинають адаптер</span></li>
+    <li><span class="n">08</span><span>Опційно: третій маршрут — tier-система з захистом цифрами</span></li>
+    <li><span class="n">09</span><span>Лаба: конфіг → роутер → розподіл у БД → провайдер на папері</span></li>
+    <li><span class="n">10</span><span>Антипатерни тижня</span></li>
+  </ul>
+</section>
+
+<section class="hw">
+  <h2>📝 Домашнє завдання</h2>
+  <h3>Обов'язково — до наступного уроку (без здачі)</h3>
+  <ul>
+    <li>закріпити лабу: роутер працює, <code>SELECT model, count(*) FROM requests GROUP BY model</code> показує дві моделі;</li>
+    <li>переконатися, що жорстке ім'я моделі лишилося тільки в одному місці — у точці рішення;</li>
+    <li>записати свій fallback-порядок (одним рядком) — знадобиться на тижні 4.</li>
+  </ul>
+  <h3>Опційно</h3>
+  <ul>
+    <li>сформулювати tier-політику на три рівні і оцінити по лозі частку трафіку кожного.</li>
+  </ul>
+  <h3>ДЗ тижня — після наступного уроку</h3>
+  <p>Тижневе ДЗ (hw2) об'єднує routing і cost: сьогоднішня частина вже у вас в руках, після уроку 4 додасться облік вартості — і тиждень здається одним PR. Критерії — у файлі ДЗ після наступного уроку.</p>
+</section>
+
+<section>
+  <h2 style="font-size:20px">Що далі</h2>
+  <p>Routing розвів трафік по моделях — а скільки це коштує? Поки що поле <code>cost_usd</code> у лозі порожнє, і на питання «скільки коштує наш AI» система відповідає мовчанням. Наступний урок — токеноміка: рахуємо вартість кожного запиту в момент запиту, оживляємо плитку «Вартість сьогодні» і вішаємо бюджет — щоб про перевитрату ви дізнавалися з консолі, а не з рахунку наприкінці місяця.</p>
+</section>
+
+<footer>SupportGW · LLMOps Bootcamp · Урок 3 з 12 · матеріал уроку — основа для відео (~30 хв)</footer>
+</div>
+</body>
+</html>
