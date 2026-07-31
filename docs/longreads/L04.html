@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Урок 4 · Токеноміка і cost attribution</title>
+<style>
+  :root{
+    --bg:#f6f7f9; --card:#ffffff; --ink:#1b1d23; --soft:#565c6b; --faint:#8a90a0;
+    --line:#e4e6ec; --accent:#4038c4; --accent-bg:#ecebfb;
+    --good:#177245; --good-bg:#e9f3ee; --warn:#9a5b12; --warn-bg:#f8f0e2; --crit:#b3261e; --crit-bg:#f9e9e8;
+    --mono:ui-monospace,"Cascadia Code",Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:860px;margin:0 auto;padding:48px 20px 90px}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:600}
+  h1{font-size:clamp(28px,5vw,40px);line-height:1.12;letter-spacing:-.02em;margin:10px 0 8px}
+  .lead{font-size:18px;color:var(--soft);max-width:64ch;margin:0}
+  .chain{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:26px 0 0;font-family:var(--mono);font-size:12px}
+  .chain span{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:4px 11px;color:var(--soft)}
+  .chain span.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+  .chain i{color:var(--faint);font-style:normal}
+  section{margin-top:52px}
+  .shead{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .num{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:10px;background:var(--accent-bg);color:var(--accent);font-family:var(--mono);font-weight:700;font-size:14px}
+  .track{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:3px 9px;border-radius:20px;font-weight:700}
+  .track.opt{background:var(--warn-bg);color:var(--warn)}
+  h2{font-size:24px;letter-spacing:-.01em;margin:0 0 12px}
+  h3{font-size:17px;margin:22px 0 8px}
+  p{margin:0 0 12px;max-width:70ch}
+  ul,ol{margin:0 0 12px;padding-left:22px;max-width:70ch}
+  li{margin-bottom:6px}
+  strong{font-weight:650}
+  code{font-family:var(--mono);font-size:.88em;background:var(--accent-bg);color:var(--accent);padding:1px 6px;border-radius:5px;white-space:nowrap}
+  pre{background:#14161c;color:#e8e9ed;border-radius:12px;padding:14px 18px;overflow-x:auto;font-family:var(--mono);font-size:13.5px;line-height:1.6;max-width:100%}
+  pre code{background:none;color:inherit;padding:0;white-space:pre}
+  .call{border-radius:12px;padding:13px 16px;margin:14px 0;max-width:70ch;border:1px solid var(--line);background:var(--card)}
+  .call b{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.09em;text-transform:uppercase;margin-bottom:5px}
+  .call.principle{background:var(--good-bg);border-color:transparent}
+  .call.principle b{color:var(--good)}
+  .call.mistake{background:var(--crit-bg);border-color:transparent}
+  .call.mistake b{color:var(--crit)}
+  .call.tip{background:var(--warn-bg);border-color:transparent}
+  .call.tip b{color:var(--warn)}
+  .call.note{background:var(--accent-bg);border-color:transparent}
+  .call.note b{color:var(--accent)}
+  table{border-collapse:collapse;width:100%;font-size:14.5px;background:var(--card);border-radius:12px;overflow:hidden;border:1px solid var(--line)}
+  th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);background:#fafafc}
+  tr:last-child td{border-bottom:none}
+  .flow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-family:var(--mono);font-size:13px;margin:14px 0}
+  .flow span{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:7px 12px}
+  .flow span.hl{border-color:var(--accent);color:var(--accent);font-weight:600}
+  .flow i{color:var(--faint);font-style:normal}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin:14px 0}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  .card h4{margin:0 0 6px;font-size:14.5px}
+  .card p{font-size:14px;color:var(--soft);margin:0}
+  .steps{counter-reset:s;margin:14px 0;padding:0;list-style:none;max-width:72ch}
+  .steps li{counter-increment:s;position:relative;padding:0 0 14px 44px;margin:0}
+  .steps li::before{content:counter(s);position:absolute;left:0;top:0;width:28px;height:28px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-family:var(--mono);font-size:13px;font-weight:700}
+  .steps li.opt::before{background:var(--warn)}
+  .check{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 18px;max-width:72ch}
+  .check ul{margin:0;padding-left:20px}
+  .links a{color:var(--accent);text-decoration:none;border-bottom:1px solid var(--accent-bg)}
+  .links a:hover{border-bottom-color:var(--accent)}
+  .map{margin:14px 0;padding:0;list-style:none;max-width:72ch}
+  .map li{display:flex;gap:12px;padding:8px 0;border-bottom:1px dashed var(--line);font-size:14.5px}
+  .map li:last-child{border-bottom:none}
+  .map .n{font-family:var(--mono);color:var(--accent);font-weight:700;min-width:26px}
+  .hw{background:var(--card);border:2px solid var(--accent);border-radius:14px;padding:20px 22px;margin-top:16px}
+  .hw h2{margin-top:0}
+  .hw h3{margin-top:14px}
+  footer{margin-top:60px;border-top:1px solid var(--line);padding-top:16px;font-family:var(--mono);font-size:12px;color:var(--faint)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">Урок 4 · SupportGW · LLMOps Bootcamp</div>
+  <h1>Токеноміка і cost attribution</h1>
+  <p class="lead">«Скільки коштує наш AI?» — питання, на яке більшість команд відповідає рахунком провайдера наприкінці місяця. Це запізно. Сьогодні система навчиться знати вартість кожного запиту в момент відповіді: прайс, формула, поле <code>cost_usd</code> у лозі і жива плитка «Вартість сьогодні» з бюджетом поруч.</p>
+  <div class="chain">
+    <span>W1 Основа + промпти</span><i>→</i>
+    <span class="on">W2 Routing + cost</span><i>→</i>
+    <span>W3 Кеш + tools</span><i>→</i>
+    <span>W4 Надійність + безпека</span><i>→</i>
+    <span>W5 Observability + evals</span><i>→</i>
+    <span>W6 CI + фінал</span>
+  </div>
+</header>
+
+<section>
+  <div class="shead"><div class="num">01</div></div>
+  <h2>Проблема: рахунок як спосіб дізнатися про катастрофу</h2>
+  <p>Вартість LLM-фічі — не константа. Вона залежить від моделі, довжини контексту, поведінки користувачів і навіть від того, як ви склеюєте промпт. Поки обліку немає, сценарій завжди однаковий: фіча злітає, всі радіють, наприкінці місяця приходить рахунок удесятеро більший за очікуваний — і починається археологія. Хто витратив? На чому? Коли почалося? Лог мовчить, бо ніхто не писав туди грошей.</p>
+  <p>Є і підступніший бік: <strong>оцінювання якості теж коштує</strong>. Перевірки на кшталт LLM-as-judge — це такі самі токени, як бойові запити. Я бачив, як пайплайн оцінки з'їдав відчутну частку бюджету просто тому, що його ніхто не рахував окремо: у звіті були лише «бойові» виклики, а judge-виклики летіли повз облік. Звіт сходився, гроші — ні.</p>
+  <p>З уроку 1 це властивість номер два LLM-систем: оплата за токен означає, що вартість визначається <em>поведінкою</em>, а не кількістю запитів. Тому й керувати нею треба на рівні запиту — там, де поведінка видима.</p>
+  <div class="call principle"><b>Принцип</b>Рахується все, що ходить у модель: бойовий трафік, ретраї, перевірки якості, службові виклики. Будь-який виняток з обліку — це майбутня стаття витрат, про яку ви дізнаєтесь останнім.</div>
+</section>
+
+<section>
+  <div class="shead"><div class="num">02</div></div>
+  <h2>Usage — єдине джерело правди</h2>
+  <p>Добра новина: все необхідне для обліку вже приходить із кожною відповіддю. Блок <code>usage</code> — стандартна частина відповіді моделі:</p>
+  <pre><code>"usage": { "prompt_tokens": 184, "completion_tokens": 46 }</code></pre>
+  <p>Наш сервіс парсить ці два числа з першого дня (подивіться в <code>/chat</code> — вони вже їдуть у лог). Вартість — проста формула поверх них: <strong>токени × ціна конкретної моделі</strong>, окремо для вхідних і вихідних, бо провайдери тарифікують їх по-різному — вихідні зазвичай у кілька разів дорожчі.</p>
+  <p>Mock повертає реалістичний usage (рахує слова запиту і відповіді), тому вся механіка сьогоднішнього уроку тренується без ключа і без витрат. З реальним провайдером зміняться лише цифри у прайсі — формула, лог і консоль не дізнаються про різницю.</p>
+  <p>Окрема згадка про <code>prompt_tokens</code>: у реальних системах саме вони зазвичай домінують у рахунку, і це неочевидно, поки не подивишся в usage. Системний промпт їде в модель із кожним запитом. А якщо у вас багатоходовий діалог — з кожним ходом їде і вся попередня історія: десятий хід розмови може коштувати вдесятеро дорожче за перший при тій самій довжині відповіді. Наш SupportGW поки одноходовий, тож ця пастка нас не стосується, — але коли додаватимете історію діалогу (тема «на виріст», за межами курсу), пам'ятайте: розмір вікна контексту — це стаття витрат, якою треба керувати, а usage чесно покаже, скільки коштує кожен зайвий абзац у промпті.</p>
+  <div class="call note"><b>Чому в момент запиту, а не з рахунку</b>Рахунок провайдера — агрегат: сума за місяць по ключу. З нього неможливо відповісти на жодне операційне питання: яка фіча дорога, яка модель відпрацювала даремно, коли почався сплеск. Облік на рівні запиту дає ті самі гроші, але з роздільною здатністю, на якій можливі рішення.</div>
+</section>
+
+<section>
+  <div class="shead"><div class="num">03</div></div>
+  <h2>Прайс живе в control plane</h2>
+  <p>Перший шматок сьогоднішньої роботи — табличка цін за 1k токенів:</p>
+  <pre><code>// [W2] прайс за 1k токенів (in, out) — навчальні числа
+var prices = new Dictionary&lt;string, (decimal In, decimal Out)&gt;
+{
+    ["mock-mini"]   = (0.00015m, 0.0006m),
+    ["mock-strong"] = (0.0025m,  0.01m),
+};</code></pre>
+  <p>Числа навчальні, але пропорції списані з реальних прайсів: сильна модель дорожча за дешеву приблизно в 16 разів, вихідні токени дорожчі за вхідні в 4. Саме ці пропорції, а не абсолютні цифри, визначають операційні рішення — і саме тому routing з минулого уроку є головним важелем економії.</p>
+  <p>Чому словник у коді, а не таблиця в базі чи конфіг адаптера? Для двох моделей — бо це найпростіше місце, яке видно в діфі. Принципово інше: прайс лежить <em>поруч із точкою рішення</em> — там же, де <code>Route()</code>. Ціна моделі — вхідний параметр маршрутизації, а не бухгалтерська довідка: змінюється прайс — переглядається політика.</p>
+  <div class="call tip"><b>Лайфхак</b>Раз на місяць звіряйте суму зі свого лога з рахунком провайдера. Розбіжність понад кілька відсотків — це діра в обліку: неврахований сервіс, службові виклики повз лог або застарілий прайс. Дешева звичка, яка ловить дорогі сюрпризи.</div>
+</section>
+
+<section>
+  <div class="shead"><div class="num">04</div></div>
+  <h2>Розрахунок: три рядки після відповіді</h2>
+  <p>Другий шматок — сама вартість. Після парсингу відповіді, поруч із <code>latency_ms</code>:</p>
+  <pre><code>// [W2] cost: tokens * ціна моделі
+decimal? costUsd = prices.TryGetValue(model, out var pr)
+    ? Math.Round(promptTokens / 1000m * pr.In
+               + completionTokens / 1000m * pr.Out, 6)
+    : null;</code></pre>
+  <p>Дві операційні дрібниці. Перша: якщо моделі немає у прайсі — пишемо <code>null</code>, а не нуль. Нуль — це брехня («запит був безкоштовний»), null — чесне «не знаємо», яке легко знайти запитом і полагодити прайс. Друга: округлення до шести знаків збігається з типом колонки <code>NUMERIC(10,6)</code> — на копійчаних цифрах mock це неважливо, на мільйонах реальних запитів неузгоджене округлення дає розбіжності, які потім шукають тижнями.</p>
+  <p>І все — <code>costUsd</code> їде в <code>LogRequest</code>, у поле, що стояло порожнім із уроку 1. Кожен рядок лога тепер відповідає на питання «скільки коштував цей конкретний запит».</p>
+</section>
+
+<section>
+  <div class="shead"><div class="num">05</div></div>
+  <h2>Атрибуція важливіша за суму</h2>
+  <p>«Ми витратили $400 цього місяця» — марна цифра: з неї не випливає жодної дії. «$310 з них — ескалації на strong-моделі, з яких третина за ключовими словами могла піти на mini» — це вже рішення з порахованим ефектом. Різниця між першим і другим — атрибуція: вміння розкласти суму за осями.</p>
+  <p>Мінімальний набір розрізів у нас уже є, бо все лежить в одному лог-рядку:</p>
+  <pre><code>-- за моделлю: чи справді дороге дістається тільки складному?
+SELECT model, count(*), SUM(cost_usd) FROM requests GROUP BY model;
+
+-- за днем: тренд і сплески
+SELECT created_at::date, SUM(cost_usd) FROM requests GROUP BY 1 ORDER BY 1;</code></pre>
+  <p>Дорослі розрізи — per-team, per-feature, per-tenant — це не нова система, а додаткові колонки в тому самому рядку: хто спитав, з якої фічі, для якого клієнта. Записали в момент запиту — і будь-який зріз коштує один <code>GROUP BY</code>. Не записали — і реконструювати заднім числом уже неможливо.</p>
+  <div class="call mistake"><b>Типова помилка</b>Оптимізувати вартість зміною промпта наосліп: «скоротили системний промпт, має стати дешевше». Без цифри до/після ви не знаєте ні ефекту, ні побічної шкоди якості. Спершу зріз по лозі, потім зміна, потім той самий зріз — інакше це не оптимізація, а ритуал.</div>
+</section>
+
+<section>
+  <div class="shead"><div class="num">06</div></div>
+  <h2>GET /cost: бюджет поруч із витратою</h2>
+  <p>Третій шматок оживляє консоль:</p>
+  <pre><code>app.MapGet("/cost", async () =>
+{
+    // SELECT COALESCE(SUM(cost_usd), 0) FROM requests
+    // WHERE created_at::date = CURRENT_DATE
+    return Results.Json(new { today_usd = Math.Round(today, 4),
+                              budget_usd = 5.0 });
+});</code></pre>
+  <p>Сума за сьогодні — прямо з лога, одним запитом. Поруч — <code>budget_usd</code>: у нас це поки константа, і це свідомо. Головна дія відбувається в консолі: плитка «Вартість сьогодні» замість «—» показує <code>$0.0002 / $5.00</code>. Цифри на mock смішні — механіка бойова: та сама плитка з реальним ключем показуватиме реальні долари, не змінивши жодного рядка.</p>
+  <p>Навіщо бюджет у відповіді, якщо він константа? Бо <strong>бюджет — це поріг дії, а не звіт</strong>. Цифра витрати без порогу поруч — це просто число: незрозуміло, радіти йому чи бити на сполох. Пара «витрачено / ліміт» — це вже стан системи, на який можна вішати реакції — і саме це опційна частина сьогоднішнього уроку.</p>
+</section>
+
+<section>
+  <div class="shead"><div class="num">07</div></div>
+  <h2>Routing × cost: важіль стає видимим</h2>
+  <p>Сьогоднішній облік — це ще й момент, коли минулий урок окупається на очах. Напишіть боту звичайне питання і ескалацію, потім:</p>
+  <pre><code>SELECT model, cost_usd FROM requests ORDER BY created_at DESC LIMIT 2;</code></pre>
+  <p>Ескалація на <code>mock-strong</code> коштує в рази більше за FAQ на <code>mock-mini</code> — при однаковій довжині розмови. Тепер уявіть, що роутера немає і весь трафік іде на strong: помножте різницю на добовий обсяг — це і є ціна рішення «одна модель на все», тільки тепер вона порахована, а не відчута.</p>
+  <p>Звідси головний висновок тижня: маршрутизація — не «оптимізація потім», а найбільший важіль вартості, який у вас є. Промпт-дієти і кеш (наступний тиждень) економлять відсотки; правильний розподіл трафіку між моделями — рази.</p>
+  <p>І ще один наслідок, який вартий фіксації: тепер будь-яку зміну в системі можна оцінювати в грошах. Нова версія промпта стала довшою — зріз по <code>prompt_version</code> покаже, наскільки подорожчав середній запит. Змінили правила роутера — розподіл по моделях і сума за день скажуть, чи виправдано. Облік перетворює суперечки «здається, стало дорого» на порівняння двох SQL-запитів.</p>
+</section>
+
+<section>
+  <div class="shead"><div class="num">08</div><span class="track opt">опційно</span></div>
+  <h2>Budget-політика: що робити при 80%</h2>
+  <p>Цифра і поріг є — можна вішати політику. Опційна частина hw2 — реакція на наближення до бюджету. Три робочі варіанти, за зростанням рішучості:</p>
+  <ul>
+    <li><strong>Алерт</strong> — при 80% бюджету писати подію в лог (а на проді — в канал чергового). Мінімум, який мусить бути завжди: перевитрата не має бути сюрпризом.</li>
+    <li><strong>Деградація</strong> — вище порогу routing примусово переводить неескалаційний трафік на дешевшу модель. Якість трохи просідає, сервіс живе, бюджет цілий.</li>
+    <li><strong>Відсікання</strong> — не-критичні запити отримують заготовлену відповідь без походу в модель. Найжорсткіший варіант; чесніший за мовчазне падіння, коли бюджет реально твердий.</li>
+  </ul>
+  <p>Зверніть увагу на форму всіх трьох: <em>умова на цифрі з лога → зміна поведінки control plane</em>. Це шаблон, у який далі ляжуть і fallback (W4), і гейт якості (W6). Механізм щоразу новий — форма рішення та сама.</p>
+</section>
+
+<section>
+  <div class="shead"><div class="num">09</div></div>
+  <h2>Лабораторна: чотири частини</h2>
+  <ol class="steps">
+    <li><strong>Завести прайс.</strong> Словник цін за 1k токенів для <code>mock-mini</code> і <code>mock-strong</code> — пропорції як у реальних прайсів (strong помітно дорожча, вихідні дорожчі за вхідні).</li>
+    <li><strong>Порахувати і записати.</strong> Після відповіді моделі: usage → формула → <code>cost_usd</code> → лог. Перевірити: <code>SELECT model, cost_usd FROM requests ORDER BY created_at DESC</code> — у ескалацій цифра помітно більша.</li>
+    <li><strong>Оживити <code>GET /cost</code>.</strong> Сума за сьогодні з БД + бюджет. Плитка в консолі показує <code>$… / $5.00</code> замість «—».</li>
+    <li><strong>Проговорити пороги.</strong> Що робити при 80% бюджету — алерт, деградація, відсікання? Сформулювати свій вибір одним реченням і записати поруч із fallback-порядком з минулого уроку.</li>
+    <li class="opt"><strong>Опційно: реалізувати політику.</strong> Обраний варіант — у код: умова на цифрі з <code>/cost</code>, зміна поведінки роутера або заглушка. Це опційна частина hw2.</li>
+  </ol>
+  <div class="check"><strong>Перевір себе (обов'язкова доріжка):</strong>
+    <ul>
+      <li>у кожного нового запиту заповнений <code>cost_usd</code>;</li>
+      <li>ескалація коштує дорожче за FAQ — і це видно в БД;</li>
+      <li>плитка вартості показує число і бюджет, а не «—»;</li>
+      <li>можеш пояснити, чому evals треба рахувати теж.</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <div class="shead"><div class="num">10</div></div>
+  <h2>Антипатерни тижня</h2>
+  <ul>
+    <li><strong>Дізнаватися вартість із рахунку наприкінці місяця.</strong> Це не облік, це розтин.</li>
+    <li><strong>Рахувати «в середньому по лікарні».</strong> Сума без атрибуції за моделлю і задачею не дає жодного рішення — тільки тривогу.</li>
+    <li><strong>Не рахувати judge- і eval-виклики</strong> («це ж службове»). Службові токени коштують стільки ж, скільки бойові.</li>
+    <li><strong>Оптимізувати вартість без цифри до/після.</strong> Скорочення промпта наосліп — це ритуал, а не інженерія.</li>
+  </ul>
+</section>
+
+<section>
+  <h2 style="font-size:20px">Карта уроку</h2>
+  <ul class="map">
+    <li><span class="n">01</span><span>Рахунок ×10 і археологія; рахується все, що ходить у модель</span></li>
+    <li><span class="n">02</span><span>Usage: два числа в кожній відповіді — джерело правди</span></li>
+    <li><span class="n">03</span><span>Прайс поруч із точкою рішення; пропорції важливіші за цифри</span></li>
+    <li><span class="n">04</span><span>Формула, null замість нуля, узгоджене округлення</span></li>
+    <li><span class="n">05</span><span>Атрибуція: per-model, per-day → per-team/feature/tenant</span></li>
+    <li><span class="n">06</span><span>GET /cost: витрата і бюджет поруч — стан, а не число</span></li>
+    <li><span class="n">07</span><span>Routing × cost: різниця в рази, порахована в БД</span></li>
+    <li><span class="n">08</span><span>Опційно: budget-політика — алерт, деградація, відсікання</span></li>
+    <li><span class="n">09</span><span>Лаба: прайс → cost_usd → /cost → розмова про пороги</span></li>
+    <li><span class="n">10</span><span>Антипатерни тижня</span></li>
+  </ul>
+</section>
+
+<section class="hw">
+  <h2>📝 Домашнє завдання</h2>
+  <h3>ДЗ тижня — hw2: routing + cost</h3>
+  <p><a class="links" href="https://github.com/TarasFedorenkoFTV/llmops-bootcamp/blob/main/starter/homework/hw2.md">starter/homework/hw2.md</a> — обидва уроки тижня в одному PR: маршрутизація з уроку 3 плюс сьогоднішній облік вартості.</p>
+  <p>Критерії приймання коротко: звичайне питання і ескалація дають різні моделі в <code>requests</code>; <code>cost_usd</code> заповнюється ненульовими значеннями; <code>GET /cost</code> повертає <code>{ today_usd, budget_usd }</code> і плитка в консолі жива. Повні критерії — у файлі ДЗ.</p>
+  <h3>Опційно (не оцінюється)</h3>
+  <ul>
+    <li>budget-політика: при 80% бюджету — алерт у лог або деградація на дешевшу модель;</li>
+    <li>третій маршрут — окремий tier для FAQ, ескалацій і «всього іншого».</li>
+  </ul>
+</section>
+
+<section>
+  <h2 style="font-size:20px">Що далі</h2>
+  <p>Ми навчилися платити менше за той самий трафік. Наступний крок радикальніший: найдешевший запит — той, якого не було. Тиждень 3 починаємо з кешу: коли можна не ходити в модель узагалі, як міряти ефект через cache-hit ratio і чому кеш без метрики — це віра, а не інженерія.</p>
+</section>
+
+<footer>SupportGW · LLMOps Bootcamp · Урок 4 з 12 · матеріал уроку — основа для відео (~30 хв)</footer>
+</div>
+</body>
+</html>
