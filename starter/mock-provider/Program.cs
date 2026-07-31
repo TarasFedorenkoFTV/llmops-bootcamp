@@ -1,17 +1,8 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// MOCK-провайдер — фейковий OpenAI-сумісний ендпоінт. ДАЄТЬСЯ ГОТОВИМ.
-//
-// Навіщо: увесь core курсу проходиться БЕЗ реального ключа, безкоштовно й
-// детерміновано. Дві ключові можливості:
-//   1) інжекція збоїв на замовлення (для reliability, W4/W6);
-//   2) відповідь залежить від system-промпта (для eval-регресії, W5/W6):
-//      правильний промпт → канонічні відповіді; зламаний → «не знаю».
-//
-// «Гра в довгу»: mock розуміє кілька інтентів (привітання, можливості, пароль,
-// замовлення, повернення, подяка), тож розмова тримається на кілька реплік, а не
-// зводиться до однієї відповіді. Це демо-логіка, не справжня модель — справжній
-// багатоходовий контекст зʼявляється з реальним ключем.
-// ─────────────────────────────────────────────────────────────────────────────
+// Фейковий OpenAI-провайдер. Даємо готовим.
+// Сенс: весь core проходиться без реального ключа — безкоштовно і передбачувано.
+// Вміє дві речі: падати на замовлення (для reliability) і відповідати по-різному
+// залежно від system-промпта (щоб eval ловив, коли промпт зламали).
+// Розмову тримає на кілька реплік — це демо-логіка, не справжня модель.
 
 using System.Text.Json;
 
@@ -23,7 +14,7 @@ app.MapPost("/v1/chat/completions", async (HttpRequest req) =>
     var root = doc.RootElement;
     var model = root.TryGetProperty("model", out var m) ? m.GetString() ?? "mock" : "mock";
 
-    // Беремо останнє повідомлення користувача і system-промпт.
+    // беремо останнє повідомлення юзера і system-промпт
     string user = "", system = "";
     foreach (var msg in root.GetProperty("messages").EnumerateArray())
     {
@@ -33,8 +24,8 @@ app.MapPost("/v1/chat/completions", async (HttpRequest req) =>
         else if (role == "system") system = content;
     }
 
-    // Інжекція збоїв: query (?fail=503&delay=2000&garbage=1) АБО маркери в тексті
-    // (маркери проходять і крізь gateway): __fail_503, __fail_429, __delay, __garbage.
+    // збої: або через query (?fail=503&delay=2000&garbage=1), або маркером у тексті
+    // (маркер проходить і крізь gateway): __fail_503, __fail_429, __delay, __garbage
     int? fail = null; int delay = 0; bool garbage = false;
     var q = req.Query;
     if (q.TryGetValue("fail", out var fq) && int.TryParse(fq, out var fc)) fail = fc;
@@ -48,7 +39,7 @@ app.MapPost("/v1/chat/completions", async (HttpRequest req) =>
     if (fail is int code) return Results.StatusCode(code);
     if (delay > 0) await Task.Delay(delay);
 
-    // Канонічні («розумні») відповіді видаємо лише при правильному system-промпті.
+    // «розумні» відповіді видаємо тільки коли промпт правильний — так eval ловить регресію
     var promptOk = system.Contains("support", StringComparison.OrdinalIgnoreCase);
     var (answer, tool) = Reply(user, promptOk, garbage);
 
@@ -74,18 +65,17 @@ app.MapPost("/v1/chat/completions", async (HttpRequest req) =>
 app.MapGet("/health", () => Results.Ok(new { status = "ok" }));
 app.Run("http://0.0.0.0:9000");
 
-// Груба оцінка токенів (≈4 символи = 1 токен) — щоб usage було реалістичним.
+// грубо: ~4 символи = 1 токен, щоб usage було схоже на правду
 static int Tokens(string s) => string.IsNullOrEmpty(s) ? 0 : Math.Max(1, s.Length / 4);
 
-// Проста інтент-логіка. Інтенти з ДІЯМИ (order/refund/safety) не залежать від
-// промпта — це структурна поведінка. «Розумні» відповіді залежать від promptOk,
-// щоб eval-гейт ловив регресію промпта.
+// проста логіка інтентів. дії (order/refund/safety) не залежать від промпта — це
+// поведінка. «розумні» відповіді залежать від promptOk, щоб було на чому ловити регресію.
 static (string, object?[]?) Reply(string user, bool promptOk, bool garbage)
 {
     if (garbage) return ("...", null);
     var u = user.ToLowerInvariant();
 
-    // структурні інтенти (незалежні від промпта)
+    // дії — незалежно від промпта
     if (u.Contains("ignore") && u.Contains("instruction"))
         return ("Вибачте, не можу виконати це прохання.", null);
     if (u.Contains("замовлен") || u.Contains("order") || u.Contains("#"))
@@ -93,7 +83,7 @@ static (string, object?[]?) Reply(string user, bool promptOk, bool garbage)
     if (u.Contains("поверн") || u.Contains("терміново") || u.Contains("refund"))
         return ("Створюю тікет і ескалюю на оператора.", Tool("create_ticket"));
 
-    // «розумні» відповіді — залежать від system-промпта
+    // далі — залежить від промпта
     if (!promptOk) return ("не знаю", null);
     if (u.Contains("пароль") || u.Contains("вхід") || u.Contains("login"))
         return ("Щоб скинути пароль: відкрийте сторінку входу, натисніть «Забули пароль» і перевірте email.", null);
