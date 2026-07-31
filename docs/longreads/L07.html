@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Урок 7 · Reliability: fallback, деградація і circuit breaker</title>
+<style>
+  :root{
+    --bg:#f6f7f9; --card:#ffffff; --ink:#1b1d23; --soft:#565c6b; --faint:#8a90a0;
+    --line:#e4e6ec; --accent:#4038c4; --accent-bg:#ecebfb;
+    --good:#177245; --good-bg:#e9f3ee; --warn:#9a5b12; --warn-bg:#f8f0e2; --crit:#b3261e; --crit-bg:#f9e9e8;
+    --mono:ui-monospace,"Cascadia Code",Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:860px;margin:0 auto;padding:48px 20px 90px}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:600}
+  h1{font-size:clamp(28px,5vw,40px);line-height:1.12;letter-spacing:-.02em;margin:10px 0 8px}
+  .lead{font-size:18px;color:var(--soft);max-width:64ch;margin:0}
+  .chain{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:26px 0 0;font-family:var(--mono);font-size:12px}
+  .chain span{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:4px 11px;color:var(--soft)}
+  .chain span.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+  .chain i{color:var(--faint);font-style:normal}
+  section{margin-top:52px}
+  .shead{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .num{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:10px;background:var(--accent-bg);color:var(--accent);font-family:var(--mono);font-weight:700;font-size:14px}
+  .track{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:3px 9px;border-radius:20px;font-weight:700}
+  .track.opt{background:var(--warn-bg);color:var(--warn)}
+  h2{font-size:24px;letter-spacing:-.01em;margin:0 0 12px}
+  h3{font-size:17px;margin:22px 0 8px}
+  p{margin:0 0 12px;max-width:70ch}
+  ul,ol{margin:0 0 12px;padding-left:22px;max-width:70ch}
+  li{margin-bottom:6px}
+  strong{font-weight:650}
+  code{font-family:var(--mono);font-size:.88em;background:var(--accent-bg);color:var(--accent);padding:1px 6px;border-radius:5px;white-space:nowrap}
+  pre{background:#14161c;color:#e8e9ed;border-radius:12px;padding:14px 18px;overflow-x:auto;font-family:var(--mono);font-size:13.5px;line-height:1.6;max-width:100%}
+  pre code{background:none;color:inherit;padding:0;white-space:pre}
+  .call{border-radius:12px;padding:13px 16px;margin:14px 0;max-width:70ch;border:1px solid var(--line);background:var(--card)}
+  .call b{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.09em;text-transform:uppercase;margin-bottom:5px}
+  .call.principle{background:var(--good-bg);border-color:transparent}
+  .call.principle b{color:var(--good)}
+  .call.mistake{background:var(--crit-bg);border-color:transparent}
+  .call.mistake b{color:var(--crit)}
+  .call.tip{background:var(--warn-bg);border-color:transparent}
+  .call.tip b{color:var(--warn)}
+  .call.note{background:var(--accent-bg);border-color:transparent}
+  .call.note b{color:var(--accent)}
+  table{border-collapse:collapse;width:100%;font-size:14.5px;background:var(--card);border-radius:12px;overflow:hidden;border:1px solid var(--line)}
+  th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);background:#fafafc}
+  tr:last-child td{border-bottom:none}
+  .flow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-family:var(--mono);font-size:13px;margin:14px 0}
+  .flow span{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:7px 12px}
+  .flow span.hl{border-color:var(--accent);color:var(--accent);font-weight:600}
+  .flow i{color:var(--faint);font-style:normal}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin:14px 0}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  .card h4{margin:0 0 6px;font-size:14.5px}
+  .card p{font-size:14px;color:var(--soft);margin:0}
+  .steps{counter-reset:s;margin:14px 0;padding:0;list-style:none;max-width:72ch}
+  .steps li{counter-increment:s;position:relative;padding:0 0 14px 44px;margin:0}
+  .steps li::before{content:counter(s);position:absolute;left:0;top:0;width:28px;height:28px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-family:var(--mono);font-size:13px;font-weight:700}
+  .steps li.opt::before{background:var(--warn)}
+  .check{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 18px;max-width:72ch}
+  .check ul{margin:0;padding-left:20px}
+  .links a{color:var(--accent);text-decoration:none;border-bottom:1px solid var(--accent-bg)}
+  .links a:hover{border-bottom-color:var(--accent)}
+  .map{margin:14px 0;padding:0;list-style:none;max-width:72ch}
+  .map li{display:flex;gap:12px;padding:8px 0;border-bottom:1px dashed var(--line);font-size:14.5px}
+  .map li:last-child{border-bottom:none}
+  .map .n{font-family:var(--mono);color:var(--accent);font-weight:700;min-width:26px}
+  .hw{background:var(--card);border:2px solid var(--accent);border-radius:14px;padding:20px 22px;margin-top:16px}
+  .hw h2{margin-top:0}
+  .hw h3{margin-top:14px}
+  footer{margin-top:60px;border-top:1px solid var(--line);padding-top:16px;font-family:var(--mono);font-size:12px;color:var(--faint)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">Урок 7 · SupportGW · LLMOps Bootcamp</div>
+  <h1>Reliability: fallback, деградація і circuit breaker</h1>
+  <p class="lead">Провайдер ляже. Питання не «чи», а «що побачить користувач, коли це станеться». Сьогодні будуємо план Б: fallback-ланцюг, ввічливу деградацію замість 500-ки — і влаштовуємо власний інцидент, бо mock уміє падати на замовлення. Для охочих — circuit breaker, разом з історією, як я сам собі влаштував outage.</p>
+  <div class="chain">
+    <span>W1 Основа + промпти</span><i>→</i>
+    <span>W2 Routing + cost</span><i>→</i>
+    <span>W3 Кеш + tools</span><i>→</i>
+    <span class="on">W4 Надійність + безпека</span><i>→</i>
+    <span>W5 Observability + evals</span><i>→</i>
+    <span>W6 CI + фінал</span>
+  </div>
+</header>
+
+<section>
+  <div class="shead"><div class="num">01</div></div>
+  <h2>Проблема: чужа інфраструктура і тихі смерті</h2>
+  <p>Ваша LLM-фіча залежить від інфраструктури, якою ви не керуєте, — це четверта властивість з уроку 1, і сьогодні її черга. 429 у пік трафіку, 5xx під час інциденту провайдера, стрибки latency — це не аномалії, це нормальний режим роботи інтернету. Ненормальним є те, як більшість систем на це реагує: гола 500-ка користувачу і тиша в логах.</p>
+  <p>Окрема підступна категорія — <strong>тихі смерті</strong>. Найгірші збої не дають 5xx. Я розбирав інцидент, де голосовий агент просто замовкав на другій хвилині розмови: жодної помилки, жодного алерту — з'єднання тихо вмирало десь по дорозі, бо ніхто не слав keepalive частіше, ніж мережа встигала «прибрати» неактивний конект. Схема «запит-відповідь» такі речі не ловить у принципі: для довгих і стрімінгових сесій потрібен heartbeat, а не надія. У нашому контурі сесії короткі, тож сьогодні ця категорія лишається згадкою — але тримайте її в голові, щойно з'явиться streaming.</p>
+  <p>І головне переформулювання уроку: reliability — це не «щоб не падало». Падатиме. Reliability — це щоб падіння було <strong>керованим</strong>: з планом Б, з ввічливою відмовою в найгіршому разі і зі слідами в метриках.</p>
+  <div class="call note"><b>Навіщо цей шар</b>До сьогодні збій провайдера означав чесну катастрофу: «Сервіс тимчасово недоступний» з нульовим планом Б — ви бачили це ще в лабі уроку 1. Сьогодні між збоєм і користувачем з'являються два шари: спроба піти в інше місце і спроєктована відмова, якщо не вийшло.</div>
+</section>
+
+<section>
+  <div class="shead"><div class="num">02</div></div>
+  <h2>Retry ≠ fallback: словник рішень</h2>
+  <p>Два слова, які часто змішують, — а це різні механізми з різною механікою відмови:</p>
+  <table>
+    <tr><th></th><th>Retry</th><th>Fallback</th></tr>
+    <tr><td><strong>Що робить</strong></td><td>ще раз туди само</td><td>в інше місце (інша модель / провайдер)</td></tr>
+    <tr><td><strong>Коли доречний</strong></td><td>минущі збої: мережевий глюк, 429</td><td>провайдер лежить або деградує</td></tr>
+    <tr><td><strong>Обов'язкові атрибути</strong></td><td>backoff і бюджет спроб</td><td>явний порядок ланцюга</td></tr>
+    <tr><td><strong>Головний ризик</strong></td><td>DDoS власного провайдера</td><td>непомітна різниця якості моделей</td></tr>
+  </table>
+  <p style="margin-top:12px">Правильний порядок теж має значення: спершу короткий retry (раптом глюк), потім fallback (схоже, надовго), і на все разом — <strong>бюджет часу</strong>, бо користувач чекає відповіді, а не вашої боротьби за неї. Бюджет згори вниз, як із таймаутами інструментів минулого уроку: спершу «скільки чекає користувач», потім — скільки з цього можна витратити на спроби.</p>
+  <div class="call mistake"><b>Типова помилка</b>Retry без backoff і без бюджету: провайдер повернув 429 «пригальмуйте» — а ви у відповідь потроїли трафік ретраями. Тепер ліміти вичерпуються ще швидше, і ваш власний код став другою половиною інциденту. Кожен retry має чекати перед спробою і мати стелю кількості.</div>
+</section>
+
+<section>
+  <div class="shead"><div class="num">03</div></div>
+  <h2>Розтин: збій стає значенням, а не винятком</h2>
+  <p>Перший крок сьогоднішньої роботи непомітний, але він робить можливим усе інше: виклик моделі виноситься у функцію, яка <em>повертає</em> успіх або невдачу, а не кидає виняток:</p>
+  <pre><code>// один виклик моделі через gateway; ok=false, якщо збій або статус >= 400
+static async Task&lt;(bool ok, string answer, string? tool, int pt, int ct, int status)&gt;
+    CallGateway(HttpClient http, string gateway, string model,
+                string system, string user)
+{
+    try
+    {
+        // ... POST /v1/chat/completions, парсинг відповіді ...
+        if (status >= 400) return (false, "", null, 0, 0, status);
+        return (true, answer, tool, pt, ct, status);
+    }
+    catch { return (false, "", null, 0, 0, 0); }  // мережа / gateway лежить
+}</code></pre>
+  <p>Чому це важливо: збій перестає бути аварією, що летить крізь стек, і стає <strong>звичайним значенням</strong>, з яким працює логіка. «Не вийшло» — це legitimate результат виклику, один із двох очікуваних. Саме навколо такої функції можна будувати ланцюги, лічити переходи і ухвалювати рішення — з винятком у польоті нічого цього зробити не можна.</p>
+  <p>Зверніть увагу на <code>status: 0</code> у гілці catch — «відповіді не було взагалі» відрізняється від «відповідь була, але 5xx», і в лозі ці випадки теж мають розрізнятися.</p>
+</section>
+
+<section>
+  <div class="shead"><div class="num">04</div></div>
+  <h2>Fallback-ланцюг: спробуй наступного</h2>
+  <p>Тепер сам ланцюг — цикл по черзі кандидатів, той самий порядок, який ми записали «на папері» ще на уроці 3:</p>
+  <pre><code>// [W4] fallback: пробуємо по черзі; на mock другий елемент — та сама модель,
+// на реальному провайдері — інша (напр. [model, "azure-gpt-4o"])
+var chain = defaultModel == "mock" ? new[] { model, "mock" }
+                                   : new[] { model, "azure-gpt-4o" };
+var ok = false;
+for (int i = 0; i < chain.Length && !ok; i++)
+{
+    if (i > 0) Interlocked.Increment(ref stats.Fallbacks);
+    var res = await CallGateway(http, gateway, chain[i], systemPrompt, userMessage);
+    if (res.ok) { ok = true; model = chain[i]; answer = res.answer; /* ... */ }
+}</code></pre>
+  <p>Розберемо операційні рішення. Перше: кожен перехід далі за ланцюгом — <strong>інкремент лічильника</strong> <code>Fallbacks</code>. Fallback, що спрацював непомітно, — це замаскована проблема: користувачі вже обслуговуються резервом, а ви про це не знаєте. Друге: <code>model = chain[i]</code> — у лог їде та модель, яка <em>реально відповіла</em>, а не та, яку обрав роутер. Інакше вся аналітика вартості й якості тижня 2 почне брехати рівно в найцікавіші моменти. Третє: на mock другий елемент ланцюга — той самий mock, і це чесне навчальне обмеження: механіка переходу справжня, а «резервного дата-центру» в компоузі немає.</p>
+</section>
+
+<section>
+  <div class="shead"><div class="num">05</div></div>
+  <h2>Graceful degradation: остання лінія — це UX-рішення</h2>
+  <p>Що, як увесь ланцюг вичерпано? Лишаються два варіанти, і обидва погані: збрехати (віддати щось із кешу під виглядом свіжої відповіді) або впасти (500). Правильний третій:</p>
+  <pre><code>if (!ok)
+{
+    answer = "Вибачте, тимчасові проблеми на нашому боці. " +
+             "Спробуйте, будь ласка, трохи згодом.";
+    status = status == 200 ? 503 : status;
+}</code></pre>
+  <p>Ввічлива заглушка — це не «здалися», це спроєктована відмова. Користувач отримує чесне людське повідомлення замість технічної помилки; чат живий; а в лозі при цьому — справжній статус збою, не 200 (інакше моніторинг тижня 5 «не побачить» інцидент, який бачили всі користувачі).</p>
+  <p>Деградація — це драбина, і в різних сходинок різні правила. Для довідкових питань можна деградувати м'якше: дешевша модель, відповідь із кешу з позначкою свіжості. Для <strong>дій</strong> — тільки чесна відмова: «створити тікет зараз не можу» краще за тікет, створений наосліп під час інциденту. Головне, щоб кожна сходинка була <em>рішенням</em>, ухваленим у спокійний четвер, а не імпровізацією о третій ночі.</p>
+  <div class="call principle"><b>Принцип</b>Користувач ніколи не має бачити ваш стек-трейс, а моніторинг ніколи не має бачити «все добре» під час інциденту. Ввічлива відмова назовні + чесний статус усередину — обидві половини обов'язкові.</div>
+</section>
+
+<section>
+  <div class="shead"><div class="num">06</div></div>
+  <h2>Помилки мають бути швидкими</h2>
+  <p>Дрібниця, яка кусається. Перша версія нашого стека мала дивну властивість: симульований збій «коштував» вісім секунд. Користувач чекав, чекав — і лише потім отримував заглушку. Розслідування привело в несподіване місце: gateway за замовчуванням <em>тихо ретраїв</em> збої всередині себе. Наш сервіс чекав не на модель — на чужі приховані спроби.</p>
+  <p>Тому в конфізі адаптера з уроку 3 стоїть <code>num_retries: 0</code> — і тепер ви знаєте, навіщо. Reliability-логіка має жити <strong>в одному місці</strong> — у вашому сервісі, де вона видима, залогована і керована. Коли ретраять кілька шарів одночасно, бюджети часу перемножуються: два ретраї в адаптері × два у сервісі × таймаут — і ось ваша «швидка відмова» триває пів хвилини.</p>
+  <p>Перевірте це сьогодні в лабі: збій має коштувати мілісекунди. Швидка помилка — це теж різновид надійності: що швидше система зрозуміла «не вийшло», то швидше спрацював план Б.</p>
+</section>
+
+<section>
+  <div class="shead"><div class="num">07</div><span class="track opt">опційно</span></div>
+  <h2>Circuit breaker — з обов'язковим half-open</h2>
+  <h3>Навіщо він</h3>
+  <p>Fallback-ланцюг має слабке місце: якщо основна модель лежить <em>довго</em>, кожен запит все одно спершу йде до неї — і платить повним таймаутом за право дізнатися те, що ви вже знаєте. Circuit breaker прибирає цей податок: після N збоїв поспіль модель «відкривається», і запити одразу йдуть у fallback, без очікування. Це захист вашої latency, а не покарання провайдера:</p>
+  <pre><code>var br = breakers.GetOrAdd(chain[i], _ => new Breaker());
+if (br.OpenUntil > now)
+{
+    // [W4] half-open: раз на 5с пропускаємо пробний запит
+    if (now < br.NextProbe) continue;
+    br.NextProbe = now.AddSeconds(5);
+}
+// ...
+if (res.ok) { br.Fails = 0; br.OpenUntil = default; }
+else if (++br.Fails >= 3)
+    br.OpenUntil = DateTimeOffset.UtcNow.AddSeconds(30);</code></pre>
+  <h3>Історія одного самострілу</h3>
+  <p>Чесна історія з підготовки цього курсу. Мій перший breaker був простий: «3 збої → open на 30 секунд». На демо після симульованого інциденту бот <strong>продовжив відбивати вже здорового провайдера</strong> ще пів хвилини — інцидент закінчився, а система вперто жила за планом Б, і eval-прогін почервонів. Circuit breaker без half-open — це самостріл: ви власноруч влаштовуєте собі outage, довший за реальний.</p>
+  <p>Правильна машина станів має три положення: closed (усе штатно, лічимо збої) → open (запити оминають модель) → <strong>half-open</strong> (раз на кілька секунд пропускаємо один пробний запит; успіх — закриваємо circuit, збій — лишаємось open). Пробний запит — це і є механізм «помічання одужання»; без нього open перетворюється на вирок із фіксованим терміном, який не зважає на реальність.</p>
+</section>
+
+<section>
+  <div class="shead"><div class="num">08</div></div>
+  <h2>Слід у метриках: інцидент без сліду повториться</h2>
+  <p>Останній шматок — переконатися, що вся сьогоднішня драма лишає докази. Лічильник <code>fallback_events</code> росте з кожним переходом за ланцюгом; статуси збоїв (503, 429, 0) лежать у лозі поруч зі звичайними 200; заглушка деградації пише чесний статус. На тижні 5 усе це стане плитками консолі — сьогодні достатньо, що цифри існують і ростуть правильно.</p>
+  <p>Чому це не бюрократія: інцидент, що не лишив сліду, — це інцидент, який неможливо розслідувати, а отже, він повториться. «Скільки запитів пішло через fallback минулої п'ятниці?» — питання, з якого починається і постмортем, і розмова з провайдером про SLA, і рішення про другого провайдера. Відповідь має бути в даних.</p>
+  <div class="call tip"><b>Лайфхак</b>Надійність, яку тестують лише реальними інцидентами, — це надія, а не інженерія. Mock дає вам збої на замовлення: <code>__fail_503</code>, <code>__fail_429</code>, <code>__delay</code>. Прогін «інцидентного сценарію» після кожної зміни reliability-коду коштує хвилину — зробіть його звичкою, а на тижні 6 він стане частиною CI.</div>
+</section>
+
+<section>
+  <div class="shead"><div class="num">09</div></div>
+  <h2>Лабораторна: інцидент на замовлення</h2>
+  <ol class="steps">
+    <li><strong>Побудувати ланцюг.</strong> Винести виклик моделі в <code>CallGateway</code> (ok/fail як значення), додати цикл по ланцюгу і лічильник fallback-переходів.</li>
+    <li><strong>Влаштувати інцидент.</strong> <code>__fail_503</code> у чат: основна «впала», fallback відпрацював. Переконатися, що перехід порахований, а в лозі — модель, яка реально відповіла.</li>
+    <li><strong>Дійти до дна.</strong> Сценарій «усі впали» (на mock другий у ланцюгу — той самий mock): користувач отримує ввічливу заглушку, а не 500. Засікти латентність збою — мілісекунди, не 8 секунд.</li>
+    <li><strong>Перевірити слід.</strong> Статуси збоїв у лозі, лічильник росте. Проговорити: які три питання ви поставите цим даним на постмортемі.</li>
+    <li class="opt"><strong>Опційно: circuit breaker.</strong> 3 збої → open: запити оминають модель без очікування. Почекати кілька секунд → пробний запит → circuit закрився. Обов'язково відтворіть самостріл: закоментуйте half-open і подивіться, як «одужалий» провайдер лишається заблокованим.</li>
+  </ol>
+  <div class="check"><strong>Перевір себе (обов'язкова доріжка):</strong>
+    <ul>
+      <li><code>__fail_503</code> не дає 500 — дає ввічливу заглушку;</li>
+      <li>fallback-перехід відбувається і лічиться, у лозі — реальна модель відповіді;</li>
+      <li>збій коштує мілісекунди, а не секунди прихованих ретраїв;</li>
+      <li>можеш пояснити retry, fallback і circuit breaker одним реченням кожен.</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <div class="shead"><div class="num">10</div></div>
+  <h2>Антипатерни тижня</h2>
+  <ul>
+    <li><strong>Retry без backoff і бюджету</strong> — DDoS власного провайдера у найгірший момент.</li>
+    <li><strong>Circuit breaker без half-open</strong> — самостріл: outage довший за реальний (перевірено на собі).</li>
+    <li><strong>Приховані ретраї в кількох шарах одночасно.</strong> Бюджети часу перемножуються, «швидка відмова» триває пів хвилини.</li>
+    <li><strong>500 користувачу як «стратегія» деградації.</strong> Відмова — теж інтерфейс; проєктуйте її.</li>
+    <li><strong>Тестувати reliability лише на реальних інцидентах.</strong> Керований збій у mock коштує хвилину — і відтворюється в CI.</li>
+  </ul>
+</section>
+
+<section>
+  <h2 style="font-size:20px">Карта уроку</h2>
+  <ul class="map">
+    <li><span class="n">01</span><span>Чужа інфраструктура, тихі смерті; падіння має бути керованим</span></li>
+    <li><span class="n">02</span><span>Retry ≠ fallback; порядок і бюджет часу згори вниз</span></li>
+    <li><span class="n">03</span><span>CallGateway: збій — значення, а не виняток</span></li>
+    <li><span class="n">04</span><span>Ланцюг: лічильник переходів, у лозі — реальна модель</span></li>
+    <li><span class="n">05</span><span>Деградація: ввічливо назовні, чесний статус усередину</span></li>
+    <li><span class="n">06</span><span>num_retries: 0 — помилки мають бути швидкими</span></li>
+    <li><span class="n">07</span><span>Опційно: circuit breaker, half-open і історія самострілу</span></li>
+    <li><span class="n">08</span><span>Слід у метриках: інцидент без сліду повториться</span></li>
+    <li><span class="n">09</span><span>Лаба: ланцюг → інцидент → дно → слід (+ CB опційно)</span></li>
+    <li><span class="n">10</span><span>Антипатерни тижня</span></li>
+  </ul>
+</section>
+
+<section class="hw">
+  <h2>📝 Домашнє завдання</h2>
+  <h3>Обов'язково — до наступного уроку (без здачі)</h3>
+  <ul>
+    <li>закріпити лабу: <code>__fail_503</code> → fallback → у найгіршому разі ввічлива заглушка;</li>
+    <li>переконатися, що збій швидкий (мілісекунди) і залишає чесний статус у лозі;</li>
+    <li>проговорити свою драбину деградації: що можна віддати з кешу, де чесно відмовити.</li>
+  </ul>
+  <h3>Опційно</h3>
+  <ul>
+    <li>circuit breaker: 3 збої → open на 30с, обов'язково з half-open (пробний запит раз на ~5с) — інакше сам собі влаштуєш outage.</li>
+  </ul>
+  <h3>ДЗ тижня — після наступного уроку</h3>
+  <p>Тижневе ДЗ (hw4) об'єднує надійність і безпеку: сьогоднішній fallback із деградацією — вже у вас в руках, після наступного уроку додасться черга підтверджень для незворотних дій — і тиждень здається одним PR. Критерії — у файлі ДЗ після наступного уроку.</p>
+</section>
+
+<section>
+  <h2 style="font-size:20px">Що далі</h2>
+  <p>Ми захистилися від збоїв інфраструктури — від того, що ламається саме. Наступний урок — захист від <strong>вмісту</strong>: prompt injection («ignore previous instructions»), персональні дані, що летять у чужі API, — і повна реалізація контракту з уроку 6: незворотна дія потрапляє в чергу <code>/approvals</code> і виконується тільки після людини.</p>
+</section>
+
+<footer>SupportGW · LLMOps Bootcamp · Урок 7 з 12 · матеріал уроку — основа для відео (~30 хв)</footer>
+</div>
+</body>
+</html>
