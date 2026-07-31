@@ -44,8 +44,9 @@ Routing, fallback, cost і policies студент пише в сервісі.
 
 ## Структура
 
+- `docs/lessons/` — [конспекти 12 уроків](docs/lessons/README.md)
 - `docs/` — архітектура, request flow, тижневі outcomes, failure scenarios, [optional і згадки](docs/optional-and-mentions.md)
-- `starter/` — те, що клонує студент: каркас, mock provider, базові конфіги
+- `starter/` — те, що клонує студент: каркас, mock provider, базові конфіги, [ДЗ по тижнях](starter/homework/README.md)
 
 ## Мінімальний стек для запуску
 
