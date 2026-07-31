@@ -28,8 +28,8 @@ jobs:
           for i in $(seq 1 40); do
             code=$(curl -s -o /dev/null -w "%{http_code}" -X POST http://localhost:4000/v1/chat/completions \
               -H "Content-Type: application/json" \
-              -d '{"model":"mock","messages":[{"role":"user","content":"hi"}]}')
-            [ "$code" = "200" ] && exit 0
+              -d '{"model":"mock","messages":[{"role":"user","content":"hi"}]}' || true)
+            if [ "$code" = "200" ]; then exit 0; fi
             sleep 5
           done
           echo "gateway not ready"
