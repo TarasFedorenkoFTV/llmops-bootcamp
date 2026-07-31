@@ -5,11 +5,11 @@
 
 | ДЗ | Після занять | Тема |
 |---|---|---|
-| [hw1.md](hw1.md) | L1–L2 | логування + prompt registry |
-| [hw2.md](hw2.md) | L3–L4 | routing + cost |
-| [hw3.md](hw3.md) | L5–L6 | кеш + інструменти |
-| [hw4.md](hw4.md) | L7–L8 | надійність + безпека |
-| [hw5.md](hw5.md) | L9–L10 | observability + evals |
+| [hw1.md](hw1.md) | L01–L02 | логування + prompt registry |
+| [hw2.md](hw2.md) | L03–L04 | routing + cost |
+| [hw3.md](hw3.md) | L05–L06 | кеш + інструменти |
+| [hw4.md](hw4.md) | L07–L08 | надійність + безпека |
+| [hw5.md](hw5.md) | L09–L10 | observability + evals |
 | [hw6.md](hw6.md) | L11–L12 | CI-гейт + інцидент |
 
 ## Спільні правила здачі
