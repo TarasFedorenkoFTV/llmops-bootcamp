@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Урок 6 · Tool calls: коли модель починає діяти</title>
+<style>
+  :root{
+    --bg:#f6f7f9; --card:#ffffff; --ink:#1b1d23; --soft:#565c6b; --faint:#8a90a0;
+    --line:#e4e6ec; --accent:#4038c4; --accent-bg:#ecebfb;
+    --good:#177245; --good-bg:#e9f3ee; --warn:#9a5b12; --warn-bg:#f8f0e2; --crit:#b3261e; --crit-bg:#f9e9e8;
+    --mono:ui-monospace,"Cascadia Code",Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:860px;margin:0 auto;padding:48px 20px 90px}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:600}
+  h1{font-size:clamp(28px,5vw,40px);line-height:1.12;letter-spacing:-.02em;margin:10px 0 8px}
+  .lead{font-size:18px;color:var(--soft);max-width:64ch;margin:0}
+  .chain{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:26px 0 0;font-family:var(--mono);font-size:12px}
+  .chain span{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:4px 11px;color:var(--soft)}
+  .chain span.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+  .chain i{color:var(--faint);font-style:normal}
+  section{margin-top:52px}
+  .shead{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .num{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:10px;background:var(--accent-bg);color:var(--accent);font-family:var(--mono);font-weight:700;font-size:14px}
+  .track{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:3px 9px;border-radius:20px;font-weight:700}
+  .track.opt{background:var(--warn-bg);color:var(--warn)}
+  h2{font-size:24px;letter-spacing:-.01em;margin:0 0 12px}
+  h3{font-size:17px;margin:22px 0 8px}
+  p{margin:0 0 12px;max-width:70ch}
+  ul,ol{margin:0 0 12px;padding-left:22px;max-width:70ch}
+  li{margin-bottom:6px}
+  strong{font-weight:650}
+  code{font-family:var(--mono);font-size:.88em;background:var(--accent-bg);color:var(--accent);padding:1px 6px;border-radius:5px;white-space:nowrap}
+  pre{background:#14161c;color:#e8e9ed;border-radius:12px;padding:14px 18px;overflow-x:auto;font-family:var(--mono);font-size:13.5px;line-height:1.6;max-width:100%}
+  pre code{background:none;color:inherit;padding:0;white-space:pre}
+  .call{border-radius:12px;padding:13px 16px;margin:14px 0;max-width:70ch;border:1px solid var(--line);background:var(--card)}
+  .call b{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.09em;text-transform:uppercase;margin-bottom:5px}
+  .call.principle{background:var(--good-bg);border-color:transparent}
+  .call.principle b{color:var(--good)}
+  .call.mistake{background:var(--crit-bg);border-color:transparent}
+  .call.mistake b{color:var(--crit)}
+  .call.tip{background:var(--warn-bg);border-color:transparent}
+  .call.tip b{color:var(--warn)}
+  .call.note{background:var(--accent-bg);border-color:transparent}
+  .call.note b{color:var(--accent)}
+  table{border-collapse:collapse;width:100%;font-size:14.5px;background:var(--card);border-radius:12px;overflow:hidden;border:1px solid var(--line)}
+  th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);background:#fafafc}
+  tr:last-child td{border-bottom:none}
+  .flow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-family:var(--mono);font-size:13px;margin:14px 0}
+  .flow span{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:7px 12px}
+  .flow span.hl{border-color:var(--accent);color:var(--accent);font-weight:600}
+  .flow i{color:var(--faint);font-style:normal}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin:14px 0}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  .card h4{margin:0 0 6px;font-size:14.5px}
+  .card p{font-size:14px;color:var(--soft);margin:0}
+  .steps{counter-reset:s;margin:14px 0;padding:0;list-style:none;max-width:72ch}
+  .steps li{counter-increment:s;position:relative;padding:0 0 14px 44px;margin:0}
+  .steps li::before{content:counter(s);position:absolute;left:0;top:0;width:28px;height:28px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-family:var(--mono);font-size:13px;font-weight:700}
+  .steps li.opt::before{background:var(--warn)}
+  .check{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 18px;max-width:72ch}
+  .check ul{margin:0;padding-left:20px}
+  .links a{color:var(--accent);text-decoration:none;border-bottom:1px solid var(--accent-bg)}
+  .links a:hover{border-bottom-color:var(--accent)}
+  .map{margin:14px 0;padding:0;list-style:none;max-width:72ch}
+  .map li{display:flex;gap:12px;padding:8px 0;border-bottom:1px dashed var(--line);font-size:14.5px}
+  .map li:last-child{border-bottom:none}
+  .map .n{font-family:var(--mono);color:var(--accent);font-weight:700;min-width:26px}
+  .hw{background:var(--card);border:2px solid var(--accent);border-radius:14px;padding:20px 22px;margin-top:16px}
+  .hw h2{margin-top:0}
+  .hw h3{margin-top:14px}
+  footer{margin-top:60px;border-top:1px solid var(--line);padding-top:16px;font-family:var(--mono);font-size:12px;color:var(--faint)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">Урок 6 · SupportGW · LLMOps Bootcamp</div>
+  <h1>Tool calls: коли модель починає діяти</h1>
+  <p class="lead">Слово можна перечитати. Дію — не завжди можна відкотити. Сьогодні бот уперше щось робить, а не тільки відповідає: розберемо анатомію tool-виклику, виконаємо read-only інструмент, обкладемо виконання таймаутом та ідемпотентністю — і чесно подивимось на «дірку», яку закриємо на тижні безпеки.</p>
+  <div class="chain">
+    <span>W1 Основа + промпти</span><i>→</i>
+    <span>W2 Routing + cost</span><i>→</i>
+    <span class="on">W3 Кеш + tools</span><i>→</i>
+    <span>W4 Надійність + безпека</span><i>→</i>
+    <span>W5 Observability + evals</span><i>→</i>
+    <span>W6 CI + фінал</span>
+  </div>
+</header>
+
+<section>
+  <div class="shead"><div class="num">01</div></div>
+  <h2>Проблема: якісно новий клас ризиків</h2>
+  <p>Поки LLM лише генерує текст, найгірше, що станеться, — погана відповідь. Неприємно, але поправно: користувач перепитає, оператор виправить. Щойно ви даєте моделі інструменти — знайти замовлення, створити тікет, змінити запис у CRM — з'являється те, чого не було: <strong>модель може зробити щось</strong>. І зробити двічі. Або не те. Або те, але в невдалий момент.</p>
+  <p>Правильна рамка мислення тут така: tool-рантайм — це production surface, повноцінна поверхня вашої системи з усіма наслідками. У неї мають бути схеми, таймаути, ретраї, логи і права. А LLM у цій рамці — <strong>ненадійний клієнт вашого API</strong>: він може викликати інструмент із дивними аргументами, може повторити виклик, може «передумати» посередині. Це не песимізм щодо моделей — це та сама інженерна презумпція, з якою ви проєктуєте будь-який публічний API: клієнту не довіряють, клієнта валідують.</p>
+  <div class="call note"><b>Навіщо цей шар</b>Інструменти — це момент, коли LLM-система з «розумного довідника» стає учасником бізнес-процесів. Разом із користю приходить відповідальність: кожна дія має бути описана, обмежена в часі, безпечна для повтору і залишати слід. Сьогодні будуємо все, крім прав людини на останнє слово, — воно на уроці 8.</div>
+</section>
+
+<section>
+  <div class="shead"><div class="num">02</div></div>
+  <h2>Анатомія tool-виклику</h2>
+  <p>Подивімося, що насправді приходить від моделі, коли вона «хоче» виконати інструмент. Напишіть у чат «Де моє замовлення #10482?» — mock, як і реальний провайдер, поверне у відповіді не текст, а намір:</p>
+  <pre><code>"message": {
+  "role": "assistant",
+  "content": "Перевіряю статус вашого замовлення…",
+  "tool_calls": [ { "function": { "name": "lookup_order", ... } } ]
+},
+"finish_reason": "tool_calls"</code></pre>
+  <p>Три речі варті уваги. Перше: <code>tool_calls</code> — це <em>прохання</em>, а не подія. Модель нічого не виконала — вона запропонувала виклик, а виконувати його чи ні, вирішує ваш сервіс. Уся сьогоднішня робота живе рівно в цьому зазорі між «модель попросила» і «система зробила». Друге: <code>finish_reason: tool_calls</code> — формальна ознака, що відповідь не фінальна. Третє: аргументи приходять як текст, згенерований моделлю, — з усіма наслідками для валідації (блок 03).</p>
+  <p>Наш сервіс уже вміє діставати назву інструмента з відповіді — парсер лежить у <code>/chat</code> з першого дня і пише її в поле <code>tool</code>. Сьогодні за розпізнаванням нарешті з'явиться виконання.</p>
+</section>
+
+<section>
+  <div class="shead"><div class="num">03</div></div>
+  <h2>Схема — перша лінія оборони</h2>
+  <p>Кожен інструмент починається не з коду, а з контракту: назва, параметри, типи, що обов'язкове. Цей контракт працює у два боки. Моделі він каже, що взагалі можна просити (провайдери передають схеми інструментів у запиті — так модель знає про <code>lookup_order</code>). А сервісу він дає право <strong>валідувати аргументи до виконання</strong>.</p>
+  <p>Модель попросила <code>lookup_order</code> без номера замовлення? Це помилка валідації — відхилити і залогувати, а не «спробуємо якось»: підставити останнє замовлення, вгадати за контекстом, викликати з порожнім аргументом. Кожне таке «якось» — це рішення, яке ухвалив ніхто, і коли воно вистрелить, винних не буде.</p>
+  <p>У нашому навчальному контурі схеми мінімальні: два інструменти, у <code>lookup_order</code> — номер замовлення, у <code>create_ticket</code> — тема. Але дисципліна закладається саме тут: інструмент без схеми — це не інструмент, а дірка, підписана як фіча.</p>
+</section>
+
+<section>
+  <div class="shead"><div class="num">04</div></div>
+  <h2>Виконання: мінімальний реєстр</h2>
+  <p>Сам рантайм у еталоні навмисно крихітний — реєстр інструментів як одна функція:</p>
+  <pre><code>// [W3] мінімальний реєстр інструментів
+static string? RunTool(string name) => name switch
+{
+    "lookup_order"  => "статус: оплачено, доставку призначено",
+    "create_ticket" => "тікет #T-" + Guid.NewGuid().ToString("N")[..4],
+    _ => null,
+};</code></pre>
+  <p>А в місці парсингу відповіді — виконання і підклейка результату:</p>
+  <pre><code>toolCall = tools[0].GetProperty("function").GetProperty("name").GetString();
+// [W3] виконуємо інструмент і додаємо результат до відповіді
+var result = RunTool(toolCall);
+if (result != null) answer += $" ({result})";</code></pre>
+  <p>У чаті це виглядає як «Перевіряю статус… (статус: оплачено, доставку призначено)». Невідомий інструмент повертає <code>null</code> — тобто «модель попросила те, чого в реєстрі немає» безпечно перетворюється на відповідь без результату, а не на виняток.</p>
+  <div class="call note"><b>Чесне спрощення</b>У повноцінних агентних системах результат інструмента повертають моделі другим викликом — вона «бачить» відповідь і формулює фінальний текст. Ми свідомо робимо один хоп із підклейкою: курс про операційний контур навколо дій — схеми, таймаути, ідемпотентність, аудит, підтвердження, — і весь цей контур однаковий незалежно від того, скільки кіл робить діалог із моделлю.</div>
+</section>
+
+<section>
+  <div class="shead"><div class="num">05</div></div>
+  <h2>Timeout: інструмент не має права висіти</h2>
+  <p>Наш mock-реєстр відповідає миттєво. Реальний інструмент — це похід у зовнішню систему: CRM, платіжний сервіс, склад. І кожен такий похід успадковує всі хвороби мереж: повільні відповіді, з'єднання, що висять, сервіси, які «зараз-зараз».</p>
+  <p>Без ліміту часу завислий інструмент вішає всю відповідь: користувач дивиться на спінер, latency летить у стелю, а якщо таких запитів багато — закінчуються з'єднання і лягає весь сервіс. Тому правило просте: <strong>кожен tool-виклик виконується з таймаутом</strong>, і його вичерпання — це нормальна, оброблена гілка («не вдалося перевірити статус, спробуйте пізніше»), а не аварія.</p>
+  <div class="call tip"><b>Лайфхак</b>Бюджет часу на інструмент має бути помітно меншим за загальний бюджет відповіді. Якщо чат обіцяє відповідь за ~10 секунд, а інструмент може законно думати 30 — у вас конфлікт бюджетів, який ви віддали на розсуд таймінгів чужого сервісу. Розставте ліміти згори вниз: спершу «скільки чекає користувач», потім — скільки з цього дістається кожному хопу.</div>
+</section>
+
+<section>
+  <div class="shead"><div class="num">06</div></div>
+  <h2>Ідемпотентність: повтор не множить наслідки</h2>
+  <p>Тепер найважливіша властивість. Сценарій: сервіс викликав <code>create_ticket</code>, зовнішня система тікет створила, але відповідь загубилася в мережі. Ваш код бачить таймаут і чесно ретраїть. А тим часом модель у наступному ході теж повторила прохання. Скільки тікетів у системі? Якщо ви не подумали про це заздалегідь — три. Правильна відповідь — один.</p>
+  <p>Рішення відоме з платіжних API — і не випадково, бо там ця сама задача коштує грошей напряму: <strong>ключ ідемпотентності</strong>. Кожна операція отримує стабільний ідентифікатор (у нас природний кандидат — <code>request_id</code>); виконавець запам'ятовує оброблені ключі, і повтор із тим самим ключем не виконує дію вдруге, а повертає збережений результат.</p>
+  <p>Зверніть увагу, як гарно це складається з ретраями: щойно повтор став безпечним, ретраї перестають бути ризиком і стають просто політикою надійності. Ідемпотентність — це те, що дозволяє системі бути наполегливою, не стаючи небезпечною.</p>
+  <div class="call mistake"><b>Типова помилка</b>Ретраїти side-effecting виклик без ключа операції: «ну, таймаут же — мабуть, не виконалось». Мабуть. А мабуть — виконалось, і відповідь не дійшла. Кожен такий ретрай — лотерея з подвійним тікетом, подвійним списанням чи подвійним листом клієнту. Повторюваним без ключа може бути тільки читання.</div>
+</section>
+
+<section>
+  <div class="shead"><div class="num">07</div></div>
+  <h2>Межа незворотного — і чесна «дірка»</h2>
+  <p>Два наші інструменти навмисно різні. <code>lookup_order</code> — читання: найгірший наслідок повтору — зайвий запит у базу. <code>create_ticket</code> — незворотна дія у зовнішній системі. Межа між ними проходить <strong>не по складності інструмента, а по відворотності наслідків</strong> — і поводитися з ними треба по-різному.</p>
+  <p>А тепер чесний момент сьогоднішнього уроку: у нашому коді <code>create_ticket</code> поки виконується так само миттєво, як і <code>lookup_order</code>. Напишіть «поверніть гроші, терміново» — і тікет створиться без жодної людини в ланцюгу. Подивіться на це очима оператора підтримки: щойно система сама, за текстом користувача, створила зобов'язання, яке хтось муситиме виконувати. Це навмисна «дірка» — найкращий спосіб відчути, навіщо потрібен наступний механізм.</p>
+  <p>Контракт фіксуємо вже сьогодні: незворотна дія не виконується автономно — вона стає <em>заявкою</em> в черзі <code>/approvals</code>, а виконання відбувається лише після підтвердження людиною. Реалізуємо це на уроці 8, і сьогоднішній «автономний тікет» стане відмінним «до» для того «після».</p>
+  <div class="call principle"><b>Принцип</b>Машина пропонує — людина підтверджує. Автономність дається інструменту за відворотністю: читання — вільно, поправне — з обмеженнями, незворотне — тільки через людину. «Модель так сказала» — не підстава для дії, яку не можна скасувати.</div>
+</section>
+
+<section>
+  <div class="shead"><div class="num">08</div></div>
+  <h2>Аудит: дія без сліду — не дія, а пригода</h2>
+  <p>Останній обов'язковий елемент рантайму — лог. Кожен tool-виклик має лишати слід того ж калібру, що й виклик моделі: <strong>хто</strong> (який запит, <code>request_id</code>), <strong>що</strong> (який інструмент), <strong>з чим</strong> (аргументи), <strong>з яким результатом</strong> (успіх, помилка, таймаут). У нас назва інструмента вже їде в лог-рядок — це мінімум; повний аудит дій — природне розширення тієї самої дисципліни unified log з уроку 1.</p>
+  <p>Перевірка проста: завтра прилітає «чому створився цей тікет?» — і відповідь має знаходитись у лозі за хвилину. Який запит, що спитав користувач, який інструмент викликано, хто підтвердив (з уроку 8). Якщо для відповіді треба «підняти логи трьох сервісів і спитати чергового» — аудиту немає.</p>
+  <p>І не забудьте зв'язку з минулим уроком: відповіді з tool-викликами <strong>не кешуються</strong> — умова <code>toolCall == null</code> перед записом у кеш. Статус замовлення, закешований на годину, — це впевнена брехня; тепер, коли інструменти працюють, ця межа з теоретичної стала вашою.</p>
+</section>
+
+<section>
+  <div class="shead"><div class="num">09</div><span class="track opt">опційно</span></div>
+  <h2>Розширений реєстр інструментів</h2>
+  <p>Наш <code>switch</code> на два інструменти — свідомий мінімум. Якщо хочеться глибше (і це опційна доріжка), реєстр росте у бік справжньої таблиці можливостей: кожен інструмент описується записом — схема аргументів, категорія (read-only / side-effecting), таймаут, політика ретраїв, чи потрібне підтвердження. Виконавець стає універсальним: дивиться в реєстр, валідує, виконує за політикою.</p>
+  <p>Цінність такої структури не в архітектурній красі, а в тому, що <em>політики стають даними</em>: додати інструмент — це додати запис із чесно заповненими полями, а не написати новий шматок логіки. На співбесідах з LLMOps, до речі, питання «як ви додаєте новий інструмент» — одне з улюблених: відповідь «запис у реєстрі з категорією і таймаутом» звучить сильно переконливіше за «дописуємо if».</p>
+</section>
+
+<section>
+  <div class="shead"><div class="num">10</div></div>
+  <h2>Лабораторна: чотири частини</h2>
+  <ol class="steps">
+    <li><strong>Прочитати tool_calls.</strong> Спитати «Де моє замовлення #10482?» і подивитися сиру відповідь mock: структура <code>tool_calls</code>, назва, <code>finish_reason: tool_calls</code>. Переконатися, що це прохання, а не подія.</li>
+    <li><strong>Виконати read-only.</strong> Додати мінімальний реєстр (<code>RunTool</code>): <code>lookup_order</code> повертає статус, результат підклеюється до відповіді. У чаті — «Перевіряю статус… (статус: оплачено, доставку призначено)».</li>
+    <li><strong>Обкласти виконання.</strong> Таймаут на tool-виклик (вичерпання — оброблена гілка) і ключ ідемпотентності: проговорити на прикладі, чому два однакові <code>create_ticket</code> з одним ключем операції — це один тікет.</li>
+    <li><strong>Подивитися в «дірку».</strong> Написати «поверніть гроші» — тікет створюється автономно. Сформулювати одним абзацом, чому так не можна, і зафіксувати контракт: незворотне → заявка в <code>/approvals</code> → виконання після підтвердження (урок 8).</li>
+    <li class="opt"><strong>Опційно: реєстр як дані.</strong> Переписати <code>switch</code> на таблицю записів зі схемою, категорією і таймаутом на кожен інструмент.</li>
+  </ol>
+  <div class="check"><strong>Перевір себе (обов'язкова доріжка):</strong>
+    <ul>
+      <li>«Де моє замовлення?» повертає відповідь з результатом інструмента;</li>
+      <li>розумієш різницю read-only / side-effecting і де проходить межа;</li>
+      <li>можеш пояснити ідемпотентність на прикладі подвійного тікета;</li>
+      <li>tool-виклик видно в лозі, а tool-відповіді не потрапляють у кеш.</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <div class="shead"><div class="num">11</div></div>
+  <h2>Антипатерни тижня</h2>
+  <ul>
+    <li><strong>Виконувати незворотні дії автономно,</strong> «бо модель попросила». Модель пропонує; відповідальність — на системі.</li>
+    <li><strong>Інструмент без схеми:</strong> «розпарсимо аргументи якось». Кожне «якось» — неухвалене рішення, яке колись вистрелить.</li>
+    <li><strong>Виклик без таймаута.</strong> Завислий інструмент вішає відповідь, потім — сервіс.</li>
+    <li><strong>Ретрай, що створює по side-effect'у на кожен повтор.</strong> Наполегливість без ідемпотентності — це небезпека, а не надійність.</li>
+    <li><strong>Tool-виклики повз лог.</strong> Дії без аудиту: «чому створився цей тікет?» — «а хто його знає».</li>
+  </ul>
+</section>
+
+<section>
+  <h2 style="font-size:20px">Карта уроку</h2>
+  <ul class="map">
+    <li><span class="n">01</span><span>Модель починає діяти; LLM — ненадійний клієнт вашого API</span></li>
+    <li><span class="n">02</span><span>Анатомія: tool_calls — прохання, не подія; зазор — ваша робота</span></li>
+    <li><span class="n">03</span><span>Схема і валідація до виконання; жодних «спробуємо якось»</span></li>
+    <li><span class="n">04</span><span>RunTool: мінімальний реєстр, підклейка результату, чесний one-hop</span></li>
+    <li><span class="n">05</span><span>Timeout: бюджети часу розставляються згори вниз</span></li>
+    <li><span class="n">06</span><span>Ідемпотентність: ключ операції робить повтор безпечним</span></li>
+    <li><span class="n">07</span><span>Межа за відворотністю; «дірка» автономного тікета; контракт /approvals</span></li>
+    <li><span class="n">08</span><span>Аудит дій у лозі; tool-відповіді не кешуються</span></li>
+    <li><span class="n">09</span><span>Опційно: реєстр інструментів як дані з політиками</span></li>
+    <li><span class="n">10</span><span>Лаба: прочитати → виконати → обкласти → подивитися в дірку</span></li>
+    <li><span class="n">11</span><span>Антипатерни тижня</span></li>
+  </ul>
+</section>
+
+<section class="hw">
+  <h2>📝 Домашнє завдання</h2>
+  <h3>ДЗ тижня — hw3: кеш + інструменти</h3>
+  <p><a class="links" href="https://github.com/TarasFedorenkoFTV/llmops-bootcamp/blob/main/starter/homework/hw3.md">starter/homework/hw3.md</a> — обидва уроки тижня в одному PR: кеш із лічильниками з уроку 5 плюс сьогоднішнє безпечне виконання інструментів.</p>
+  <p>Критерії приймання коротко: другий однаковий запит відповідає миттєво (з кешу); «Де моє замовлення #123?» повертає відповідь із результатом інструмента; повторний tool-виклик не робить side-effect двічі; таймаут продуманий. Повні критерії — у файлі ДЗ.</p>
+  <h3>Опційно (не оцінюється)</h3>
+  <ul>
+    <li>TTL: кешовані відповіді старіють і перезапитуються;</li>
+    <li>semantic cache: Redis з advanced-профілю + порівняння за схожістю.</li>
+  </ul>
+</section>
+
+<section>
+  <h2 style="font-size:20px">Що далі</h2>
+  <p>Бот говорить, рахує гроші, вміє діяти. Наступний тиждень — про найнеприємніше: що робити, коли провайдер лежить, ліміти вичерпані, а користувачі пишуть просто зараз. Fallback на резервну модель, красива деградація замість мовчазного падіння — і керовані інциденти, які ми влаштуємо власними руками, бо mock уміє падати на замовлення.</p>
+</section>
+
+<footer>SupportGW · LLMOps Bootcamp · Урок 6 з 12 · матеріал уроку — основа для відео (~30 хв)</footer>
+</div>
+</body>
+</html>
