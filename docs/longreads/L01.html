@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Урок 1 · LLMOps і архітектура production LLM-системи</title>
+<style>
+  :root{
+    --bg:#f6f7f9; --card:#ffffff; --ink:#1b1d23; --soft:#565c6b; --faint:#8a90a0;
+    --line:#e4e6ec; --accent:#4038c4; --accent-bg:#ecebfb;
+    --good:#177245; --good-bg:#e9f3ee; --warn:#9a5b12; --warn-bg:#f8f0e2; --crit:#b3261e; --crit-bg:#f9e9e8;
+    --mono:ui-monospace,"Cascadia Code",Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:860px;margin:0 auto;padding:48px 20px 90px}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:600}
+  h1{font-size:clamp(28px,5vw,40px);line-height:1.12;letter-spacing:-.02em;margin:10px 0 8px}
+  .lead{font-size:18px;color:var(--soft);max-width:64ch;margin:0}
+  .chain{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:26px 0 0;font-family:var(--mono);font-size:12px}
+  .chain span{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:4px 11px;color:var(--soft)}
+  .chain span.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+  .chain i{color:var(--faint);font-style:normal}
+  section{margin-top:52px}
+  .num{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:10px;background:var(--accent-bg);color:var(--accent);font-family:var(--mono);font-weight:700;font-size:14px;margin-bottom:10px}
+  h2{font-size:24px;letter-spacing:-.01em;margin:0 0 12px}
+  h3{font-size:17px;margin:22px 0 8px}
+  p{margin:0 0 12px;max-width:70ch}
+  ul{margin:0 0 12px;padding-left:22px;max-width:70ch}
+  li{margin-bottom:6px}
+  strong{font-weight:650}
+  code{font-family:var(--mono);font-size:.88em;background:var(--accent-bg);color:var(--accent);padding:1px 6px;border-radius:5px;white-space:nowrap}
+  pre{background:#14161c;color:#e8e9ed;border-radius:12px;padding:14px 18px;overflow-x:auto;font-family:var(--mono);font-size:13.5px;line-height:1.6;max-width:100%}
+  pre code{background:none;color:inherit;padding:0;white-space:pre}
+  .call{border-radius:12px;padding:13px 16px;margin:14px 0;max-width:70ch;border:1px solid var(--line);background:var(--card)}
+  .call b{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.09em;text-transform:uppercase;margin-bottom:5px}
+  .call.principle{background:var(--good-bg);border-color:transparent}
+  .call.principle b{color:var(--good)}
+  .call.mistake{background:var(--crit-bg);border-color:transparent}
+  .call.mistake b{color:var(--crit)}
+  .call.tip{background:var(--warn-bg);border-color:transparent}
+  .call.tip b{color:var(--warn)}
+  .call.note{background:var(--accent-bg);border-color:transparent}
+  .call.note b{color:var(--accent)}
+  table{border-collapse:collapse;width:100%;font-size:14.5px;background:var(--card);border-radius:12px;overflow:hidden;border:1px solid var(--line)}
+  th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);background:#fafafc}
+  tr:last-child td{border-bottom:none}
+  .flow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-family:var(--mono);font-size:13px;margin:14px 0}
+  .flow span{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:7px 12px}
+  .flow span.hl{border-color:var(--accent);color:var(--accent);font-weight:600}
+  .flow i{color:var(--faint);font-style:normal}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin:14px 0}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  .card h4{margin:0 0 6px;font-size:14.5px}
+  .card p{font-size:14px;color:var(--soft);margin:0}
+  .steps{counter-reset:s;margin:14px 0;padding:0;list-style:none;max-width:72ch}
+  .steps li{counter-increment:s;position:relative;padding:0 0 14px 44px;margin:0}
+  .steps li::before{content:counter(s);position:absolute;left:0;top:0;width:28px;height:28px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-family:var(--mono);font-size:13px;font-weight:700}
+  .check{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 18px;max-width:72ch}
+  .check ul{margin:0;padding-left:20px}
+  .links a{color:var(--accent);text-decoration:none;border-bottom:1px solid var(--accent-bg)}
+  .links a:hover{border-bottom-color:var(--accent)}
+  .map{margin:14px 0;padding:0;list-style:none;max-width:72ch}
+  .map li{display:flex;gap:12px;padding:8px 0;border-bottom:1px dashed var(--line);font-size:14.5px}
+  .map li:last-child{border-bottom:none}
+  .map .n{font-family:var(--mono);color:var(--accent);font-weight:700;min-width:26px}
+  .hw{background:var(--card);border:2px solid var(--accent);border-radius:14px;padding:20px 22px;margin-top:16px}
+  .hw h2{margin-top:0}
+  footer{margin-top:60px;border-top:1px solid var(--line);padding-top:16px;font-family:var(--mono);font-size:12px;color:var(--faint)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">Урок 1 · SupportGW · LLMOps Bootcamp</div>
+  <h1>LLMOps і архітектура production LLM-системи</h1>
+  <p class="lead">Від «API відповів 200» до системи, якою можна керувати. Сьогодні піднімаємо каркас капстоуна і проводимо перший запит крізь увесь ланцюг — очима оператора, а не програміста.</p>
+  <div class="chain">
+    <span class="on">W1 Основа + промпти</span><i>→</i>
+    <span>W2 Routing + cost</span><i>→</i>
+    <span>W3 Кеш + tools</span><i>→</i>
+    <span>W4 Надійність + безпека</span><i>→</i>
+    <span>W5 Observability + evals</span><i>→</i>
+    <span>W6 CI + фінал</span>
+  </div>
+</header>
+
+<section>
+  <div class="num">01</div>
+  <h2>Проблема: 200 — це не «працює»</h2>
+  <p>Викликати модель — три рядки коду. Запит пішов, 200 повернувся, демо готове. А тепер чотири питання, на які ці три рядки не відповідають:</p>
+  <ul>
+    <li>Скільки ця фіча коштує на тиждень? А на якій задачі гроші згорають дарма?</li>
+    <li>Що станеться, коли провайдер ляже на 20 хвилин у робочий час?</li>
+    <li>Хто помітить, що відповіді стали гіршими після «маленької» правки промпта?</li>
+    <li>Куди дивитися, коли користувач каже «бот верзе дурниці», а всі графіки зелені?</li>
+  </ul>
+  <p>Класичний моніторинг тут сліпий: LLM-система може бути «здоровою» за всіма HTTP-метриками — і при цьому брехати, палити бюджет і тихо деградувати. Недетермінізм, вартість за токен, регресії від одного речення, залежність від чужої інфраструктури — це операційна реальність, яку DevOps і MLOps у чистому вигляді не покривають.</p>
+  <div class="call note"><b>Теза курсу</b>LLMOps — не про те, як покликати модель. Це про те, як експлуатувати її як production-сервіс. Тому цей курс — не про програмування: код вам дається, ваша робота — механізми керування.</div>
+</section>
+
+<section>
+  <div class="num">02</div>
+  <h2>Хто такий LLMOps-інженер</h2>
+  <p>Три звичні ролі приходять до однієї й тієї самої прогалини:</p>
+  <table>
+    <tr><th>Роль</th><th>Що вже вміє</th><th>Чого бракує для LLM у проді</th></tr>
+    <tr><td><strong>DevOps / Platform</strong></td><td>CI/CD, деплой, моніторинг</td><td>недетермінізм, токеноміка, регресії промптів</td></tr>
+    <tr><td><strong>MLOps / ML</strong></td><td>ML lifecycle, метрики моделей</td><td>prompt lifecycle, evals для LLM, маршрутизація провайдерів</td></tr>
+    <tr><td><strong>Software Engineer</strong></td><td>сервіси, API, бази</td><td>як зробити LLM-фічу керованою: fallback, cost, гейти якості</td></tr>
+  </table>
+  <p style="margin-top:12px">Фінальна здатність одна для всіх: узяти LLM-прототип і довести його до <strong>керованої production-системи</strong> — з маршрутизацією, вартістю, надійністю, спостережуваністю і гейтами якості. Рівно це ми і зробимо за 6 тижнів, шар за шаром.</p>
+</section>
+
+<section>
+  <div class="num">03</div>
+  <h2>Капстоун: SupportGW</h2>
+  <p>Наскрізний проєкт курсу — бот служби підтримки з повноцінним control plane. Ліворуч чат для користувача; праворуч — консоль оператора: вартість, latency, версії промптів, здоров'я провайдерів, черга підтверджень. Каркас дається готовим і піднімається однією командою.</p>
+  <div class="cards">
+    <div class="card"><h4>Дається готовим</h4><p>Веб-інтерфейс (чат + консоль), каркас сервісу, gateway-адаптер, база, mock-провайдер, CI-шаблон. Фронтенд ви не чіпаєте взагалі.</p></div>
+    <div class="card"><h4>Ваша робота</h4><p>Control plane: маршрутизація, вартість, кеш, безпечні дії, fallback, guardrails, метрики, evals, CI-гейт. Один шар на тиждень.</p></div>
+  </div>
+  <div class="call note"><b>Це не курс програмування</b>Кожне ДЗ — це десятки рядків у підписаних місцях (<code>TODO(student, W#)</code>), а не «напишіть сервіс». Складність — в операційних рішеннях: що кешувати, коли деградувати, який поріг якості. Код — лише спосіб їх зафіксувати.</div>
+  <div class="call tip"><b>Лайфхак</b>Весь core курсу проходиться на фейковому провайдері — без жодного платного ключа. Нуль витрат, повна відтворюваність. Реальний ключ знадобиться один раз, на тижні оцінки якості, і це опційно.</div>
+</section>
+
+<section>
+  <div class="num">04</div>
+  <h2>Архітектура: шлях одного запиту</h2>
+  <div class="flow">
+    <span>Користувач</span><i>→</i><span>Chat UI</span><i>→</i><span class="hl">Сервіс · control plane</span><i>→</i><span>Gateway-адаптер</span><i>→</i><span>Модель / mock</span><i>⇢</i><span>Лог у БД</span>
+  </div>
+  <p>Головна межа проходить між двома словами: <strong>вирішує</strong> і <strong>виконує</strong>. Сервіс вирішує: яку модель узяти, чи є відповідь у кеші, чи потрібен fallback, скільки це коштувало. Gateway-адаптер лише виконує виклик і згладжує розбіжності між провайдерами. Уся ваша робота в курсі житиме на боці «вирішує».</p>
+  <div class="call principle"><b>Принцип</b>Ключ провайдера живе тільки в gateway. Якщо секрет лежить у коді застосунку — контрол-плейну у вас ще немає, є розкидані виклики. Це найчастіша помилка на старті й найдешевша для виправлення саме зараз.</div>
+  <div class="call mistake"><b>Типова помилка</b>Дозволити gateway-адаптеру «вирішувати» через конфіг: і роутити, і фейлитись самому. Тоді ви навчитеся клікати прапорці конкретного інструмента, а не будувати механізм. У нашій архітектурі рішення — це код, який ви розумієте, тестуєте і логуєте.</div>
+</section>
+
+<section>
+  <div class="num">05</div>
+  <h2>Unified log: фундамент усього курсу</h2>
+  <p>Кожен запит лишає один рядок у таблиці <code>requests</code>:</p>
+  <pre><code>request_id · model · prompt_version · latency_ms
+prompt_tokens · completion_tokens · cost_usd · status</code></pre>
+  <p>Виглядає скромно, але з цього рядка виростає весь курс: облік вартості (W2), кеш-метрики (W3), сліди інцидентів (W4), уся спостережуваність (W5) і докази для гейтів якості (W5–W6). Сьогодні два поля ще порожні — <code>prompt_version</code> і <code>cost_usd</code>. Це не недоробка, це ваша робота на найближчі два тижні.</p>
+  <div class="call principle"><b>Принцип</b>Немає лога — немає операцій. Будь-яке операційне питання («скільки?», «чому повільно?», «яка версія?») має відповідатися з лога, а не з пам'яті команди.</div>
+</section>
+
+<section>
+  <div class="num">06</div>
+  <h2>Mock-провайдер: чому без ключа — це фіча</h2>
+  <p>У стеку живе фейковий провайдер, сумісний за API зі справжніми. У нього дві суперсили, які роблять курс можливим:</p>
+  <ul>
+    <li><strong>Падає на замовлення.</strong> Маркер <code>__fail_503</code> у повідомленні — і «провайдер лежить». Так ми тренуватимемо надійність детерміновано, а не чекаючи реального інциденту.</li>
+    <li><strong>Реагує на промпт.</strong> Зіпсуєте системний промпт — відповіді стануть «не знаю». Так регресію промпта зможе ловити автоматика, і ви побачите це на власні очі вже наступного уроку.</li>
+  </ul>
+  <div class="call note"><b>Навіщо так</b>Механіка контуру — маршрутизація, лог, fallback, гейти — однакова для mock і реальної моделі. Міняється лише «мозок» на іншому кінці дроту. Тому все, що ви збудуєте, переноситься на бойових провайдерів без переробки.</div>
+</section>
+
+<section>
+  <div class="num">07</div>
+  <h2>Лабораторна: чотири кроки</h2>
+  <ol class="steps">
+    <li><strong>Підняти стек.</strong> <code>docker compose up --build</code> у папці <code>starter/</code>. Відкрити <code>http://localhost:4200</code>, написати боту «Як скинути пароль?» — і подивитись відповідь. Консоль праворуч поки показує «—» скрізь: це чесна точка А.</li>
+    <li><strong>Пройти шлях запиту.</strong> Відкрити <code>service/Program.cs</code> і прочитати <code>/chat</code> згори вниз: звідки модель, як збирається запит, куди пишеться лог. Знайти всі <code>TODO(student, W#)</code> — це мапа вашої роботи на 6 тижнів.</li>
+    <li><strong>Побачити свій запит у лозі.</strong> <code>SELECT * FROM requests ORDER BY created_at DESC</code> — знайти рядок свого повідомлення і чесно відповісти: яких полів ще бракує і кому вони потрібні.</li>
+    <li><strong>Зламати.</strong> Написати в чат <code>__fail_503</code>. Бот відповість «сервіс недоступний» — жодного плану Б поки немає. Запам'ятайте це відчуття: до W4 ми його повністю виправимо.</li>
+  </ol>
+  <div class="check"><strong>Перевір себе:</strong>
+    <ul>
+      <li>стек піднявся, чат відповідає;</li>
+      <li>можеш намалювати шлях запиту з пам'яті;</li>
+      <li>бачив рядок свого запиту в <code>requests</code>;</li>
+      <li>знаєш, де в коді живуть твої майбутні задачі.</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <div class="num">08</div>
+  <h2>Все для старту: посилання і вимоги</h2>
+  <p class="links">Один раз, все в одному місці:</p>
+  <table class="links">
+    <tr><th>Що</th><th>Де</th></tr>
+    <tr><td><strong>Репозиторій курсу</strong> (клонувати)</td><td><a href="https://github.com/TarasFedorenkoFTV/llmops-bootcamp">github.com/TarasFedorenkoFTV/llmops-bootcamp</a> — робоча папка <code>starter/</code></td></tr>
+    <tr><td><strong>Повний гайд</strong>: вимоги, запуск, кожна папка, troubleshooting</td><td><a href="https://github.com/TarasFedorenkoFTV/llmops-bootcamp/blob/main/starter/GETTING_STARTED.md">starter/GETTING_STARTED.md</a></td></tr>
+    <tr><td><strong>Домашні завдання</strong> по тижнях</td><td><a href="https://github.com/TarasFedorenkoFTV/llmops-bootcamp/tree/main/starter/homework">starter/homework/</a></td></tr>
+    <tr><td><strong>Конспекти уроків</strong></td><td><a href="https://github.com/TarasFedorenkoFTV/llmops-bootcamp/tree/main/docs/lessons">docs/lessons/</a></td></tr>
+    <tr><td><strong>Еталонні рішення</strong> (після здачі свого — звіритись)</td><td><a href="https://github.com/TarasFedorenkoFTV/llmops-bootcamp-solutions">llmops-bootcamp-solutions</a>, бранчі <code>w1</code>…<code>w6</code></td></tr>
+  </table>
+  <h3>Мінімальні вимоги</h3>
+  <ul>
+    <li>Docker з Compose v2 (будь-який дистрибутив) і Git;</li>
+    <li>~4 ГБ диска під образи, вільні порти <code>4200 / 8080 / 4000 / 5432</code>;</li>
+    <li>жодних платних ключів — усе на mock.</li>
+  </ul>
+  <div class="call tip"><b>Лайфхак</b>Якщо порт зайнятий або щось не піднімається — у GETTING_STARTED є розділ Troubleshooting з найчастішими граблями (зайняті порти, корпоративний проксі, кирилиця в терміналі). Спершу туди, потім у чат курсу.</div>
+</section>
+
+<section>
+  <div class="num">09</div>
+  <h2>Антипатерни тижня</h2>
+  <ul>
+    <li><strong>Ключ провайдера в коді застосунку.</strong> «Потім перенесемо» — не перенесете.</li>
+    <li><strong>Демо на одному запиті як доказ готовності.</strong> Готовність — це відповіді на питання з блоку 01.</li>
+    <li><strong>«Логи подивимось, коли зламається».</strong> Тоді дивитися буде нікуди.</li>
+    <li><strong>Почати з оркестрації і трьох провайдерів.</strong> Спочатку — один робочий контур наскрізь.</li>
+  </ul>
+</section>
+
+<section>
+  <h2 style="font-size:20px">Карта уроку</h2>
+  <ul class="map">
+    <li><span class="n">01</span><span>200 ≠ production: чотири питання без відповіді</span></li>
+    <li><span class="n">02</span><span>LLMOps = експлуатація LLM як сервісу; три ролі → одна здатність</span></li>
+    <li><span class="n">03</span><span>SupportGW: каркас готовий, ваша робота — control plane</span></li>
+    <li><span class="n">04</span><span>Сервіс вирішує, адаптер виконує; ключ живе в gateway</span></li>
+    <li><span class="n">05</span><span>Unified log — рядок, з якого виростає весь курс</span></li>
+    <li><span class="n">06</span><span>Mock: збої на замовлення + чутливість до промпта = курс без ключа</span></li>
+    <li><span class="n">07</span><span>Лаба: підняти → прочитати → знайти в лозі → зламати</span></li>
+    <li><span class="n">08</span><span>Стартовий пакет: репозиторій, гайд, вимоги</span></li>
+  </ul>
+</section>
+
+<section class="hw">
+  <h2>📝 Домашнє завдання</h2>
+  <p><strong>До наступного уроку</strong> (без здачі, ~1 година):</p>
+  <ul>
+    <li>підняти стек і пройти всі 4 кроки лабораторної;</li>
+    <li>витримати чек-лист «перевір себе» з блоку 07.</li>
+  </ul>
+  <p><strong>ДЗ тижня</strong> (здається після уроку 2, з PR): логування + prompt registry — <a class="links" href="https://github.com/TarasFedorenkoFTV/llmops-bootcamp/blob/main/starter/homework/hw1.md">hw1.md</a>. Критерії приймання коротко: стек піднімається однією командою; промпт живе в БД, а не в коді; у кожному лог-рядку заповнена версія промпта; відкат на «поганий» промпт ловиться перевірками. Повні критерії — у файлі ДЗ.</p>
+</section>
+
+<section>
+  <h2 style="font-size:20px">Що далі</h2>
+  <p>Сьогодні ваш системний промпт захардкоджений у коді. Наступний урок — чому промпт це production-артефакт з версіями, promote і rollback, і що стається з якістю, коли «маленьку правку промпта» викочують без сліду.</p>
+</section>
+
+<footer>SupportGW · LLMOps Bootcamp · Урок 1 з 12 · матеріал уроку — основа для відео</footer>
+</div>
+</body>
+</html>
