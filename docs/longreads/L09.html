@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Урок 9 · Observability для LLM-систем</title>
+<style>
+  :root{
+    --bg:#f6f7f9; --card:#ffffff; --ink:#1b1d23; --soft:#565c6b; --faint:#8a90a0;
+    --line:#e4e6ec; --accent:#4038c4; --accent-bg:#ecebfb;
+    --good:#177245; --good-bg:#e9f3ee; --warn:#9a5b12; --warn-bg:#f8f0e2; --crit:#b3261e; --crit-bg:#f9e9e8;
+    --mono:ui-monospace,"Cascadia Code",Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:860px;margin:0 auto;padding:48px 20px 90px}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:600}
+  h1{font-size:clamp(28px,5vw,40px);line-height:1.12;letter-spacing:-.02em;margin:10px 0 8px}
+  .lead{font-size:18px;color:var(--soft);max-width:64ch;margin:0}
+  .chain{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:26px 0 0;font-family:var(--mono);font-size:12px}
+  .chain span{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:4px 11px;color:var(--soft)}
+  .chain span.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+  .chain i{color:var(--faint);font-style:normal}
+  section{margin-top:52px}
+  .shead{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .num{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:10px;background:var(--accent-bg);color:var(--accent);font-family:var(--mono);font-weight:700;font-size:14px}
+  .track{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:3px 9px;border-radius:20px;font-weight:700}
+  .track.opt{background:var(--warn-bg);color:var(--warn)}
+  h2{font-size:24px;letter-spacing:-.01em;margin:0 0 12px}
+  h3{font-size:17px;margin:22px 0 8px}
+  p{margin:0 0 12px;max-width:70ch}
+  ul,ol{margin:0 0 12px;padding-left:22px;max-width:70ch}
+  li{margin-bottom:6px}
+  strong{font-weight:650}
+  code{font-family:var(--mono);font-size:.88em;background:var(--accent-bg);color:var(--accent);padding:1px 6px;border-radius:5px;white-space:nowrap}
+  pre{background:#14161c;color:#e8e9ed;border-radius:12px;padding:14px 18px;overflow-x:auto;font-family:var(--mono);font-size:13.5px;line-height:1.6;max-width:100%}
+  pre code{background:none;color:inherit;padding:0;white-space:pre}
+  .call{border-radius:12px;padding:13px 16px;margin:14px 0;max-width:70ch;border:1px solid var(--line);background:var(--card)}
+  .call b{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.09em;text-transform:uppercase;margin-bottom:5px}
+  .call.principle{background:var(--good-bg);border-color:transparent}
+  .call.principle b{color:var(--good)}
+  .call.mistake{background:var(--crit-bg);border-color:transparent}
+  .call.mistake b{color:var(--crit)}
+  .call.tip{background:var(--warn-bg);border-color:transparent}
+  .call.tip b{color:var(--warn)}
+  .call.note{background:var(--accent-bg);border-color:transparent}
+  .call.note b{color:var(--accent)}
+  table{border-collapse:collapse;width:100%;font-size:14.5px;background:var(--card);border-radius:12px;overflow:hidden;border:1px solid var(--line)}
+  th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);background:#fafafc}
+  tr:last-child td{border-bottom:none}
+  .flow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-family:var(--mono);font-size:13px;margin:14px 0}
+  .flow span{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:7px 12px}
+  .flow span.hl{border-color:var(--accent);color:var(--accent);font-weight:600}
+  .flow i{color:var(--faint);font-style:normal}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin:14px 0}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  .card h4{margin:0 0 6px;font-size:14.5px}
+  .card p{font-size:14px;color:var(--soft);margin:0}
+  .steps{counter-reset:s;margin:14px 0;padding:0;list-style:none;max-width:72ch}
+  .steps li{counter-increment:s;position:relative;padding:0 0 14px 44px;margin:0}
+  .steps li::before{content:counter(s);position:absolute;left:0;top:0;width:28px;height:28px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-family:var(--mono);font-size:13px;font-weight:700}
+  .steps li.opt::before{background:var(--warn)}
+  .check{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 18px;max-width:72ch}
+  .check ul{margin:0;padding-left:20px}
+  .links a{color:var(--accent);text-decoration:none;border-bottom:1px solid var(--accent-bg)}
+  .links a:hover{border-bottom-color:var(--accent)}
+  .map{margin:14px 0;padding:0;list-style:none;max-width:72ch}
+  .map li{display:flex;gap:12px;padding:8px 0;border-bottom:1px dashed var(--line);font-size:14.5px}
+  .map li:last-child{border-bottom:none}
+  .map .n{font-family:var(--mono);color:var(--accent);font-weight:700;min-width:26px}
+  .hw{background:var(--card);border:2px solid var(--accent);border-radius:14px;padding:20px 22px;margin-top:16px}
+  .hw h2{margin-top:0}
+  .hw h3{margin-top:14px}
+  footer{margin-top:60px;border-top:1px solid var(--line);padding-top:16px;font-family:var(--mono);font-size:12px;color:var(--faint)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">Урок 9 · SupportGW · LLMOps Bootcamp</div>
+  <h1>Observability для LLM-систем</h1>
+  <p class="lead">Uptime зелений, користувачі нещасні — ласкаво просимо у спостережуваність LLM. Сьогодні консоль оживає повністю: p95 і error rate з власного лога, cache-hit і fallback з лічильників, статус провайдерів — і вміння бачити інциденти, які не дають жодної помилки.</p>
+  <div class="chain">
+    <span>W1 Основа + промпти</span><i>→</i>
+    <span>W2 Routing + cost</span><i>→</i>
+    <span>W3 Кеш + tools</span><i>→</i>
+    <span>W4 Надійність + безпека</span><i>→</i>
+    <span class="on">W5 Observability + evals</span><i>→</i>
+    <span>W6 CI + фінал</span>
+  </div>
+</header>
+
+<section>
+  <div class="shead"><div class="num">01</div></div>
+  <h2>Проблема: тихі інциденти</h2>
+  <p>Класичний моніторинг відповідає на питання «сервіс живий?». Для LLM-системи це питання майже нічого не варте: сервіс може бути живий на всі сто — і при цьому відповідати гірше, коштувати дорожче і дедалі частіше падати у fallback. Жоден health-check цього не покаже.</p>
+  <p>Найнеприємніші інциденти LLM-систем — <strong>тихі</strong>. Вони не дають 5xx. Якість просіла після зміни промпта — 200. Вартість виросла втричі, бо хтось зламав ключ кешу — 200. Трафік поповз на слабшу модель через fallback — 200, 200, 200. Той голосовий агент з уроку 7, що замовкав посеред розмови, теж був «зеленим» за всіма стандартними метриками — його знайшли по слідах у поведінці, а не по алерту.</p>
+  <p>Звідси головна теза уроку: спостережуваність LLM-системи — це чотири виміри разом. <strong>Доступність</strong> і <strong>latency</strong> — знайомі кожному, хто працював з веб-сервісами. <strong>Вартість</strong> і <strong>якість/поведінка</strong> — те, чим LLMOps відрізняється від просто Ops. Дивитися тільки на перші два — значить моніторити чужу половину системи.</p>
+  <div class="call note"><b>Навіщо цей шар</b>Усі механізми, які ви збудували за чотири тижні, продукують цифри: роутер — розподіл моделей, облік — вартість, кеш — hit ratio, fallback — лічильник переходів. Сьогодні ці цифри вперше збираються в одному місці й стають тим, на що дивиться оператор. Курс переходить від «будуємо механізми» до «керуємо системою».</div>
+</section>
+
+<section>
+  <div class="shead"><div class="num">02</div></div>
+  <h2>Один лог-рядок — джерело всього</h2>
+  <p>Пам'ятаєте обіцянку з уроку 1 — «лог з'являється першим, усе інше — надбудови над ним»? Сьогодні день розплати, у хорошому сенсі. Таблиця <code>requests</code>, яку ви ведете з першої лаби (request_id, model, prompt_version, latency_ms, tokens, cost_usd, status), виявляється одночасно трьома речами:</p>
+  <ul>
+    <li><strong>трейсом</strong> — по request_id відновлюється шлях конкретного запиту: яка модель, яка версія промпта, скільки тривало;</li>
+    <li><strong>метрикою</strong> — p95 це перцентиль по <code>latency_ms</code>, error rate — частка не-200, вартість дня — сума <code>cost_usd</code>;</li>
+    <li><strong>аудитом</strong> — хто, коли, якою версією, з яким результатом.</li>
+  </ul>
+  <p>Ніякої магії, ніякого окремого «стека спостережуваності» для ядра: SQL по таблиці, яку ви й так пишете. Уявіть на секунду, що на першому тижні ми полінувалися: сьогодні довелося б спершу два тижні збирати дані, перш ніж побачити першу цифру. Лог, закладений заздалегідь, — це різниця між «подивімось» і «почекаймо місяць».</p>
+</section>
+
+<section>
+  <div class="shead"><div class="num">03</div></div>
+  <h2>p95, не середнє</h2>
+  <p>Одна метрика заслуговує окремої зупинки. Середня latency — цифра, що бреше в очі: дев'ять запитів по 300 мс і один на 8 секунд дають середнє ~1.1 секунди — «прийнятно». А тепер згадайте, хто з цих десяти користувачів напише в підтримку. Правильно — десятий. І його досвід у середньому розчинився.</p>
+  <p>Перцентилі дивляться на розподіл з боку найневдаліших запитів: p95 — це «95% запитів швидші за цю цифру», тобто чесна межа того, що бачить помітна частина користувачів. p99 — те саме для найгіршого відсотка. Для LLM-систем це особливо важливо: latency генерації нестабільна за природою (довжина відповіді, черги провайдера, ретраї) — розподіл має довгий хвіст, і саме у хвості живуть скарги.</p>
+  <div class="call mistake"><b>Типова помилка</b>Ставити алерт на середню latency. Вона згладить і сплеск таймаутів, і деградацію провайдера — ви дізнаєтесь про проблему зі скарг, а алерт так і не спрацює. Алерти й SLO — на перцентилі; середнє лишіть для звітів, у яких ніхто не шукає правди.</div>
+</section>
+
+<section>
+  <div class="shead"><div class="num">04</div></div>
+  <h2>Розтин: GET /observability</h2>
+  <p>Серце сьогоднішньої роботи — один SQL-запит і один ендпоінт. Спершу агрегати з бази:</p>
+  <pre><code>SELECT count(*),
+       percentile_cont(0.95) WITHIN GROUP (ORDER BY latency_ms),
+       AVG(CASE WHEN status <> '200' THEN 1.0 ELSE 0 END) * 100
+FROM requests WHERE created_at::date = CURRENT_DATE;</code></pre>
+  <p>Три цифри одним проходом: запити за сьогодні, p95, відсоток помилок. <code>percentile_cont</code> — штатна функція Postgres; ваша «система моніторингу» — це буквально один рядок SQL. Далі ендпоінт збирає гібрид:</p>
+  <pre><code>return Results.Json(new
+{
+    p95_ms = (int)p95,
+    requests,
+    cache_hit_pct = total == 0 ? 0
+        : Math.Round(stats.CacheHits * 100.0 / total, 1),
+    error_rate_pct = Math.Round(errorRate, 1),
+    fallback_events = stats.Fallbacks,
+});</code></pre>
+  <p>Зверніть увагу на два джерела: requests/p95/error rate — з <strong>бази</strong> (переживають рестарт, історичні), cache-hit і fallback — з <strong>лічильників у пам'яті</strong> (швидкі, обнуляються з рестартом). Це чесний компроміс навчального стека, і він же — гарне питання на подумати: які з цих цифр ви б переселили в базу першими і чому? (Підказка: ті, за якими захочеться дивитися тренд — блок 06.)</p>
+</section>
+
+<section>
+  <div class="shead"><div class="num">05</div></div>
+  <h2>Плитка — це відповідь на питання</h2>
+  <p><code>GET /providers</code> додає останній шматок — статус провайдерів (на mock він завжди ok, але форма бойова: з реальним ключем сюди природно лягає перевірка досяжності). І консоль оживає повністю. Пройдімося по плитках так, як ми проєктували кожен механізм, — від питання:</p>
+  <table>
+    <tr><th>Плитка</th><th>Операційне питання</th><th>Звідки цифра</th></tr>
+    <tr><td><strong>Requests today</strong></td><td>яке навантаження зараз?</td><td>count по лозі</td></tr>
+    <tr><td><strong>Вартість сьогодні</strong></td><td>скільки палимо і чи в бюджеті?</td><td>сума cost_usd (L04)</td></tr>
+    <tr><td><strong>p95 latency</strong></td><td>що бачать найневдаліші користувачі?</td><td>перцентиль по лозі</td></tr>
+    <tr><td><strong>Error rate</strong></td><td>яка частка запитів ламається?</td><td>частка не-200</td></tr>
+    <tr><td><strong>Cache-hit %</strong></td><td>чи окупається кеш?</td><td>лічильники (L05)</td></tr>
+    <tr><td><strong>Fallback</strong></td><td>чи живемо ми на плані Б?</td><td>лічильник (L07)</td></tr>
+  </table>
+  <div class="call principle"><b>Принцип</b>Кожен елемент дашборда має відповідати на конкретне операційне питання — інакше це прикраса. Тест простий: сформулюйте питання вголос; не формулюється — плитку геть. Дашборд, який «просто показує все», не читає ніхто.</div>
+</section>
+
+<section>
+  <div class="shead"><div class="num">06</div></div>
+  <h2>Тренд важливіший за снапшот</h2>
+  <p>Цифра на плитці — це стан на зараз. Але тихі інциденти видають себе не станом, а <strong>рухом</strong>:</p>
+  <ul>
+    <li><code>fallback_events = 1</code> — подія, буває. Fallback росте щогодини — інцидент, що повзе: основна модель деградує, і ви поки що цього «не бачите», бо відповіді йдуть.</li>
+    <li>Cache-hit повільно падає тиждень — хтось зламав ключ кешу правкою, або змінився профіль трафіку. Обидва варіанти варті розслідування.</li>
+    <li>Розподіл моделей поїхав у бік strong — або ескалацій справді більше, або роутер зламаний, і бюджет згорає вдвічі швидше.</li>
+  </ul>
+  <p>Саме тому питання з блоку 04 — «що переселити з пам'яті в базу» — має відповідь: усе, за чим хочеться стежити в часі. Снапшот показує, <em>що</em> зараз; тренд показує, <em>куди</em> воно йде — а реагувати треба на «куди».</p>
+</section>
+
+<section>
+  <div class="shead"><div class="num">07</div><span class="track opt">опційно</span></div>
+  <h2>Таксономія помилок</h2>
+  <p>«Error rate 6%» — це початок питання, а не відповідь. За цими шістьма відсотками можуть ховатися зовсім різні історії: 429 від провайдера (треба знижувати темп або міняти ліміти), timeout інструмента (винна зовнішня система), відмова guardrail'а (це взагалі не помилка, а робота захисту), збій БД (ваша інфраструктура). Різні причини — різні дії — різні відповідальні.</p>
+  <p>Опційне поглиблення тижня (воно ж — опційна частина hw5): класифікувати помилки й лічити їх окремо. Мінімум у нас уже є — поле <code>status</code> у лозі розрізняє 429/503/timeout. Дорослий рівень — явна таксономія: <code>provider_429</code>, <code>tool_timeout</code>, <code>guardrail_refusal</code>, <code>db_error</code> — окремі лічильники, окремі тренди, а на проді — окремі алерти з різними адресатами.</p>
+  <p>Корисна дисципліна при проєктуванні таксономії: категорія має визначати <em>дію</em>. Якщо дві категорії ведуть до однієї дії — зливайте їх; якщо в одній категорії дві різні дії — діліть. Таксономія заради таблички нікому не потрібна.</p>
+</section>
+
+<section>
+  <div class="shead"><div class="num">08</div></div>
+  <h2>Обзервабіліті в продукті — чи індустріальний стек?</h2>
+  <p>Помітили архітектурний хід? Спостережуваність у нас — <strong>розділ у самому продукті</strong>: ендпоінти сервісу поверх власного лога, консоль як вітрина. Жодного окремого Prometheus, жодної Grafana в обов'язковій доріжці. Це свідомо, і не лише з навчальних міркувань.</p>
+  <p>Індустріальний стек метрик — чудова річ, коли у вас багато сервісів і команда, яка ним володіє. Але він не безкоштовний: інфраструктура, конфіги, ще одна система, яка може зламатись. А головне — він <em>не додає даних</em>: усе, що покаже дашборд, має спершу з'явитись у ваших логах і лічильниках. Налагодьте джерело — а вітрин може бути скільки завгодно: наша консоль сьогодні, <code>/metrics</code> для зовнішніх дашбордів — опційна тема фінального тижня.</p>
+  <div class="call tip"><b>Лайфхак</b>Звірка чесності даних за 10 секунд: цифра на плитці Requests мусить збігатися з <code>SELECT count(*) FROM requests WHERE created_at::date = CURRENT_DATE</code>. Якщо консоль показує одне, а SQL інше — у вас дві правди, і скоро ви перестанете вірити обом. Звіряйте вітрину з джерелом після кожної зміни агрегатів.</div>
+</section>
+
+<section>
+  <div class="shead"><div class="num">09</div></div>
+  <h2>Лабораторна: консоль оживає</h2>
+  <ol class="steps">
+    <li><strong>SQL руками.</strong> У psql написати запит: count, <code>percentile_cont(0.95)</code> по latency, частка не-200 за сьогодні. Спершу руками — щоб побачити, що жодної магії немає.</li>
+    <li><strong>Загорнути в ендпоінт.</strong> <code>GET /observability</code>: агрегати з БД + cache-hit % і fallback з лічильників сервісу. <code>GET /providers</code> — статус (на mock завжди ok, форма — бойова).</li>
+    <li><strong>Оживити консоль.</strong> Згенерувати трафік: звичайні питання, повтор (кеш), <code>__fail_503</code> (fallback). Усі шість плиток — з числами. Пройти по кожній: на яке операційне питання вона відповідає?</li>
+    <li><strong>Детектив.</strong> Симулювати тиху деградацію: серія <code>__fail_503</code> → fallback і error rate ростуть — <strong>без жодного 500 користувачу</strong> (урок 7 відпрацював). Проговорити: як виглядав би цей самий інцидент на дашборді, де є тільки uptime?</li>
+    <li class="opt"><strong>Опційно: таксономія.</strong> Розділити помилки за причинами (429 / timeout / guardrail / БД) і завести окремі лічильники — заготовка під опційну частину hw5.</li>
+  </ol>
+  <div class="check"><strong>Перевір себе (обов'язкова доріжка):</strong>
+    <ul>
+      <li>всі плитки консолі показують числа — і ти знаєш, звідки береться кожне;</li>
+      <li>можеш пояснити, чому p95, а не середнє;</li>
+      <li>бачив інцидент (fallback↑, error rate↑) без жодної помилки назовні;</li>
+      <li>розумієш, що додати в лог, якщо завтра спитають «а по тенантах?».</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <div class="shead"><div class="num">10</div></div>
+  <h2>Антипатерни тижня</h2>
+  <ul>
+    <li><strong>Моніторити лише uptime і latency.</strong> «У нас все зелене» — поки скарги не стануть четвертим виміром замість якості.</li>
+    <li><strong>Середні замість перцентилів.</strong> Середнє ховає саме тих користувачів, які пишуть скарги.</li>
+    <li><strong>Дашборд заради дашборда.</strong> Плитка без операційного питання — шум, який привчає не дивитися.</li>
+    <li><strong>Дивитись метрики лише під час інцидентів.</strong> Тихі деградації видно тільки тому, хто бачив «норму».</li>
+    <li><strong>Окрема система моніторингу до того, як налагоджені власні логи.</strong> Вітрина без джерела показує порожнечу — красиво і безкорисно.</li>
+  </ul>
+</section>
+
+<section>
+  <h2 style="font-size:20px">Карта уроку</h2>
+  <ul class="map">
+    <li><span class="n">01</span><span>Тихі інциденти; чотири виміри: доступність, latency, вартість, якість</span></li>
+    <li><span class="n">02</span><span>Лог-рядок з L01 = трейс + метрика + аудит</span></li>
+    <li><span class="n">03</span><span>p95, не середнє: скарги живуть у хвості розподілу</span></li>
+    <li><span class="n">04</span><span>Розтин /observability: SQL-агрегати + лічильники, два джерела</span></li>
+    <li><span class="n">05</span><span>/providers і шість плиток — кожна відповідає на питання</span></li>
+    <li><span class="n">06</span><span>Тренд важливіший за снапшот: інциденти, що повзуть</span></li>
+    <li><span class="n">07</span><span>Опційно: таксономія помилок — категорія визначає дію</span></li>
+    <li><span class="n">08</span><span>Обзервабіліті в продукті; індустріальний стек — надбудова</span></li>
+    <li><span class="n">09</span><span>Лаба: SQL → ендпоінт → консоль → детектив</span></li>
+    <li><span class="n">10</span><span>Антипатерни тижня</span></li>
+  </ul>
+</section>
+
+<section class="hw">
+  <h2>📝 Домашнє завдання</h2>
+  <h3>Обов'язково — до наступного уроку (без здачі)</h3>
+  <ul>
+    <li>закріпити лабу: всі шість плиток живі, звірені з SQL;</li>
+    <li>відтворити «детектива»: інцидент видно в метриках, користувач не бачить 500;</li>
+    <li>сформулювати по одному операційному питанню на кожну плитку — своїми словами.</li>
+  </ul>
+  <h3>Опційно</h3>
+  <ul>
+    <li>таксономія помилок: окремі лічильники за причинами (429 провайдера, timeout інструмента, відмова guardrail).</li>
+  </ul>
+  <h3>ДЗ тижня — після наступного уроку</h3>
+  <p>Тижневе ДЗ (hw5) об'єднує спостережуваність і evals: сьогоднішні ендпоінти — вже у вас в руках, після наступного уроку додадуться власні eval-кейси в golden dataset — і тиждень здається одним PR. Критерії — у файлі ДЗ після наступного уроку.</p>
+</section>
+
+<section>
+  <h2 style="font-size:20px">Що далі</h2>
+  <p>Метрики кажуть «щось не так». Наступний урок — інструмент, який каже «що саме»: golden dataset і eval runner. Перетворюємо перевірку якості з «клацнути очима по чату» на повторюваний прогін — той самий, що на тижні 6 стане гейтом у CI і фізично не пустить погану версію промпта в main.</p>
+</section>
+
+<footer>SupportGW · LLMOps Bootcamp · Урок 9 з 12 · матеріал уроку — основа для відео (~30 хв)</footer>
+</div>
+</body>
+</html>
