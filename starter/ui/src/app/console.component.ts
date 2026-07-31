@@ -39,7 +39,7 @@ import { catchError } from 'rxjs/operators';
       <ng-container *ngIf="providers?.length; else emptyH">
         <div class="prov" *ngFor="let p of providers"><span class="dot" [class.down]="p.status !== 'ok'"></span>{{ p.name }} · {{ p.status }}</div>
       </ng-container>
-      <ng-template #emptyH><div class="empty">— очікує GET /health (providers[])</div></ng-template>
+      <ng-template #emptyH><div class="empty">— очікує GET /providers (providers[])</div></ng-template>
     </div>
 
     <div class="card">
@@ -91,7 +91,7 @@ export class ConsoleComponent implements OnInit {
     get('/api/observability').subscribe((d) => (this.obs = d));
     get('/api/cost').subscribe((d) => (this.cost = d));
     get('/api/prompts').subscribe((d) => (this.prompts = Array.isArray(d) ? d : d?.versions ?? null));
-    get('/api/health').subscribe((d) => (this.providers = d?.providers ?? null));
+    get('/api/providers').subscribe((d) => (this.providers = d?.providers ?? null));
     get('/api/approvals').subscribe((d) => (this.approvals = d?.pending ?? null));
   }
 
