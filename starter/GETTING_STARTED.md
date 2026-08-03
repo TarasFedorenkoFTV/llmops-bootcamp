@@ -276,9 +276,31 @@ Rule-based evals і весь інженерний core однакові в об�
 
 ## 11. Здача домашок і перевірка
 
+### Крок 0 (один раз): свій репозиторій зі стартера
+
+Стартер — **підпапка** цього репо, тому звичайний fork не підійде: у твоєму
+репозиторії коренем має бути **вміст `starter/`** — інакше CI-шаблон
+`.github/workflows/eval-gate.yml` не запуститься (GitHub бачить workflows лише
+в корені). Один раз зроби так:
+
+```bash
+# 1) створи на GitHub порожній репозиторій, наприклад llmops-bootcamp-my
+# 2) скопіюй вміст starter/ (УВАЖНО: разом із прихованою папкою .github!)
+git clone https://github.com/TarasFedorenkoFTV/llmops-bootcamp.git
+mkdir my-bootcamp && cd my-bootcamp
+cp -r ../llmops-bootcamp/starter/. .
+git init && git add -A && git commit -m "start: llmops-bootcamp starter"
+git remote add origin https://github.com/<ти>/llmops-bootcamp-my.git
+git push -u origin main
+```
+
+Перевір себе: з кореня твого репо працює `docker compose up --build`, а на
+першому ж PR у вкладці Actions запускається `eval-gate`. (`cp -r …/starter/. .`
+з крапкою в кінці копіює і приховані файли; на Windows зручно з Git Bash.)
+
 ### Студент здає
 
-1. Гілка + Pull Request у своєму репозиторії (копія/fork цього стартера).
+1. Гілка + Pull Request у своєму репозиторії (створеному в кроці 0).
 2. На PR запускається CI (`.github/workflows/eval-gate.yml`): піднімає стек, ганяє evals і
    **червоніє, якщо пройдено менше за поріг** (регресія).
 3. В описі PR: що реалізовано цього тижня + скрін консолі (які плитки/картки ожили).
