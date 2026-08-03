@@ -2,7 +2,7 @@
 
 Контрол-плейн — це **не Angular-застосунок**. Це бекенд + конфіг:
 логіка на .NET (routing, fallback, cost, guardrails, HITL), конфіги
-(`routing.yaml`, промпти, policies) і дані в Postgres. Оце будує студент.
+(правила роутингу в коді сервісу, промпти в реєстрі, policies) і дані в Postgres. Оце будує студент.
 
 Angular дає дві **готові** в'юхи — Chat і Console. Console — це вітрина контрол-плейну:
 показує routing, версії промптів, cost, provider health, traces і має кілька дій
@@ -24,7 +24,7 @@ flowchart TB
   subgraph S["Студент пише — .NET + конфіг"]
     API["endpoints (.NET)<br/>chat · observability · cost · prompts · health · approvals"]
     LOGIC["control-plane логіка<br/>routing · fallback · cost · guardrails · HITL"]
-    CFG["конфіг<br/>routing.yaml · prompts · policies"]
+    CFG["рішення<br/>Route() · prompts (БД) · policies"]
   end
   DB[(Postgres)]
   CHAT -->|API-контракт| API

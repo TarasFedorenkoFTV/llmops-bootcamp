@@ -199,7 +199,10 @@ if (br.OpenUntil > now)
 // ...
 if (res.ok) { br.Fails = 0; br.OpenUntil = default; }
 else if (++br.Fails >= 3)
-    br.OpenUntil = DateTimeOffset.UtcNow.AddSeconds(30);</code></pre>
+{
+    br.OpenUntil = DateTimeOffset.UtcNow.AddSeconds(30);
+    br.NextProbe = DateTimeOffset.UtcNow.AddSeconds(5); // перший probe — через 5с, не одразу
+}</code></pre>
   <p>Придивіться до першого рядка: <code>breakers</code> — це словник, і breaker у ньому — <em>окремий на кожну модель</em>, а не один глобальний. Це важливе рішення: якщо лежить mock-strong, а mock-mini здорова, глобальний breaker покарав би обох — і система відбивала б живу модель за гріхи мертвої. Стан відмови завжди має ту саму гранулярність, що й одиниця відмови: падають моделі поодинці — і breaker'и мають бути поодинці.</p>
   <h3>Історія одного самострілу</h3>
   <p>Чесна історія з підготовки цього курсу. Мій перший breaker був простий: «3 збої → open на 30 секунд». На демо після симульованого інциденту бот <strong>продовжив відбивати вже здорового провайдера</strong> ще пів хвилини — інцидент закінчився, а система вперто жила за планом Б, і eval-прогін почервонів. Circuit breaker без half-open — це самостріл: ви власноруч влаштовуєте собі outage, довший за реальний.</p>

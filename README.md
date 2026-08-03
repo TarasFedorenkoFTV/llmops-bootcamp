@@ -44,9 +44,10 @@ Routing, fallback, cost і policies студент пише в сервісі.
 
 ## Структура
 
-- `docs/lessons/` — [конспекти 12 уроків](docs/lessons/README.md)
-- `docs/` — архітектура, request flow, тижневі outcomes, failure scenarios, [optional і згадки](docs/optional-and-mentions.md)
-- `starter/` — те, що клонує студент: каркас, mock provider, базові конфіги, [ДЗ по тижнях](starter/homework/README.md)
+- `docs/longreads/` — **навчальні матеріали 12 занять** (self-contained HTML) + [зміст курсу](docs/longreads/index.html)
+- `docs/lessons/` — [конспекти 12 уроків](docs/lessons/README.md) (стислий зміст, джерело для лонг-рідів)
+- `docs/` — [гайд ментора](docs/MENTOR_GUIDE.md), [маніфест занять](docs/COURSE_MANIFEST.md), архітектура, request flow, тижневі outcomes, [optional і згадки](docs/optional-and-mentions.md)
+- `starter/` — те, що клонує студент: каркас, mock provider, конфіги, [пре-реквізити](starter/PREREQUISITES.md), [ДЗ по тижнях](starter/homework/README.md)
 
 ## Мінімальний стек для запуску
 
@@ -55,4 +56,8 @@ Redis, дашборди й реальний ключ провайдера — о
 
 ## Статус
 
-Draft для strategy sync. Reference solution ще не додано — окрема private-гілка після узгодження власника репозиторію.
+Контент курсу готовий: 12 занять (лонг-ріди + конспекти), ДЗ hw1–hw6 з критеріями,
+пре-реквізити і setup guide, CI-гейт у шаблоні. Еталонні рішення — окремий
+репозиторій [llmops-bootcamp-solutions](https://github.com/TarasFedorenkoFTV/llmops-bootcamp-solutions),
+бранчі `w1`…`w6` (тиждень = бранч); студентам відкриті — політика «спершу
+власна спроба, потім звірка».

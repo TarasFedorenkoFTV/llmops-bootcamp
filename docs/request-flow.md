@@ -11,7 +11,7 @@ sequenceDiagram
 
   U->>UI: повідомлення
   UI->>S: POST /chat
-  S->>S: routing (faq → mini / escalation → 4o)
+  S->>S: routing (faq → mock-mini / escalation → mock-strong)
   S->>GW: виклик обраної моделі
   GW->>P: provider call
   P-->>GW: відповідь + usage
