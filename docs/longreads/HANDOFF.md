@@ -14,7 +14,7 @@
 | Нотатки для запису відео | [PRODUCTION.md](PRODUCTION.md) | тільки для автора; на сторінках занять продакшн-інформації немає |
 | Комплект заняття (файли/бранчі/ДЗ) | [../COURSE_MANIFEST.md](../COURSE_MANIFEST.md) | для того, хто публікує |
 
-Супутнє (поза цією папкою): конспекти `docs/lessons/`, ДЗ `starter/homework/`,
+Супутнє (поза цією папкою): ДЗ `starter/homework/`,
 [гайд ментора](../MENTOR_GUIDE.md), пре-реквізити `starter/PREREQUISITES.md`.
 
 ## Чим це перевірено

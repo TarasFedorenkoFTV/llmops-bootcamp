@@ -44,8 +44,7 @@ Routing, fallback, cost і policies студент пише в сервісі.
 
 ## Структура
 
-- `docs/longreads/` — **навчальні матеріали 12 занять** (self-contained HTML) + [зміст курсу](docs/longreads/index.html)
-- `docs/lessons/` — [конспекти 12 уроків](docs/lessons/README.md) (стислий зміст, джерело для лонг-рідів)
+- `docs/longreads/` — **навчальні матеріали 12 занять** (self-contained HTML) + [зміст курсу](docs/longreads/index.html) — єдине джерело правди про зміст занять
 - `docs/` — [гайд ментора](docs/MENTOR_GUIDE.md), [маніфест занять](docs/COURSE_MANIFEST.md), архітектура, request flow, тижневі outcomes, [optional і згадки](docs/optional-and-mentions.md)
 - `starter/` — те, що клонує студент: каркас, mock provider, конфіги, [пре-реквізити](starter/PREREQUISITES.md), [ДЗ по тижнях](starter/homework/README.md)
 
