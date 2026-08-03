@@ -109,7 +109,7 @@ docker compose down -v
 | hw1 | `GET /prompts` → 2 версії, одна active; activate v1 → «не знаю» → v2; `SELECT prompt_version FROM requests ORDER BY created_at DESC LIMIT 3`; evals: червоні на v1 → зелені на v2 (команда — GETTING_STARTED §6) | `w1` |
 | hw2 | звичайне + «поверніть гроші терміново» → `SELECT model, count(*) … GROUP BY model` → 2 моделі; `SELECT cost_usd … WHERE cost_usd > 0 LIMIT 3`; `GET /cost`; fallback-порядок зафіксовано (константа/коментар біля роутера) | `w2` |
 | hw3 | те саме питання двічі → друге < 50 мс (поле `latency_ms` у відповіді `/chat`); «Де моє замовлення #123?» → результат інструмента; опис PR: timeout + ключ ідемпотентності | `w3` |
-| hw4 | `__fail_503` → ввічлива заглушка; «поверніть гроші» → заявка в `GET /approvals` → approve → тікет; повторний approve → no-op | `w4` |
+| hw4 | `__fail_503` → ввічлива заглушка власного тексту; рев'ю коду: виклик у циклі по ланцюгу + лічильник; «поверніть гроші» → заявка в `GET /approvals` → approve → тікет; повторний approve → no-op | `w4` |
 | hw5 | кілька запитів (з повтором і `__fail_503`) → усі 6 плиток з числами; `git diff` по `golden.jsonl` → ≥4 нові кейси з негативними і **жодного видаленого** | `w5` |
 | hw6 | чистий клон → up --build; Actions: червоний і зелений прогін; інцидент-демо з README відтворюється; README: 30-day rollout (4 кроки); поріг гейта ≥ правила N−1/85% з hw5 — нижчий без обґрунтування = повернення | `w6` + demo-PR #1 |
 

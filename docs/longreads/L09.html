@@ -201,7 +201,7 @@ FROM requests WHERE created_at::date = CURRENT_DATE;</code></pre>
   <h2>Лабораторна: консоль оживає</h2>
   <ol class="steps">
     <li><strong>SQL руками.</strong> У psql написати запит: count, <code>percentile_cont(0.95)</code> по latency, частка не-200 за сьогодні. Спершу руками — щоб побачити, що жодної магії немає.</li>
-    <li><strong>Загорнути в ендпоінт.</strong> <code>GET /observability</code>: агрегати з БД + cache-hit % і fallback з лічильників сервісу. <code>GET /providers</code> — статус (на mock завжди ok, форма — бойова).</li>
+    <li><strong>Загорнути в ендпоінт.</strong> <code>GET /observability</code>: агрегати з БД + cache-hit % і fallback з лічильників сервісу. <code>GET /providers</code> — статус провайдерів: у штатному режимі «ok», при відкритому circuit breaker — «degraded» (блок 05).</li>
     <li><strong>Оживити консоль.</strong> Згенерувати трафік: звичайні питання, повтор (кеш), <code>__fail_503</code> (fallback). Усі шість плиток — з числами. Пройти по кожній: на яке операційне питання вона відповідає?</li>
     <li><strong>Детектив.</strong> Симулювати тиху деградацію: серія <code>__fail_503</code> → fallback і error rate ростуть — <strong>без жодного 500 користувачу</strong> (урок 7 відпрацював). Проговорити: як виглядав би цей самий інцидент на дашборді, де є тільки uptime?</li>
     <li class="opt"><strong>Опційно: таксономія.</strong> Розділити помилки за причинами (429 / timeout / guardrail / БД) і завести окремі лічильники — заготовка під опційну частину hw5.</li>
