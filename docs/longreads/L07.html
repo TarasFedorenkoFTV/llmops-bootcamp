@@ -73,6 +73,9 @@
   .hw h2{margin-top:0}
   .hw h3{margin-top:14px}
   footer{margin-top:60px;border-top:1px solid var(--line);padding-top:16px;font-family:var(--mono);font-size:12px;color:var(--faint)}
+  footer a{color:var(--accent);text-decoration:none;border-bottom:1px solid var(--accent-bg)}
+  footer a:hover{border-bottom-color:var(--accent)}
+  .fnav{margin-bottom:10px}
 </style>
 </head>
 <body>
@@ -280,7 +283,10 @@ else if (++br.Fails >= 3)
   <p>Ми захистилися від збоїв інфраструктури — від того, що ламається саме. Наступний урок — захист від <strong>вмісту</strong>: prompt injection («ignore previous instructions»), персональні дані, що летять у чужі API, — і повна реалізація контракту з уроку 6: незворотна дія потрапляє в чергу <code>/approvals</code> і виконується тільки після людини.</p>
 </section>
 
-<footer>SupportGW · LLMOps Bootcamp · Урок 7 з 12</footer>
+<footer>
+  <div class="fnav"><a href="L06.html">&larr; Урок 6</a> · <a href="index.html">Зміст курсу</a> · <a href="L08.html">Урок 8 &rarr;</a></div>
+  SupportGW · LLMOps Bootcamp · Урок 7 з 12
+</footer>
 </div>
 </body>
 </html>

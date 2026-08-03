@@ -73,6 +73,9 @@
   .hw h2{margin-top:0}
   .hw h3{margin-top:14px}
   footer{margin-top:60px;border-top:1px solid var(--line);padding-top:16px;font-family:var(--mono);font-size:12px;color:var(--faint)}
+  footer a{color:var(--accent);text-decoration:none;border-bottom:1px solid var(--accent-bg)}
+  footer a:hover{border-bottom-color:var(--accent)}
+  .fnav{margin-bottom:10px}
 </style>
 </head>
 <body>
@@ -261,7 +264,10 @@ var promptOk = system.Contains("support", StringComparison.OrdinalIgnoreCase);</
   <p>Реєстр захищає від поганих версій промпта. А від поганого дня провайдера — ні: модель у нас досі одна, і будь-яка її проблема — це проблема всієї системи. Наступний тиждень — маршрутизація: чому «одна модель на все» — це дорого і крихко, як адаптер ховає від сервісу провайдерські причуди і як розкладати трафік між моделями свідомо, а не «як історично склалося».</p>
 </section>
 
-<footer>SupportGW · LLMOps Bootcamp · Урок 2 з 12</footer>
+<footer>
+  <div class="fnav"><a href="L01.html">&larr; Урок 1</a> · <a href="index.html">Зміст курсу</a> · <a href="L03.html">Урок 3 &rarr;</a></div>
+  SupportGW · LLMOps Bootcamp · Урок 2 з 12
+</footer>
 </div>
 </body>
 </html>

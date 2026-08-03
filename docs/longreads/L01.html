@@ -73,6 +73,9 @@
   .hw h2{margin-top:0}
   .hw h3{margin-top:14px}
   footer{margin-top:60px;border-top:1px solid var(--line);padding-top:16px;font-family:var(--mono);font-size:12px;color:var(--faint)}
+  footer a{color:var(--accent);text-decoration:none;border-bottom:1px solid var(--accent-bg)}
+  footer a:hover{border-bottom-color:var(--accent)}
+  .fnav{margin-bottom:10px}
 </style>
 </head>
 <body>
@@ -250,6 +253,7 @@ MODEL=назва-моделі docker compose up</code></pre>
   <table class="links">
     <tr><th>Що</th><th>Де</th></tr>
     <tr><td><strong>Репозиторій курсу</strong> (клонувати)</td><td><a href="https://github.com/TarasFedorenkoFTV/llmops-bootcamp">github.com/TarasFedorenkoFTV/llmops-bootcamp</a> — робоча папка <code>starter/</code></td></tr>
+    <tr><td><strong>Пре-реквізити</strong>: перевірка системи, акаунтів і навичок до старту</td><td><a href="https://github.com/TarasFedorenkoFTV/llmops-bootcamp/blob/main/starter/PREREQUISITES.md">starter/PREREQUISITES.md</a></td></tr>
     <tr><td><strong>Повний гайд</strong>: вимоги, запуск, кожна папка, troubleshooting</td><td><a href="https://github.com/TarasFedorenkoFTV/llmops-bootcamp/blob/main/starter/GETTING_STARTED.md">starter/GETTING_STARTED.md</a></td></tr>
     <tr><td><strong>Домашні завдання</strong> по тижнях, з критеріями</td><td><a href="https://github.com/TarasFedorenkoFTV/llmops-bootcamp/tree/main/starter/homework">starter/homework/</a></td></tr>
     <tr><td><strong>Конспекти уроків</strong></td><td><a href="https://github.com/TarasFedorenkoFTV/llmops-bootcamp/tree/main/docs/lessons">docs/lessons/</a></td></tr>
@@ -315,7 +319,10 @@ MODEL=назва-моделі docker compose up</code></pre>
   <p>Сьогодні ваш системний промпт захардкоджений у коді — і це остання доба, коли це прийнятно. Наступний урок: чому промпт — це production-артефакт з версіями, promote і rollback; що стається з якістю, коли «маленьку правку промпта» викочують без сліду; і як зробити відкат за секунди замість розкопок «а як там було вчора».</p>
 </section>
 
-<footer>SupportGW · LLMOps Bootcamp · Урок 1 з 12</footer>
+<footer>
+  <div class="fnav"><a href="index.html">Зміст курсу</a> · <a href="L02.html">Урок 2 &rarr;</a></div>
+  SupportGW · LLMOps Bootcamp · Урок 1 з 12
+</footer>
 </div>
 </body>
 </html>

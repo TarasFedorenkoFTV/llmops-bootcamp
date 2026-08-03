@@ -73,6 +73,9 @@
   .hw h2{margin-top:0}
   .hw h3{margin-top:14px}
   footer{margin-top:60px;border-top:1px solid var(--line);padding-top:16px;font-family:var(--mono);font-size:12px;color:var(--faint)}
+  footer a{color:var(--accent);text-decoration:none;border-bottom:1px solid var(--accent-bg)}
+  footer a:hover{border-bottom-color:var(--accent)}
+  .fnav{margin-bottom:10px}
 </style>
 </head>
 <body>
@@ -259,7 +262,10 @@ SELECT created_at::date, SUM(cost_usd) FROM requests GROUP BY 1 ORDER BY 1;</cod
   <p>Ми навчилися платити менше за той самий трафік. Наступний крок радикальніший: найдешевший запит — той, якого не було. Тиждень 3 починаємо з кешу: коли можна не ходити в модель узагалі, як міряти ефект через cache-hit ratio і чому кеш без метрики — це віра, а не інженерія.</p>
 </section>
 
-<footer>SupportGW · LLMOps Bootcamp · Урок 4 з 12</footer>
+<footer>
+  <div class="fnav"><a href="L03.html">&larr; Урок 3</a> · <a href="index.html">Зміст курсу</a> · <a href="L05.html">Урок 5 &rarr;</a></div>
+  SupportGW · LLMOps Bootcamp · Урок 4 з 12
+</footer>
 </div>
 </body>
 </html>

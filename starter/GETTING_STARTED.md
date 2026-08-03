@@ -7,6 +7,9 @@ cost, guardrails, HITL, observability, evals). Нижче — вимоги, за
 Коротко про поділ праці: **пишеш .NET + конфіг + Python-evals; Angular не чіпаєш — він готовий.**
 Уся логіка (control plane) — у `service/`, а LiteLLM просто ходить у провайдерів.
 
+> Ще не готував(-ла) машину? Спершу [PREREQUISITES.md](PREREQUISITES.md) —
+> перевірка системи, акаунтів і навичок за 15–20 хвилин, до першого уроку.
+
 ---
 
 ## 1. Вимоги
