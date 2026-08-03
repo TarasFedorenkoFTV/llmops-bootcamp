@@ -13,10 +13,18 @@
 ## Обов'язково
 
 1. Розбирається, як запит пише рядок у таблицю `requests` (у стартері це вже працює).
-2. Переносить system-промпт із хардкоду в таблицю `prompts`: сервіс бере активну версію.
-3. Пише версію промпта (`prompt_version`) у кожен лог-рядок.
-4. Реалізує `GET /prompts` (список версій) і `POST /prompts/{version}/activate`
-   (promote / rollback).
+2. Наповнює реєстр: у `db/schema.sql` таблиця `prompts` створюється **порожньою** —
+   додає seed із двома версіями (`v1` = `You are an assistant.`,
+   `v2` = `You are a support assistant. Be concise and helpful.`, активна — `v2`)
+   і піднімає базу заново: `docker compose down -v && docker compose up -d`
+   (міграція виконується лише на чистому томі — без `-v` зміни в `schema.sql` не застосуються).
+3. Переносить system-промпт із хардкоду (`service/Program.cs`, `TODO(student, W1)`) у
+   таблицю `prompts`: сервіс бере активну версію. Дефолт на випадок порожнього реєстру —
+   **без** слова «support», щоб поломка реєстру була видна, а не замаскована.
+4. Пише версію промпта (`prompt_version`) у кожен лог-рядок.
+5. Реалізує `GET /prompts` (список версій) і `POST /prompts/{version}/activate`
+   (promote / rollback). Активація неіснуючої версії має віддавати `404`, а не «тихо»
+   знімати активність з усіх.
 
 ## Опційно (не оцінюється)
 
@@ -33,6 +41,8 @@ PR, де чат працює, промпт живе в БД, консоль по
 |---|---|---|
 | Стек піднімається | `docker compose up --build` | усі контейнери Up, чат відповідає |
 | Промпт у БД | `GET /prompts` | список версій, одна active |
+| Реєстр наповнено міграцією | `docker compose exec postgres psql -U llmops -d llmops -c "SELECT version, is_active FROM prompts"` | два рядки, active рівно один |
+| Активація «сміття» | `POST /prompts/v99/activate` | `404`, активна версія не змінилася |
 | Версія в лозі | `SELECT model, prompt_version FROM requests ORDER BY created_at DESC LIMIT 3` | `prompt_version` заповнений |
 | Rollback ловиться eval-прогоном | активувати «поганий» промпт → evals; повернути → evals | червоні → зелені |
 
