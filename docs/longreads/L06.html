@@ -195,7 +195,7 @@ if (result != null) answer += $" ({result})";</code></pre>
 
 <section>
   <div class="shead"><div class="num">10</div></div>
-  <h2>Лабораторна: чотири частини</h2>
+  <h2>Лабораторна: чотири частини + опційна</h2>
   <ol class="steps">
     <li><strong>Прочитати tool_calls.</strong> Спитати «Де моє замовлення #10482?» і подивитися сиру відповідь mock: структура <code>tool_calls</code>, назва, <code>finish_reason: tool_calls</code>. Переконатися, що це прохання, а не подія.</li>
     <li><strong>Виконати read-only.</strong> Додати мінімальний реєстр (<code>RunTool</code>): <code>lookup_order</code> повертає статус, результат підклеюється до відповіді. У чаті — «Перевіряю статус… (статус: оплачено, доставку призначено)».</li>

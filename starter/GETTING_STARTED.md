@@ -7,6 +7,10 @@ cost, guardrails, HITL, observability, evals). Нижче — вимоги, за
 Коротко про поділ праці: **пишеш .NET + конфіг + Python-evals; Angular не чіпаєш — він готовий.**
 Уся логіка (control plane) — у `service/`, а LiteLLM просто ходить у провайдерів.
 
+> **Windows:** усі команди курсу виконуй у **Git Bash** (ставиться разом із Git for Windows).
+> У PowerShell `curl` — це аліас `Invoke-WebRequest`, а `VAR=x команда` не працює;
+> PowerShell-варіанти наведені лише там, де вони справді відрізняються.
+
 > Ще не готував(-ла) машину? Спершу [PREREQUISITES.md](PREREQUISITES.md) —
 > перевірка системи, акаунтів і навичок за 15–20 хвилин, до першого уроку.
 
@@ -44,7 +48,9 @@ Mock-провайдер працює лише всередині docker-мере
 ## 2. Швидкий старт
 
 ```bash
-# якщо це окремий starter-репо — ти вже в його корені
+# варіант А: щойно клонував курсовий репо — стартер у підпапці
+cd llmops-bootcamp/starter
+# варіант Б: це вже ТВІЙ репо, створений зі стартера (§11, крок 0) — ти в корені
 docker compose up --build
 ```
 
@@ -90,7 +96,7 @@ docker compose down -v     # + стерти дані Postgres (чистий ст
 │  └─ Dockerfile
 │
 ├─ service/                    # .NET сервіс = CONTROL PLANE — ТУТ ТИ ПРАЦЮЄШ
-│  ├─ Program.cs               #   /chat + API-контракт; seam'и позначені TODO(student)
+│  ├─ Program.cs               #   /chat + API-контракт; місця для твого коду позначені TODO(student)
 │  ├─ Service.csproj, appsettings.json
 │  └─ Dockerfile
 │
@@ -169,6 +175,13 @@ curl -X POST http://localhost:8080/chat \
   -H "Content-Type: application/json" \
   -d '{"message":"please check my order"}'
 
+# SQL до лога (лаби постійно просять SELECT-и) — psql уже є всередині контейнера:
+docker compose exec postgres psql -U llmops -d llmops
+#   далі звичайний SQL; вихід: \q. Креденшели: llmops/llmops, база llmops
+#   GUI-клієнт (DBeaver/pgAdmin): host localhost, port 5432, ті самі креденшели
+# або одним рядком:
+docker compose exec postgres psql -U llmops -d llmops -c "SELECT * FROM requests ORDER BY created_at DESC LIMIT 5;"
+
 # логи
 docker compose logs -f service
 docker compose logs mock-provider
@@ -195,10 +208,18 @@ docker run --rm --network <project>_default \
 
 `<project>` — префікс мережі (звичайно ім'я папки; глянь `docker network ls`).
 
+**Windows/Git Bash:** MSYS інколи «перетворює» шляхи у монтуванні (`/e:ro` → `E:o`).
+Якщо побачив таку помилку — додай префікс `MSYS_NO_PATHCONV=1` перед `docker run …`.
+
 Або з хоста (якщо `8080` вільний і без проксі):
 
 ```bash
 SERVICE_URL=http://localhost:8080 python evals/run.py --dataset evals/golden.jsonl --threshold 5
+```
+
+```powershell
+# PowerShell-варіант того самого
+$env:SERVICE_URL="http://localhost:8080"; python evals/run.py --dataset evals/golden.jsonl --threshold 5
 ```
 
 Вихід: `eval: 6/6 passed, threshold 5`, код виходу `0` (green) або `1` (red).
@@ -289,7 +310,7 @@ Rule-based evals і весь інженерний core однакові в об�
 git clone https://github.com/TarasFedorenkoFTV/llmops-bootcamp.git
 mkdir my-bootcamp && cd my-bootcamp
 cp -r ../llmops-bootcamp/starter/. .
-git init && git add -A && git commit -m "start: llmops-bootcamp starter"
+git init -b main && git add -A && git commit -m "start: llmops-bootcamp starter"
 git remote add origin https://github.com/<ти>/llmops-bootcamp-my.git
 git push -u origin main
 ```

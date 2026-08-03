@@ -46,16 +46,17 @@ app.MapPost("/chat", async (ChatIn body, IHttpClientFactory httpFactory) =>
     });
 
     var http = httpFactory.CreateClient();
-    var response = await http.PostAsync(
-        $"{gateway}/v1/chat/completions",
-        new StringContent(payload, Encoding.UTF8, "application/json"));
-    var rawJson = await response.Content.ReadAsStringAsync();
-
     var answer = "";
     string? toolCall = null;
-    int promptTokens = 0, completionTokens = 0;
+    int promptTokens = 0, completionTokens = 0, status = 0; // 0 = відповіді не було
     try
     {
+        var response = await http.PostAsync(
+            $"{gateway}/v1/chat/completions",
+            new StringContent(payload, Encoding.UTF8, "application/json"));
+        status = (int)response.StatusCode;
+        var rawJson = await response.Content.ReadAsStringAsync();
+
         using var doc = JsonDocument.Parse(rawJson);
         var message = doc.RootElement.GetProperty("choices")[0].GetProperty("message");
         answer = message.GetProperty("content").GetString() ?? "";
@@ -75,7 +76,8 @@ app.MapPost("/chat", async (ChatIn body, IHttpClientFactory httpFactory) =>
     }
     catch
     {
-        // модель/gateway недоступні. TODO(student, W4): тут краще graceful degradation
+        // мережа/gateway недоступні або відповідь не розпарсилась (status лишиться 0/5xx).
+        // TODO(student, W4): тут краще graceful degradation
         answer = "Сервіс тимчасово недоступний.";
     }
 
@@ -85,7 +87,7 @@ app.MapPost("/chat", async (ChatIn body, IHttpClientFactory httpFactory) =>
     decimal? costUsd = null;  // TODO(student, W2)
 
     // лог кожного запиту — з цього живе observability (W1) і cost (W2)
-    await LogRequest(dbConn, requestId, model, latencyMs, promptTokens, completionTokens, costUsd, (int)response.StatusCode);
+    await LogRequest(dbConn, requestId, model, latencyMs, promptTokens, completionTokens, costUsd, status);
 
     return Results.Json(new { request_id = requestId, content = answer, tool = toolCall, latency_ms = latencyMs });
 });

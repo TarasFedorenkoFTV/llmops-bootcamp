@@ -204,7 +204,7 @@ static string Route(string message, string def)
 
 <section>
   <div class="shead"><div class="num">09</div></div>
-  <h2>Лабораторна: чотири частини</h2>
+  <h2>Лабораторна: чотири частини + опційна</h2>
   <ol class="steps">
     <li><strong>Прочитати конфіг.</strong> Відкрити <code>gateway/litellm-config.yaml</code>: знайти <code>mock-mini</code> і <code>mock-strong</code>, переконатися, що обидві дивляться на той самий mock. Звернути увагу на <code>drop_params</code> і <code>num_retries: 0</code> — і пояснити собі, навіщо вони.</li>
     <li><strong>Написати роутер.</strong> Додати <code>Route(message)</code> у сервіс: ескалаційні маркери («поверн», «терміново», «скарг», «refund») → <code>mock-strong</code>, решта → <code>mock-mini</code>. Жорсткий <code>MODEL</code> лишити тільки як дефолт для реального ключа.</li>

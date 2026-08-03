@@ -201,7 +201,7 @@ SELECT created_at::date, SUM(cost_usd) FROM requests GROUP BY 1 ORDER BY 1;</cod
 
 <section>
   <div class="shead"><div class="num">09</div></div>
-  <h2>Лабораторна: чотири частини</h2>
+  <h2>Лабораторна: чотири частини + опційна</h2>
   <ol class="steps">
     <li><strong>Завести прайс.</strong> Словник цін за 1k токенів для <code>mock-mini</code> і <code>mock-strong</code> — пропорції як у реальних прайсів (strong помітно дорожча, вихідні дорожчі за вхідні).</li>
     <li><strong>Порахувати і записати.</strong> Після відповіді моделі: usage → формула → <code>cost_usd</code> → лог. Перевірити: <code>SELECT model, cost_usd FROM requests ORDER BY created_at DESC</code> — у ескалацій цифра помітно більша.</li>

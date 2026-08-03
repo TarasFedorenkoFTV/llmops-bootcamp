@@ -33,7 +33,7 @@ mock-провайдері. Реальний ключ — суто опційна
 - читаєш простий Python (evals — один файл на stdlib);
 - базовий SQL: `SELECT`, `WHERE`, `GROUP BY`;
 - git: clone, branch, commit, push, відкрити PR;
-- не боїшся термінала.
+- не боїшся термінала (Windows: команди курсу — у Git Bash, він іде разом із Git).
 
 Якщо чогось із цього бракує — курс прохідний, але заклади +1–2 години на
 тиждень на догугл.
@@ -56,8 +56,9 @@ lsof -i :4200 -i :8080 -i :4000 -i :5432
 ```
 
 ```powershell
-# Windows (PowerShell)
-netstat -ano | findstr ":4200 :8080 :4000 :5432"
+# Windows (PowerShell) — дивись ЛИШЕ на рядки LISTENING по цих портах;
+# рядки TIME_WAIT/ESTABLISHED і "схожі" порти (:42005) — не завада
+netstat -ano | findstr "LISTENING" | findstr ":4200 :8080 :4000 :5432"
 ```
 
 І фінальний смоук — підняти стек курсу:
