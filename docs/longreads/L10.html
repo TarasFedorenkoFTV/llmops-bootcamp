@@ -212,7 +212,7 @@ eval: 6/6 passed                      # зелено знову</code></pre>
   <h2>Лабораторна: зламай і злови</h2>
   <ol class="steps">
     <li><strong>Анатомія кейса.</strong> Прочитати <code>golden.jsonl</code>: faq-кейси (expect/forbid), tool-кейс, safety-кейс з <code>expect_refusal</code>. Проговорити, який тиждень курсу перевіряє кожен.</li>
-    <li><strong>Grader і runner.</strong> Прочитати <code>run.py</code>: цикл → POST у сервіс → grade → підсумок і exit code. Прогнати: 6/6, зелено; перевірити <code>echo $?</code> — нуль.</li>
+    <li><strong>Grader і runner.</strong> Прочитати <code>run.py</code>: цикл → POST у сервіс → grade → підсумок і exit code. Прогнати (команда — GETTING_STARTED §6): 6/6, зелено; перевірити <code>echo $?</code> — нуль.</li>
     <li><strong>Зламати і зловити.</strong> Rollback промпта на v1 (урок 2) → прогін → 3/6, червоно, exit code 1. Повернути v2 → 6/6. Регресія, яку ви бачили очима, тепер ловиться командою.</li>
     <li><strong>Власні кейси.</strong> Додати щонайменше два: позитивний (подяка, уточнення) і негативний (перефразований injection). Прогнати, за потреби підняти поріг — і пояснити собі чому.</li>
     <li class="opt"><strong>Опційно: спроєктувати judge.</strong> Для одного кейса сформулювати критерії model-based перевірки (faithfulness або тон) і прикинути її вартість за прайсом з уроку 4. Реалізація — з реальним ключем, поза core.</li>

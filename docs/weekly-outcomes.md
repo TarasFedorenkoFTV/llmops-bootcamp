@@ -15,7 +15,7 @@
 | **W2** | routing (модель за задачею, конфіг) | 1.5 | core |
 | | cost attribution (+ фіксація fallback-порядку) | 1.5 | core |
 | | budget-alert / деградація за бюджетом | 0.5 | optional |
-| | provider normalization (легко, дає LiteLLM) | 0.5 | core |
+| | provider normalization — дає адаптер зі стартера | ~0 | core |
 | | **разом (core)** | **~3** | ок після трима |
 | **W3** | cache відповідей + лічильники hit/miss | 1.0 | core |
 | | tool-виклик (read-only) + рішення timeout/idempotency у PR | 1.0–1.5 | core |
@@ -32,7 +32,7 @@
 | | **разом (core)** | **~2.5–3** | ок після трима |
 | **W6** | CI eval gate (run.py у GitHub Actions, блок за порогом) | 1.0 | core |
 | | incident demo (outage → fallback → recovery) | 1.0 | core |
-| | фінальне впорядкування repo / README | 0.5–1 | core |
+| | впорядкування repo / README + 30-day rollout (начерк — з лаби L12) | 0.5–1 | core |
 | | **разом** | **~2.5–3** | ок |
 
 ## На кінець тижня студент має
@@ -42,7 +42,7 @@
 - **W3** — кеш із лічильниками; tool-виклик виконується, timeout/ключ ідемпотентності зафіксовані як рішення.
 - **W4** — AI-фіча переживає падіння провайдера; незворотна дія — через human approval.
 - **W5** — жива консоль (усі плитки) + повторюване оцінювання проти розширеного golden dataset.
-- **W6** — CI блокує regression; демо інциденту з fallback; зібраний фінальний repo.
+- **W6** — CI блокує regression; демо інциденту з fallback; зібраний фінальний repo + 30-day rollout план.
 
 ## Тримінг перевантажених тижнів
 
