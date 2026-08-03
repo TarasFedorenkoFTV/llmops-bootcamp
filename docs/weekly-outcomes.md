@@ -10,7 +10,7 @@
 |---|---|---|---|
 | **W1** | scaffold + перший запит service → LiteLLM → mock | 0.5 | core |
 | | unified logging (id/model/latency/tokens/cost → Postgres) | 1.0 | core |
-| | prompt registry (версія + promote/rollback + у лог) | 1.0–1.5 | core |
+| | prompt registry (seed реєстру + версія + promote/rollback + у лог) | 1.0–1.5 | core |
 | | **разом** | **~2.5–3** | на межі |
 | **W2** | routing (модель за задачею, конфіг) | 1.5 | core |
 | | cost attribution (+ фіксація fallback-порядку) | 1.5 | core |
@@ -27,7 +27,7 @@
 | | guardrails (PII / injection) | 1.5 | optional |
 | | **разом (core)** | **~2.5** | ок після трима |
 | **W5** | observability-ендпоінти (/observability, /providers) | 1.0 | core |
-| | розширення golden dataset (+4 кейси) + поріг | 1.0 | core |
+| | розширення golden dataset (+4 кейси) + поріг + перевірка на фальш-позитиви | 1.0 | core |
 | | таксономія помилок / LLM-as-judge | — | optional |
 | | **разом (core)** | **~2.5–3** | ок після трима |
 | **W6** | CI eval gate (run.py у GitHub Actions, блок за порогом) | 1.0 | core |

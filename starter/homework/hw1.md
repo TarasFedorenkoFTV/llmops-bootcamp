@@ -22,7 +22,8 @@
    таблицю `prompts`: сервіс бере активну версію. Дефолт на випадок порожнього реєстру —
    **без** слова «support», щоб поломка реєстру була видна, а не замаскована.
 4. Пише версію промпта (`prompt_version`) у кожен лог-рядок.
-5. Реалізує `GET /prompts` (список версій) і `POST /prompts/{version}/activate`
+5. Замінює заглушку `GET /prompts` (у стартері вона віддає `{ todo: ... }`, тому картка
+   реєстру в консолі показує «—») на список версій і додає `POST /prompts/{version}/activate`
    (promote / rollback). Активація неіснуючої версії має віддавати `404`, а не «тихо»
    знімати активність з усіх.
 
@@ -41,7 +42,7 @@ PR, де чат працює, промпт живе в БД, консоль по
 |---|---|---|
 | Стек піднімається | `docker compose up --build` | усі контейнери Up, чат відповідає |
 | Промпт у БД | `GET /prompts` | список версій, одна active |
-| Реєстр наповнено міграцією | `docker compose exec postgres psql -U llmops -d llmops -c "SELECT version, is_active FROM prompts"` | два рядки, active рівно один |
+| Реєстр наповнено міграцією | `docker compose exec postgres psql -U llmops -d llmops -c "SELECT name, version, active FROM prompts"` | два рядки, active рівно один |
 | Активація «сміття» | `POST /prompts/v99/activate` | `404`, активна версія не змінилася |
 | Версія в лозі | `SELECT model, prompt_version FROM requests ORDER BY created_at DESC LIMIT 3` | `prompt_version` заповнений |
 | Rollback ловиться eval-прогоном | активувати «поганий» промпт → evals; повернути → evals | червоні → зелені |

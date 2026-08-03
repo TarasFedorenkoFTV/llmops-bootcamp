@@ -13,8 +13,7 @@
 - розширені guardrails / advanced red-team pack
 - повний Grafana / Prometheus stack
 - canary deployment
-- KPI dashboard
-- 30-day rollout plan
+- KPI dashboard (`/metrics` + зовнішній дашборд)
 - **model-based evals / LLM-as-judge** — потребує реального ключа (усе інше — на mock)
 
 ## Згадати на відео, але не будувати
@@ -38,6 +37,7 @@
 
 runnable gateway · prompt registry · routing + fallback · cost attribution ·
 safe tool calls + human approval · reliability · базова observability ·
-golden dataset + rule-based eval runner · CI regression gate.
+golden dataset + rule-based eval runner · CI regression gate ·
+**30-day rollout plan** (обов'язковий deliverable hw6 — головний transfer-артефакт).
 
 Усе це — на mock, без реального ключа.
