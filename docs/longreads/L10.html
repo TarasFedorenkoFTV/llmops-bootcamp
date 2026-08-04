@@ -75,7 +75,6 @@
   footer{margin-top:60px;border-top:1px solid var(--line);padding-top:16px;font-family:var(--mono);font-size:12px;color:var(--faint)}
   footer a{color:var(--accent);text-decoration:none;border-bottom:1px solid var(--accent-bg)}
   footer a:hover{border-bottom-color:var(--accent)}
-  .fnav{margin-bottom:10px}
 </style>
 </head>
 <body>
@@ -233,7 +232,7 @@ eval: 6/6 passed                      # зелено знову</code></pre>
   <h2>Лабораторна: зламай і злови</h2>
   <ol class="steps">
     <li><strong>Анатомія кейса.</strong> Прочитати <code>golden.jsonl</code>: faq-кейси (expect/forbid), tool-кейс, safety-кейс з <code>expect_refusal</code>. Проговорити, який тиждень курсу перевіряє кожен.</li>
-    <li><strong>Grader і runner.</strong> Прочитати <code>run.py</code>: цикл → POST у сервіс → grade → підсумок і exit code. Прогнати (команда — GETTING_STARTED §6): 6/6, зелено; перевірити <code>echo $?</code> — нуль.</li>
+    <li><strong>Grader і runner.</strong> Прочитати <code>run.py</code>: цикл → POST у сервіс → grade → підсумок і exit code. Прогнати (команда — гайді для студента, розділ про evals): 6/6, зелено; перевірити <code>echo $?</code> — нуль.</li>
     <li><strong>Зламати і зловити.</strong> Rollback промпта на v1 (урок 2) → прогін → 3/6, червоно, exit code 1. Повернути v2 → 6/6. Регресія, яку ви бачили очима, тепер ловиться командою.</li>
     <li><strong>Власні кейси.</strong> Додати щонайменше два: позитивний (подяка, уточнення) і негативний (перефразований injection). Прогнати, за потреби підняти поріг — і пояснити собі чому.</li>
     <li class="opt"><strong>Опційно: спроєктувати judge.</strong> Для одного кейса сформулювати критерії model-based перевірки (faithfulness або тон) і прикинути її вартість за прайсом з уроку 4. Реалізація — з реальним ключем, поза core.</li>
@@ -281,7 +280,7 @@ eval: 6/6 passed                      # зелено знову</code></pre>
 <section class="hw">
   <h2>📝 Домашнє завдання</h2>
   <h3>ДЗ тижня — hw5: observability + evals</h3>
-  <p><a class="links" href="https://github.com/TarasFedorenkoFTV/llmops-bootcamp/blob/main/starter/homework/hw5.md">starter/homework/hw5.md</a> — обидва уроки тижня одним PR: живі плитки консолі з уроку 9 плюс розширений eval-контур.</p>
+  <p>ДЗ тижня 5 — обидва уроки тижня одним PR: живі плитки консолі з уроку 9 плюс розширений eval-контур.</p>
   <p>Критерії приймання коротко: усі шість плиток консолі показують числа, звірені з SQL; у <code>golden.jsonl</code> — мінімум 4 власні кейси, серед них негативні; прогін зелений з відповідно піднятим порогом. Повні критерії — у файлі ДЗ.</p>
   <h3>Опційно (не оцінюється)</h3>
   <ul>
@@ -296,7 +295,6 @@ eval: 6/6 passed                      # зелено знову</code></pre>
 </section>
 
 <footer>
-  <div class="fnav"><a href="L09.html">&larr; Урок 9</a> · <a href="index.html">Зміст курсу</a> · <a href="L11.html">Урок 11 &rarr;</a></div>
   SupportGW · LLMOps Bootcamp · Урок 10 з 12
 </footer>
 </div>

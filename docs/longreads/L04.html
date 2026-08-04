@@ -75,7 +75,6 @@
   footer{margin-top:60px;border-top:1px solid var(--line);padding-top:16px;font-family:var(--mono);font-size:12px;color:var(--faint)}
   footer a{color:var(--accent);text-decoration:none;border-bottom:1px solid var(--accent-bg)}
   footer a:hover{border-bottom-color:var(--accent)}
-  .fnav{margin-bottom:10px}
 </style>
 </head>
 <body>
@@ -273,7 +272,7 @@ SELECT created_at::date, SUM(cost_usd) FROM requests GROUP BY 1 ORDER BY 1;</cod
 <section class="hw">
   <h2>📝 Домашнє завдання</h2>
   <h3>ДЗ тижня — hw2: routing + cost</h3>
-  <p><a class="links" href="https://github.com/TarasFedorenkoFTV/llmops-bootcamp/blob/main/starter/homework/hw2.md">starter/homework/hw2.md</a> — обидва уроки тижня в одному PR: маршрутизація з уроку 3 плюс сьогоднішній облік вартості.</p>
+  <p>ДЗ тижня 2 — обидва уроки тижня в одному PR: маршрутизація з уроку 3 плюс сьогоднішній облік вартості.</p>
   <p>Критерії приймання коротко: звичайне питання і ескалація дають різні моделі в <code>requests</code>; <code>cost_usd</code> заповнюється ненульовими значеннями; <code>GET /cost</code> повертає <code>{ today_usd, budget_usd }</code> і плитка в консолі жива. Повні критерії — у файлі ДЗ.</p>
   <h3>Опційно (не оцінюється)</h3>
   <ul>
@@ -288,7 +287,6 @@ SELECT created_at::date, SUM(cost_usd) FROM requests GROUP BY 1 ORDER BY 1;</cod
 </section>
 
 <footer>
-  <div class="fnav"><a href="L03.html">&larr; Урок 3</a> · <a href="index.html">Зміст курсу</a> · <a href="L05.html">Урок 5 &rarr;</a></div>
   SupportGW · LLMOps Bootcamp · Урок 4 з 12
 </footer>
 </div>
