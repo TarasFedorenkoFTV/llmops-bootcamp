@@ -26,6 +26,27 @@
   a.card h2{font-size:16.5px;margin:6px 0 6px;letter-spacing:-.01em}
   a.card p{font-size:13.5px;color:var(--soft);margin:0}
   footer{margin-top:60px;border-top:1px solid var(--line);padding-top:16px;font-family:var(--mono);font-size:12px;color:var(--faint)}
+  h2.sh{font-size:22px;letter-spacing:-.01em;margin:0 0 12px}
+  p{margin:0 0 12px;max-width:72ch}
+  ul{margin:0 0 12px;padding-left:22px;max-width:72ch}
+  li{margin-bottom:6px}
+  code{font-family:var(--mono);font-size:.88em;background:var(--accent-bg);color:var(--accent);padding:1px 6px;border-radius:5px}
+  strong{font-weight:650}
+  table{border-collapse:collapse;width:100%;font-size:14.5px;background:var(--card);border-radius:12px;overflow:hidden;border:1px solid var(--line);margin-bottom:12px}
+  th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);background:#fafafc}
+  tr:last-child td{border-bottom:none}
+  .call{border-radius:12px;padding:13px 16px;margin:14px 0;max-width:72ch;border:1px solid var(--line);background:var(--card)}
+  .call b{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.09em;text-transform:uppercase;margin-bottom:5px}
+  .call.principle{background:var(--good-bg);border-color:transparent}
+  .call.principle b{color:var(--good)}
+  .call.tip{background:var(--warn-bg);border-color:transparent}
+  .call.tip b{color:var(--warn)}
+  .call.note{background:var(--accent-bg);border-color:transparent}
+  .call.note b{color:var(--accent)}
+  .track.opt{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:3px 9px;border-radius:20px;font-weight:700;background:var(--warn-bg);color:var(--warn)}
+  a.inline{color:var(--accent);text-decoration:none;border-bottom:1px solid var(--accent-bg)}
+  a.inline:hover{border-bottom-color:var(--accent)}
 </style>
 </head>
 <body>
@@ -34,8 +55,48 @@
 <header>
   <div class="eyebrow">SupportGW · LLMOps Bootcamp</div>
   <h1>Зміст курсу: 12 лонг-рідів</h1>
-  <p class="lead">Від трьох рядків, що викликають модель, — до керованої production-системи. Один урок — один шар контуру керування. Кожен лонг-рід самодостатній: теорія, розтин коду, лабораторна і домашнє завдання.</p>
+  <p class="lead">Від трьох рядків, що викликають модель, — до керованої production-системи. Один урок — один шар контуру керування. Кожен лонг-рід самодостатній: теорія, розтин коду, лабораторна і домашнє завдання. Ця сторінка — точка входу: спершу про те, що ви побудуєте і як влаштований курс, далі всі дванадцять уроків.</p>
 </header>
+
+<section>
+    <h2 class="sh">Капстоун: SupportGW — точка А і точка Б</h2>
+  <p>Наскрізний проєкт курсу — бот служби підтримки з контуром керування. Один екран, дві половини: ліворуч чат для користувача, праворуч консоль оператора.</p>
+  <p><strong>Точка А (перший урок):</strong> чат відповідає — і все. Консоль показує «—» у кожній плитці: система не знає ні своєї вартості, ні latency, ні версії промпта, ні чи живі провайдери. Це стан 90% LLM-фіч у продах: працює, але некеровано. <strong>Точка Б (тиждень 6):</strong> той самий чат, але кожна плитка жива — вартість дня з бюджетом, p95, частка кешу, помилки, спрацювання fallback; версію промпта можна відкотити кнопкою; незворотна дія чекає підтвердження людини; а зміна, що ламає якість, фізично не мержиться — її блокує гейт у CI.</p>
+  <p>Розрив між А і Б — це 12 уроків, по шару за урок. Окремого «фінального проєкту» немає: капстоун збирається вашими домашніми завданнями. Готовим дається все, що не є предметом курсу (інтерфейс, каркас сервісу, gateway-адаптер, база, mock, CI-шаблон); ваша робота — контур керування: routing, cost, кеш, інструменти з підтвердженням людини (human-in-the-loop, далі HITL), fallback, guardrails, метрики, evals, CI-гейт.</p>
+  <div class="call note"><b>Це не курс програмування</b>Кожне ДЗ — десятки рядків у місцях, підписаних <code>TODO(student, W#)</code>, а не «напишіть сервіс з нуля». Складність — в операційних рішеннях: що кешувати, коли деградувати, який поріг якості достатній. Код — лише спосіб зафіксувати рішення. Умієте читати код і писати прості функції — цього достатньо.</div>
+</section>
+
+<section>
+    <h2 class="sh">Дві доріжки курсу: обов'язкове і опційне</h2>
+  <p>Щоб курс був прохідним для працюючої людини, він явно поділений на дві доріжки — і так буде в кожному уроці й кожному ДЗ. <strong>Обов'язкова</strong> — мінімальний робочий контур керування, ядро капстоуна: routing, cost, кеш із метрикою, fallback, HITL, evals, CI-гейт. Це ~5–7 годин на тиждень разом з уроками й лабами, і саме вона йде без жодної позначки. <strong>Опційна</strong> — поглиблення для тих, кому мало: semantic cache, circuit breaker, повний стек метрик, canary, реальний ключ. Вона позначена бейджем <span class="track opt">опційно</span> в уроках і окремою секцією в ДЗ, і на оцінку не впливає.</p>
+  <div class="call principle"><b>Принцип</b>Опційне ніколи не є передумовою обов'язкового. Пропустили всі опційні блоки курсу — капстоун усе одно збирається повністю. Опційна доріжка — це глибина, а не борг.</div>
+  <div class="call tip"><b>Лайфхак</b>Якщо тижневе ДЗ виходить суттєво довшим за 3 години — ви, найімовірніше, випадково пішли в опційну доріжку. Поверніться до обов'язкових пунктів; опційне — на вихідні або ніколи.</div>
+</section>
+
+<section>
+    <h2 class="sh">Хто такий LLMOps-інженер — і хто ним стає</h2>
+  <p>Це не нова професія з нуля, а прогалина, до якої одночасно прийшли три звичні ролі. DevOps приносить CI/CD і моніторинг, але впирається в LLM-специфіку, з якої починається урок 1: недетермінізм, токеноміку, регресії промптів. MLOps знає життєвий цикл моделей, але не prompt lifecycle і не маршрутизацію провайдерів. Розробник уміє будувати сервіси, але не має механізмів, які роблять LLM-фічу керованою. Прогалину закриває той, хто прийшов першим — і здатність у всіх трьох одна: <strong>узяти LLM-прототип і довести до керованої production-системи</strong>. Не «знати 20 інструментів», а володіти механізмами: маршрутизація, облік вартості, кеш, безпечні дії, відмовостійкість, метрики, автоматична перевірка якості, гейт у CI.</p>
+  <p>Чого курс <em>не</em> робить: не тренує й не файнтюнить моделі, не будує RAG-пошук, не чіпає фронтенд. Наш шар — <strong>між застосунком і моделлю</strong>, і суміжні теми ми позначимо як опційні або «на виріст» прямо, а не забудемо.</p>
+</section>
+
+<section>
+    <h2 class="sh">Все для старту: посилання</h2>
+  <p class="links">Один раз, все в одному місці. Вхідний порог — Docker з Compose v2 і Git, ~4 ГБ диска, жодних платних ключів; повна перевірка системи — у PREREQUISITES.</p>
+  <table class="links">
+    <tr><th>Що</th><th>Де</th></tr>
+    <tr><td><strong>Репозиторій курсу</strong> (клонувати)</td><td><a href="https://github.com/TarasFedorenkoFTV/llmops-bootcamp">github.com/TarasFedorenkoFTV/llmops-bootcamp</a> — робоча папка <code>starter/</code></td></tr>
+    <tr><td><strong>Пре-реквізити</strong>: перевірка системи, акаунтів і навичок до старту</td><td><a href="https://github.com/TarasFedorenkoFTV/llmops-bootcamp/blob/main/starter/PREREQUISITES.md">starter/PREREQUISITES.md</a></td></tr>
+    <tr><td><strong>Повний гайд</strong>: вимоги, запуск, кожна папка, troubleshooting</td><td><a href="https://github.com/TarasFedorenkoFTV/llmops-bootcamp/blob/main/starter/GETTING_STARTED.md">starter/GETTING_STARTED.md</a></td></tr>
+    <tr><td><strong>Домашні завдання</strong> по тижнях, з критеріями</td><td><a href="https://github.com/TarasFedorenkoFTV/llmops-bootcamp/tree/main/starter/homework">starter/homework/</a></td></tr>
+    <tr><td><strong>Зміст курсу</strong>: усі 12 занять одним списком</td><td><a href="https://github.com/TarasFedorenkoFTV/llmops-bootcamp/blob/main/docs/longreads/index.html">docs/longreads/index.html</a></td></tr>
+    <tr><td><strong>Еталонні рішення</strong> по тижнях (звірятися після здачі свого)</td><td><a href="https://github.com/TarasFedorenkoFTV/llmops-bootcamp-solutions">llmops-bootcamp-solutions</a>, бранчі <code>w1</code>…<code>w6</code></td></tr>
+  </table>
+  <div class="call tip"><b>Лайфхак</b>Щось не піднімається — спершу розділ Troubleshooting у GETTING_STARTED: там найчастіші граблі (зайняті порти, корпоративний проксі, кирилиця в терміналі) з готовими фіксами. Потім — чат курсу.</div>
+</section>
+
+<section>
+  <h2 class="sh">Дванадцять уроків</h2>
+</section>
 
 <section>
   <div class="wk">Тиждень 1 · Основа + промпти</div>
