@@ -21,7 +21,7 @@
   .wk{font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:10px}
   .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
   .card{display:block;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;text-decoration:none;color:var(--ink);transition:border-color .15s}
-  
+  .card:hover{border-color:var(--accent)}
   .num{font-family:var(--mono);font-size:12px;color:var(--accent);font-weight:700}
   .card h2{font-size:16.5px;margin:6px 0 6px;letter-spacing:-.01em}
   .card p{font-size:13.5px;color:var(--soft);margin:0}
@@ -62,13 +62,13 @@
     <h2 class="sh">Капстоун: SupportGW — точка А і точка Б</h2>
   <p>Наскрізний проєкт курсу — бот служби підтримки з контуром керування. Один екран, дві половини: ліворуч чат для користувача, праворуч консоль оператора.</p>
   <p><strong>Точка А (перший урок):</strong> чат відповідає — і все. Консоль показує «—» у кожній плитці: система не знає ні своєї вартості, ні latency, ні версії промпта, ні чи живі провайдери. Це стан 90% LLM-фіч у продах: працює, але некеровано. <strong>Точка Б (тиждень 6):</strong> той самий чат, але кожна плитка жива — вартість дня з бюджетом, p95, частка кешу, помилки, спрацювання fallback; версію промпта можна відкотити кнопкою; незворотна дія чекає підтвердження людини; а зміна, що ламає якість, фізично не мержиться — її блокує гейт у CI.</p>
-  <p>Розрив між А і Б — це 12 уроків, по шару за урок. Окремого «фінального проєкту» немає: капстоун збирається вашими домашніми завданнями. Готовим дається все, що не є предметом курсу (інтерфейс, каркас сервісу, gateway-адаптер, база, mock, CI-шаблон); ваша робота — контур керування: routing, cost, кеш, інструменти з підтвердженням людини (human-in-the-loop, далі HITL), fallback, guardrails, метрики, evals, CI-гейт.</p>
+  <p>Розрив між А і Б — це 12 уроків, по шару за урок. Окремого «фінального проєкту» немає: капстоун збирається вашими домашніми завданнями. Готовим дається все, що не є предметом курсу (інтерфейс, каркас сервісу, gateway-адаптер, база, mock, CI-шаблон); ваша робота — контур керування: routing, cost, кеш, інструменти з підтвердженням людини (human-in-the-loop, далі HITL), fallback, guardrail на межі (PII), метрики, evals, CI-гейт.</p>
   <div class="call note"><b>Це не курс програмування</b>Кожне ДЗ — десятки рядків у місцях, підписаних <code>TODO(student, W#)</code>, а не «напишіть сервіс з нуля». Складність — в операційних рішеннях: що кешувати, коли деградувати, який поріг якості достатній. Код — лише спосіб зафіксувати рішення. Умієте читати код і писати прості функції — цього достатньо.</div>
 </section>
 
 <section>
     <h2 class="sh">Дві доріжки курсу: обов'язкове і опційне</h2>
-  <p>Щоб курс був прохідним для працюючої людини, він явно поділений на дві доріжки — і так буде в кожному уроці й кожному ДЗ. <strong>Обов'язкова</strong> — мінімальний робочий контур керування, ядро капстоуна: routing, cost, кеш із метрикою, fallback, HITL, evals, CI-гейт. Це ~5–7 годин на тиждень разом з уроками й лабами, і саме вона йде без жодної позначки. <strong>Опційна</strong> — поглиблення для тих, кому мало: semantic cache, circuit breaker, повний стек метрик, canary, реальний ключ. Вона позначена бейджем <span class="track opt">опційно</span> в уроках і окремою секцією в ДЗ, і на оцінку не впливає.</p>
+  <p>Щоб курс був прохідним для працюючої людини, він явно поділений на дві доріжки — і так буде в кожному уроці й кожному ДЗ. <strong>Обов'язкова</strong> — мінімальний робочий контур керування, ядро капстоуна: routing, cost, кеш із метрикою, fallback, HITL, evals, CI-гейт. Це ~5–7 годин на тиждень разом з уроками й лабами, і саме вона йде без жодної позначки. <strong>Опційна</strong> — поглиблення для тих, кому мало. Опційна секція є в кожному занятті (одна на урок) і в кожному ДЗ; найбільші теми — semantic cache, circuit breaker, повний стек метрик, canary, реальний ключ; повний перелік тижня — у файлі ДЗ. Опційне позначене бейджем <span class="track opt">опційно</span> в уроках і окремою секцією в ДЗ, і на оцінку не впливає.</p>
   <div class="call principle"><b>Принцип</b>Опційне ніколи не є передумовою обов'язкового. Пропустили всі опційні блоки курсу — капстоун усе одно збирається повністю. Опційна доріжка — це глибина, а не борг.</div>
   <div class="call tip"><b>Лайфхак</b>Якщо тижневе ДЗ виходить суттєво довшим за 3 години — ви, найімовірніше, випадково пішли в опційну доріжку. Поверніться до обов'язкових пунктів; опційне — на вихідні або ніколи.</div>
 </section>
@@ -85,9 +85,9 @@
   <table class="links">
     <tr><th>Що</th><th>Де</th></tr>
     <tr><td><strong>Репозиторій курсу</strong> (клонувати)</td><td><a href="https://github.com/TarasFedorenkoFTV/llmops-bootcamp">github.com/TarasFedorenkoFTV/llmops-bootcamp</a> — робоча папка <code>starter/</code> у клоні</td></tr>
-    <tr><td><strong>Пре-реквізити</strong>: перевірка системи, акаунтів і навичок до старту</td><td>документ «Пре-реквізити» (видається разом із курсом)</td></tr>
-    <tr><td><strong>Повний гайд</strong>: вимоги, запуск, кожна папка, troubleshooting</td><td>документ «Гайд для студента»</td></tr>
-    <tr><td><strong>Домашні завдання</strong> по тижнях, з критеріями</td><td>документи «ДЗ тижня 1…6»</td></tr>
+    <tr><td><strong>Пре-реквізити</strong>: перевірка системи, акаунтів і навичок до старту</td><td>документ «Пре-реквізити» — <code>starter/PREREQUISITES.md</code> у репозиторії курсу</td></tr>
+    <tr><td><strong>Повний гайд</strong>: вимоги, запуск, кожна папка, troubleshooting</td><td>документ «Гайд для студента» — <code>starter/GETTING_STARTED.md</code> у репозиторії курсу</td></tr>
+    <tr><td><strong>Домашні завдання</strong> по тижнях, з критеріями</td><td>документи «ДЗ тижня 1…6» — <code>starter/homework/</code> у репозиторії курсу</td></tr>
     <tr><td><strong>Зміст курсу</strong>: усі 12 занять одним списком</td><td>ця сторінка</td></tr>
     <tr><td><strong>Еталонні рішення</strong> по тижнях (звірятися після здачі свого)</td><td><a href="https://github.com/TarasFedorenkoFTV/llmops-bootcamp-solutions">llmops-bootcamp-solutions</a>, бранчі <code>w1</code>…<code>w6</code></td></tr>
   </table>
@@ -101,48 +101,48 @@
 <section>
   <div class="wk">Тиждень 1 · Основа + промпти</div>
   <div class="cards">
-    <div class="card"><span class="num">Урок 1</span><h2>LLMOps і архітектура production LLM-системи</h2><p>Чотири питання, на які не відповідає «200 OK»; каркас капстоуна і перший керований злам.</p></div>
-    <div class="card"><span class="num">Урок 2</span><h2>Prompt lifecycle: промпт як production-артефакт</h2><p>Промпт переїжджає в реєстр: версії, promote, rollback і слід у лозі.</p></div>
+    <a class="card" href="L01.html"><span class="num">Урок 1</span><h2>LLMOps і архітектура production LLM-системи</h2><p>Чотири питання, на які не відповідає «200 OK»; каркас капстоуна і перший керований злам.</p></a>
+    <a class="card" href="L02.html"><span class="num">Урок 2</span><h2>Prompt lifecycle: промпт як production-артефакт</h2><p>Промпт переїжджає в реєстр: версії, promote, rollback і слід у лозі.</p></a>
   </div>
 </section>
 
 <section>
   <div class="wk">Тиждень 2 · Routing + cost</div>
   <div class="cards">
-    <div class="card"><span class="num">Урок 3</span><h2>Мультипровайдерний gateway і маршрутизація моделей</h2><p>Сервіс вирішує, адаптер виконує: роутер, конфіг і політика fallback.</p></div>
-    <div class="card"><span class="num">Урок 4</span><h2>Токеноміка і cost attribution</h2><p>Вартість кожного запиту в момент відповіді: прайс, cost_usd, бюджет поруч із витратою.</p></div>
+    <a class="card" href="L03.html"><span class="num">Урок 3</span><h2>Мультипровайдерний gateway і маршрутизація моделей</h2><p>Сервіс вирішує, адаптер виконує: роутер, конфіг і політика fallback.</p></a>
+    <a class="card" href="L04.html"><span class="num">Урок 4</span><h2>Токеноміка і cost attribution</h2><p>Вартість кожного запиту в момент відповіді: прайс, cost_usd, бюджет поруч із витратою.</p></a>
   </div>
 </section>
 
 <section>
   <div class="wk">Тиждень 3 · Кеш + tools</div>
   <div class="cards">
-    <div class="card"><span class="num">Урок 5</span><h2>Кешування: точний кеш, метрика і semantic cache</h2><p>Ключ, який не бреше, лічильники з першої хвилини, межі кешованого.</p></div>
-    <div class="card"><span class="num">Урок 6</span><h2>Tool calls: коли модель починає діяти</h2><p>Схеми, таймаути, ідемпотентність — і чесна «дірка» незворотної дії.</p></div>
+    <a class="card" href="L05.html"><span class="num">Урок 5</span><h2>Кешування: точний кеш, метрика і semantic cache</h2><p>Ключ, який не бреше, лічильники з першої хвилини, межі кешованого.</p></a>
+    <a class="card" href="L06.html"><span class="num">Урок 6</span><h2>Tool calls: коли модель починає діяти</h2><p>Схеми, таймаути, ідемпотентність — і чесна «дірка» незворотної дії.</p></a>
   </div>
 </section>
 
 <section>
   <div class="wk">Тиждень 4 · Надійність + безпека</div>
   <div class="cards">
-    <div class="card"><span class="num">Урок 7</span><h2>Reliability: fallback, деградація і circuit breaker</h2><p>План Б: fallback-ланцюг, красива відмова — і власний інцидент на замовлення.</p></div>
-    <div class="card"><span class="num">Урок 8</span><h2>Safety, guardrails і human-in-the-loop</h2><p>Injection наживо, черга підтверджень для незворотного, red-team кейси.</p></div>
+    <a class="card" href="L07.html"><span class="num">Урок 7</span><h2>Reliability: fallback, деградація і circuit breaker</h2><p>План Б: fallback-ланцюг, красива відмова — і власний інцидент на замовлення.</p></a>
+    <a class="card" href="L08.html"><span class="num">Урок 8</span><h2>Safety, guardrails і human-in-the-loop</h2><p>Injection наживо, черга підтверджень для незворотного, red-team кейси.</p></a>
   </div>
 </section>
 
 <section>
   <div class="wk">Тиждень 5 · Observability + evals</div>
   <div class="cards">
-    <div class="card"><span class="num">Урок 9</span><h2>Observability для LLM-систем</h2><p>Консоль оживає: p95, error rate, cache-hit, fallback — чотири виміри разом.</p></div>
-    <div class="card"><span class="num">Урок 10</span><h2>Golden dataset і eval suite</h2><p>Якість стає числом: контракт поведінки, grader, поріг, exit code.</p></div>
+    <a class="card" href="L09.html"><span class="num">Урок 9</span><h2>Observability для LLM-систем</h2><p>Консоль оживає: p95, error rate, cache-hit, fallback — чотири виміри разом.</p></a>
+    <a class="card" href="L10.html"><span class="num">Урок 10</span><h2>Golden dataset і eval suite</h2><p>Якість стає числом: контракт поведінки, grader, поріг, exit code.</p></a>
   </div>
 </section>
 
 <section>
   <div class="wk">Тиждень 6 · CI + фінал</div>
   <div class="cards">
-    <div class="card"><span class="num">Урок 11</span><h2>CI/CD quality gates, canary і rollback</h2><p>Eval-гейт на кожен PR: регресія фізично не потрапляє в main.</p></div>
-    <div class="card"><span class="num">Урок 12</span><h2>Фінал: LLMOps operating model</h2><p>Наскрізний прогін, incident runbook, KPI-мова і 30-day rollout для вашої команди.</p></div>
+    <a class="card" href="L11.html"><span class="num">Урок 11</span><h2>CI/CD quality gates, canary і rollback</h2><p>Eval-гейт на кожен PR: регресія фізично не потрапляє в main.</p></a>
+    <a class="card" href="L12.html"><span class="num">Урок 12</span><h2>Фінал: LLMOps operating model</h2><p>Наскрізний прогін, incident runbook, KPI-мова і 30-day rollout для вашої команди.</p></a>
   </div>
 </section>
 
