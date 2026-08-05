@@ -3,6 +3,9 @@
 *.env
 !*.env.example
 
+# локальний зсув портів
+docker-compose.override.yml
+
 # python
 __pycache__/
 *.pyc

@@ -25,7 +25,7 @@
 
 ![Контрол-плейн](docs/control-plane.png)
 
-Джерела діаграм (mermaid, рендеряться на GitHub): [architecture](docs/architecture.md) · [request-flow](docs/request-flow.md) · [student-load](docs/student-load.md) · [control-plane](docs/control-plane.md).
+Джерела діаграм (mermaid, рендеряться на GitHub): [architecture](docs/architecture.md) · [request-flow](docs/request-flow.md) · [навантаження студента](docs/weekly-outcomes.md) · [control-plane](docs/control-plane.md).
 
 ## Стек
 

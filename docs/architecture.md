@@ -14,12 +14,12 @@ flowchart LR
   CHAT --> SVC[App service · .NET<br/>control plane · студент]
   CON --> OAPI[Observability API · .NET<br/>студент]
   SVC -->|обраний виклик| GW[LiteLLM<br/>провайдер-адаптер]
-  GW --> P1[OpenAI]
-  GW --> P2[Azure]
+  GW --> P1["Провайдер A<br/>(реальний ключ · опційно)"]
+  GW --> P2["Провайдер B<br/>(реальний ключ · опційно)"]
   GW --> MOCK[Mock provider]
   SVC --> PG[(Postgres<br/>logs · prompts · cost)]
   OAPI --> PG
-  SVC --> RED[(Redis · cache)]
+  SVC --> RED[("Redis · винесений кеш<br/>(advanced · опційно)")]
   EV[Eval runner · Python · студент] --> PG
   CI[GitHub Actions<br/>eval gate] --> EV
 ```
@@ -31,7 +31,7 @@ flowchart LR
 - **Observability API (.NET, студент)** — читає логи з Postgres, віддає агрегати (traces, p95, cost, error-taxonomy) у Console-в'юху. Це і є «розділ обзервабіліті» — дані й логіка на бекенді, показ у готовій Angular-консолі.
 - **LiteLLM** — єдиний виклик до будь-якого провайдера + нормалізація відмінностей. Логіки рішень не тримає.
 - **Postgres** — логи запитів (`request_id`, model, latency, tokens, cost, prompt_version), prompt registry, cost records.
-- **Redis** — кеш (опційно, з уроку про caching).
+- **Redis** — опційний **винесений** кеш (advanced-профіль). Сам кеш відповідей із лічильниками hit/miss — core тижня 3 і живе в сервісі; Redis — опційна надбудова для semantic cache.
 - **Eval runner (Python, студент)** — golden dataset, graders, пороги.
 - **GitHub Actions** — eval gate, блокує regression.
 
