@@ -6,4 +6,4 @@ services:
   ui:      { ports: !override ["4300:4200"] }
   service: { ports: !override ["8180:8080"] }
   gateway: { ports: !override ["4100:4000"] }
-  postgres: { ports: !override ["15432:5432"] }
+  postgres: { ports: !override ["25432:5432"] }   # 25432, а не 15432: override.example займає 15432 — інакше два стеки поруч конфліктують саме на postgres
