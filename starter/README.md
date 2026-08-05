@@ -28,7 +28,3 @@ docker compose up --build
 Піднімаються: UI (`:4200`), сервіс (`:8080`), LiteLLM (`:4000`), Postgres, mock provider.
 Для mock реальні ключі не потрібні. Redis і дашборди — опційні: `docker compose --profile advanced up`.
 Для оцінки якості (model-based evals): `cp gateway/.env.example gateway/.env` і заповнити ключі.
-
-## Власник репозиторію
-
-Визначається на strategy sync. До того — draft.

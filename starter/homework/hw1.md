@@ -45,10 +45,11 @@ PR, де чат працює, промпт живе в БД, консоль по
 |---|---|---|
 | Стек піднімається | `docker compose up --build` | усі контейнери Up, чат відповідає |
 | Промпт у БД | `GET /prompts` | список версій, одна active |
-| Реєстр наповнено міграцією | `docker compose exec postgres psql -U llmops -d llmops -c "SELECT name, version, active FROM prompts"` | два рядки, active рівно один |
+| Реєстр наповнено міграцією | `docker compose down -v && docker compose up --build`, потім `docker compose exec postgres psql -U llmops -d llmops -c "SELECT name, version, active FROM prompts"` | два рядки, active рівно один — **без жодного ручного `INSERT`**: seed справді сидить у міграції `db/schema.sql`, а не в коді сервісу і не вставлений руками |
 | Активація «сміття» | `POST /prompts/v99/activate` | `404`, активна версія не змінилася |
-| Версія в лозі | `SELECT model, prompt_version FROM requests ORDER BY created_at DESC LIMIT 3` | `prompt_version` заповнений |
-| Rollback ловиться eval-прогоном | активувати «поганий» промпт → evals; повернути → evals | червоні → зелені |
+| Версія в лозі | `POST /prompts/v1/activate` → нове питання в чат → `SELECT model, prompt_version FROM requests ORDER BY created_at DESC LIMIT 3` | `prompt_version` **збігається з активною версією реєстру**: у свіжому рядку лога — `v1`. Непорожність недостатня — константа в лозі цей рядок не проходить |
+| Поломка реєстру видна | `docker compose exec postgres psql -U llmops -d llmops -c "UPDATE prompts SET active=false;"` → `POST /chat` | відповідь деградує («не знаю» або власний чесний дефолт) **і** `prompt_version` у лозі ≠ версія з реєстру (в еталоні — `none`). Нормальна support-відповідь із `prompt_version=v2` при порожньому реєстрі = на доопрацювання |
+| Rollback ловиться eval-прогоном | активувати «поганий» промпт → evals; повернути → evals | прогін на v1 — результат **нижче порога** (exit 1; на стартовому датасеті еталонна картина — 3/6), на v2 — зелені. «Один-два червоні кейси при зеленому підсумку» — це не «ловиться» |
 
 ## Самоперевірка перед здачею
 
