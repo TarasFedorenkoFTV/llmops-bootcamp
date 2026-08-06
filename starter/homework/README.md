@@ -31,6 +31,9 @@
 
 ## Optional (за бажанням, не оцінюється)
 
-Semantic cache замість точного збігу ключа · третій провайдер у ланцюгу fallback ·
-повний Prometheus + Grafana поверх `/metrics` · розширений red-team pack (5+
-prompt-injection кейсів) · canary: два промпти паралельно на частині трафіку.
+Повний перелік опційного — у файлі ДЗ відповідного тижня. Найбільші теми:
+semantic cache замість
+точного збігу ключа (hw3) · circuit breaker з half-open (hw4) · вхідний
+regex-детект prompt injection і HITL TTL (hw4) · SLO з бюджетом помилок,
+таксономія помилок і model-based grader (hw5) · canary-план та `/metrics` із
+зовнішнім дашбордом (hw6).
