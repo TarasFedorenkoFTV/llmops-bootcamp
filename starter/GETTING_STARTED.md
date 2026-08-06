@@ -348,7 +348,9 @@ Mock падає на замовлення — двома способами:
 п'ять команд (потрібен .NET SDK з розділу «Опційно» §1):
 
 ```bash
-dotnet new xunit -o tests
+# --framework net8.0 обов'язковий: без нього шаблон візьме дефолтний TFM
+# твого SDK (напр. net10), і тест-збірка не зматчиться із сервісом на net8
+dotnet new xunit -o tests --framework net8.0
 dotnet add tests/tests.csproj reference service/Service.csproj
 # винеси функцію під тест у public static class (див. нижче), потім:
 dotnet test tests
