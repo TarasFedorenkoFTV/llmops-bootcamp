@@ -27,7 +27,7 @@
 | `MENTOR_GUIDE.md` | живий — робочий документ ментора |
 | `weekly-outcomes.md` | живий — канонічні цифри навантаження |
 | `demo-script.md`, `failure-scenarios.md`, `optional-and-mentions.md` | живі перевірні реєстри; актуалізуються з кожною хвилею правок |
-| `architecture.md` + `architecture.png`, `control-plane.md` + `control-plane.png`, `request-flow.png` | службові діаграми для автора/ведучого; у студентський комплект не входять |
+| `architecture.md` + `architecture.png`, `control-plane.md` + `control-plane.png`, `request-flow.md` + `request-flow.png` | службові діаграми для автора/ведучого; у студентський комплект не входять |
 | `student-load.png`, `capstone-mockup.png` | ілюстрації робочих нотаток; не публікуються |
 | `longreads/PRODUCTION.md` | живий — нотатки ведучого (демо і опційний запис) |
 | `longreads/STYLE.md`, `longreads/HANDOFF.md` | живі — правила формату і цей файл |
