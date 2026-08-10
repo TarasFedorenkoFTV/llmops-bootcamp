@@ -84,7 +84,7 @@ D.titleSlide({
 
 {
   const s = D.slide({ num: "03", title: "Runbook — сценарій, а не есе", pill: "absorb", notes: N() });
-  D.table(s, { x: MX, y: 1.9, w: 12.1, colW: [2.4, 3.4, 6.3], rowH: 0.66, size: 11.5,
+  D.table(s, { x: MX, y: 1.9, w: 12.1, colW: [2.4, 3.4, 6.3], rowH: 0.56, size: 11.5,
     head: ["такт", "питання", "у нашому інциденті"],
     rows: [
       { cells: ["Симптом", "що видно?", "скарги «бот вибачається», error rate росте"] },
@@ -114,7 +114,7 @@ D.titleSlide({
 
 {
   const s = D.slide({ num: "05", title: "KPI-мова: за що дають бюджет", pill: "absorb", notes: N() });
-  D.table(s, { x: MX, y: 1.9, w: 12.1, colW: [5.0, 7.1], rowH: 0.6, size: 11.5,
+  D.table(s, { x: MX, y: 1.9, w: 12.1, colW: [5.0, 7.1], rowH: 0.52, size: 11.5,
     head: ["інженерне", "KPI-мовою"],
     rows: [
       { cells: ["fallback + degradation", "падіння провайдера користувач не помічає"], tone: "good" },
