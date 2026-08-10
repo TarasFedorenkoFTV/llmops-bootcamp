@@ -31,7 +31,7 @@ D.titleSlide({
    ["07","Promote і rollback"],["08","Чому mock відчуває промпт"],["09","Дисципліна версій"],
    ["10","Audit trail · опційно"],["11","Лабораторна"],["12","Антипатерни"],
   ].forEach(([n, t], i) => D.tile(s, { x: MX + (i % 3) * 4.05, y: 1.8 + Math.floor(i / 3) * 1.15, w: 3.85, h: 0.95,
-      badge: n, title: t, tone: n === "10" ? "warn" : (i < 5 ? "acc" : "card") }));
+      badge: n, title: t, tone: n === "10" ? "warn" : "card" }));
   D.band(s, { x: MX, y: 6.4, w: 12.1, h: 0.62, tone: "card", text: "Від «git чистий, система зламана» — до реєстру, у якому відкат займає секунду." });
 }
 

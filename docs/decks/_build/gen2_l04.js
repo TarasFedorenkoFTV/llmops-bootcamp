@@ -29,7 +29,7 @@ D.titleSlide({
    ["07","GET /cost і бюджет"],["08","Routing × cost"],["09","Budget-політика · опційно"],
    ["10","Лабораторна"],["11","Антипатерни"],
   ].forEach(([n, t], i) => D.tile(s, { x: MX + (i % 3) * 4.05, y: 1.8 + Math.floor(i / 3) * 1.15, w: 3.85, h: 0.95,
-      badge: n, title: t, tone: n === "09" ? "warn" : (i < 5 ? "acc" : "card") }));
+      badge: n, title: t, tone: n === "09" ? "warn" : "card" }));
   D.band(s, { x: MX, y: 6.4, w: 12.1, h: 0.62, tone: "card", text: "Від «дізналися з рахунку» — до цифри, яка з'являється разом із відповіддю." });
 }
 

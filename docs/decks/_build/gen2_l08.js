@@ -29,7 +29,7 @@ D.titleSlide({
    ["07","Approve: єдина точка"],["08","MaskPii"],["09","TTL заявки · опційно"],
    ["10","Red-team як регресія"],["11","Лабораторна"],["12","Антипатерни"],
   ].forEach(([n, t], i) => D.tile(s, { x: MX + (i % 3) * 4.05, y: 1.8 + Math.floor(i / 3) * 1.15, w: 3.85, h: 0.95,
-      badge: n, title: t, tone: n === "09" ? "warn" : (i < 5 ? "acc" : "card") }));
+      badge: n, title: t, tone: n === "09" ? "warn" : "card" }));
   D.band(s, { x: MX, y: 6.4, w: 12.1, h: 0.62, tone: "card", text: "Від «модель діє сама» — до «між пропозицією і дією стоять черга і людина»." });
 }
 

@@ -29,7 +29,7 @@ D.titleSlide({
    ["07","Помилки мають бути швидкими"],["08","Circuit breaker · опційно"],["09","Слід у метриках"],
    ["10","Лабораторна"],["11","Антипатерни"],
   ].forEach(([n, t], i) => D.tile(s, { x: MX + (i % 3) * 4.05, y: 1.8 + Math.floor(i / 3) * 1.15, w: 3.85, h: 0.95,
-      badge: n, title: t, tone: n === "08" ? "warn" : (i < 5 ? "acc" : "card") }));
+      badge: n, title: t, tone: n === "08" ? "warn" : "card" }));
   D.band(s, { x: MX, y: 6.4, w: 12.1, h: 0.62, tone: "card", text: "Reliability — не «щоб не падало». Падатиме. Щоб падіння було керованим." });
 }
 
