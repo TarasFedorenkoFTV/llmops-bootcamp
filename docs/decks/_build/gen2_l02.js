@@ -3,7 +3,7 @@ const path = require("path");
 const { createDeck, notesFrom } = require("./deck_lib2");
 const SRC = process.env.DECKS_DIR || path.join(__dirname, "..");
 const N = notesFrom(path.join(SRC, "L02-script.md"));
-const D = createDeck({ lesson: 2, week: 1, fileTitle: "Prompt lifecycle: промпт як production-артефакт" });
+const D = createDeck({ lesson: 2, week: 1, fileTitle: "Prompt lifecycle: промпт як production-артефакт", notes: N });
 const { P, F, MX } = D;
 
 D.titleSlide({
@@ -278,7 +278,7 @@ D.titleSlide({
 
 // що це довело
 {
-  const s = D.slide({ title: "Що це довело", pill: "absorb", notes: N() });
+  const s = D.slide({ title: "Що це довело", pill: "connect", notes: N() });
   D.tile(s, { x: MX, y: 1.9, w: 3.9, h: 2.0, title: "Регресія без коміта — реальна", body: "activate v1 зламав відповіді: git чистий, деплою не було", tone: "crit" });
   D.tile(s, { x: 4.72, y: 1.9, w: 3.9, h: 2.0, title: "Rollback — одна операція", body: "activate v2 полагодив за секунди: той самий ендпоінт", tone: "good" });
   D.tile(s, { x: 8.82, y: 1.9, w: 3.9, h: 2.0, title: "Лог знає, кого винуватити", body: "сплеск «не знаю» збігається з активацією v1", tone: "acc" });
@@ -304,7 +304,7 @@ D.titleSlide({
 
 // антипатерни
 {
-  const s = D.slide({ title: "Антипатерни тижня", pill: "absorb", notes: N() });
+  const s = D.slide({ title: "Антипатерни тижня", pill: "connect", notes: N() });
   [["Правити активний промпт «на живу»", "знищує можливість порівняти «до» і «після»; нова версія — один INSERT"],
    ["Промпт у коді, у документі або в голові тімліда", "усі три означають одне: система не знає, що нею керує"],
    ["Лог без prompt_version", "реєстр є, а розслідування наосліп"],

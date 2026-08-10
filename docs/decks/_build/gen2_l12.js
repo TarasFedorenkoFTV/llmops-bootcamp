@@ -3,7 +3,7 @@ const path = require("path");
 const { createDeck, notesFrom } = require("./deck_lib2");
 const SRC = process.env.DECKS_DIR || path.join(__dirname, "..");
 const N = notesFrom(path.join(SRC, "L12-script.md"));
-const D = createDeck({ lesson: 12, week: 6, fileTitle: "Фінал: LLMOps operating model" });
+const D = createDeck({ lesson: 12, week: 6, fileTitle: "Фінал: LLMOps operating model", notes: N });
 const { P, F, MX } = D;
 
 D.titleSlide({
@@ -219,7 +219,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Що це довело", pill: "absorb", notes: N() });
+  const s = D.slide({ title: "Що це довело", pill: "connect", notes: N() });
   D.tile(s, { x: MX, y: 1.9, w: 3.9, h: 2.0, title: "Система відтворювана", body: "з чистого клону, без прихованих кроків і локальних змінних", tone: "good" });
   D.tile(s, { x: 4.72, y: 1.9, w: 3.9, h: 2.0, title: "Інцидент керований", body: "деградація, метрики, відновлення — за сценарієм, не імпровізацією", tone: "acc" });
   D.tile(s, { x: 8.82, y: 1.9, w: 3.9, h: 2.0, title: "Робота пояснювана", body: "кожна плитка перекладається мовою грошей і ризику" });
@@ -241,7 +241,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Антипатерни фіналу", pill: "absorb", notes: N() });
+  const s = D.slide({ title: "Антипатерни фіналу", pill: "connect", notes: N() });
   [["«Працює на моїй машині»", "система, яку не підняти з чистого клону, не передається нікому"],
    ["Постмортем із винними", "механізми лагодять інциденти; прізвища — ні"],
    ["Демо без артефактів", "твердження без скріншота плитки чи рядка лога — просто слова"],

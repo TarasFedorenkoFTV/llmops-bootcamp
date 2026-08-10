@@ -3,7 +3,7 @@ const path = require("path");
 const { createDeck, notesFrom } = require("./deck_lib2");
 const SRC = process.env.DECKS_DIR || path.join(__dirname, "..");
 const N = notesFrom(path.join(SRC, "L07-script.md"));
-const D = createDeck({ lesson: 7, week: 4, fileTitle: "Reliability: fallback, деградація і circuit breaker" });
+const D = createDeck({ lesson: 7, week: 4, fileTitle: "Reliability: fallback, деградація і circuit breaker", notes: N });
 const { P, F, MX } = D;
 
 D.titleSlide({
@@ -167,7 +167,7 @@ D.titleSlide({
 
 {
   const s = D.slide({ num: "06", title: "Остання лінія — це UX-рішення", pill: "absorb", notes: N() });
-  D.code(s, { x: MX, y: 1.9, w: 12.1, h: 1.75, size: 12, lines: [
+  D.code(s, { x: MX, y: 1.9, w: 12.1, h: 2.05, size: 12, lines: [
     [{ t: "if (!ok) {", c: "82AAFF" }],
     [{ t: '    answer = "Вибачте, тимчасові проблеми на нашому боці. ', c: "C3E88D" }],
     [{ t: '             Спробуйте, будь ласка, трохи згодом.";', c: "C3E88D" }],
@@ -198,10 +198,11 @@ D.titleSlide({
 
 {
   const s = D.slide({ num: "08", title: "Circuit breaker: перестати стукати в мертве", pill: "absorb", opt: true, notes: N() });
-  D.code(s, { x: MX, y: 1.9, w: 12.1, h: 1.75, size: 12, lines: [
+  D.code(s, { x: MX, y: 1.9, w: 12.1, h: 2.05, size: 12, lines: [
     [{ t: "// [W4 · опційно] 3 збої поспіль → open на 30 с", c: P.dim }],
-    [{ t: "if (failures >= 3 && DateTime.UtcNow < openUntil)", c: "82AAFF" }],
-    [{ t: "    return Degraded();   ", c: "F78C6C" }, { t: "// у провайдера навіть не питаємо", c: P.dim }],
+    [{ t: "var br = breakers.GetOrAdd(chain[i], _ => new Breaker());", c: "82AAFF" }],
+    [{ t: "if (br.OpenUntil > now)", c: "82AAFF" }],
+    [{ t: "    continue;            ", c: "F78C6C" }, { t: "// у провайдера навіть не питаємо", c: P.dim }],
   ] });
   D.tile(s, { x: MX, y: 3.9, w: 5.85, h: 1.65, title: "Навіщо",
     body: "перестати витрачати час користувача на виклик, який майже напевно впаде", tone: "good" });
@@ -237,6 +238,20 @@ D.titleSlide({
     text: "На тижні 5 усе це стане плитками консолі — сьогодні досить, що цифри існують і ростуть правильно." });
 }
 
+// ─── дві сучасні поправки до бюджету часу (доважок блоку 09) ───
+{
+  const s = D.slide({ num: "09", title: "Дві сучасні поправки до бюджету часу", pill: "absorb",
+    kicker: "Яких не було в епоху «одна модель — одна відповідь»", notes: N() });
+  D.tile(s, { x: MX, y: 2.15, w: 5.85, h: 1.95, badge: 1, title: "Режим мислення — інший порядок часу",
+    body: "секунди замість сотень мілісекунд: таймаут під швидкий режим «падає» на легітимно повільній відповіді", tone: "warn" });
+  D.tile(s, { x: 6.87, y: 2.15, w: 5.85, h: 1.95, badge: 2, title: "Ліміти стали багатовимірними",
+    body: "не лише запити на хвилину: токени на хвилину, окремі квоти на «думаючі» моделі й кешовані токени", tone: "warn" });
+  D.band(s, { x: MX, y: 4.4, w: 12.1, h: 1.05, tone: "crit",
+    text: "429 приходить не тому, що «багато запитів», а тому, що ви вибрали токен-квоту." });
+  D.band(s, { x: MX, y: 5.65, w: 12.1, h: 1.0, tone: "good", label: "Висновок",
+    text: "Бюджет часу — властивість маршруту, а не константа сервісу: ставиться там само, де ухвалюється рішення про модель." });
+}
+
 {
   const s = D.slide({ title: "Зараз ви побачите — і навіщо", pill: "do", notes: N() });
   [["__fail_503 → заглушка", "ввічлива відмова замість 500-ки", "good"],
@@ -266,7 +281,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Що це довело", pill: "absorb", notes: N() });
+  const s = D.slide({ title: "Що це довело", pill: "connect", notes: N() });
   D.tile(s, { x: MX, y: 1.9, w: 3.9, h: 2.0, title: "Збій швидкий", body: "мілісекунди замість восьми секунд прихованих ретраїв", tone: "good" });
   D.tile(s, { x: 4.72, y: 1.9, w: 3.9, h: 2.0, title: "Користувач бачить ввічливість", body: "заглушка замість 500-ки — чат живий", tone: "acc" });
   D.tile(s, { x: 8.82, y: 1.9, w: 3.9, h: 2.0, title: "Система бачить правду", body: "503 у лозі й лічильник переходів, а не «все добре»" });
@@ -288,7 +303,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Антипатерни тижня", pill: "absorb", notes: N() });
+  const s = D.slide({ title: "Антипатерни тижня", pill: "connect", notes: N() });
   [["Retry без паузи і без стелі", "ваш код стає другою половиною інциденту"],
    ["Заглушка зі статусом 200", "моніторинг бачить здорову систему, коли всі бачать вибачення"],
    ["Ретраї в кількох шарах одразу", "бюджети часу перемножуються — «швидка відмова» на пів хвилини"],

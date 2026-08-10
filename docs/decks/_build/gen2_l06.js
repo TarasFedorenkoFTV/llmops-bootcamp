@@ -3,7 +3,7 @@ const path = require("path");
 const { createDeck, notesFrom } = require("./deck_lib2");
 const SRC = process.env.DECKS_DIR || path.join(__dirname, "..");
 const N = notesFrom(path.join(SRC, "L06-script.md"));
-const D = createDeck({ lesson: 6, week: 3, fileTitle: "Tool calls: коли модель починає діяти" });
+const D = createDeck({ lesson: 6, week: 3, fileTitle: "Tool calls: коли модель починає діяти", notes: N });
 const { P, F, MX } = D;
 
 D.titleSlide({
@@ -248,7 +248,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Що це довело", pill: "absorb", notes: N() });
+  const s = D.slide({ title: "Що це довело", pill: "connect", notes: N() });
   D.tile(s, { x: MX, y: 1.9, w: 3.9, h: 2.0, title: "Прохання ≠ подія", body: "модель просить, сервіс вирішує і виконує — межа видима в коді", tone: "good" });
   D.tile(s, { x: 4.72, y: 1.9, w: 3.9, h: 2.0, title: "Читання безпечне", body: "повтор lookup_order коштує зайвий запит у базу — і все", tone: "acc" });
   D.tile(s, { x: 8.82, y: 1.9, w: 3.9, h: 2.0, title: "Незворотне — ні", body: "два тікети на одне питання: дірка HITL і відсутність ідемпотентності", tone: "crit" });
@@ -270,7 +270,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Антипатерни тижня", pill: "absorb", notes: N() });
+  const s = D.slide({ title: "Антипатерни тижня", pill: "connect", notes: N() });
   [["Виконувати все, що попросила модель", "клієнту не довіряють — клієнта валідують"],
    ["«Спробуємо якось» замість відмови", "рішення, яке ухвалив ніхто, вистрелить без винних"],
    ["Ретрай дії без ключа операції", "лотерея з подвійним тікетом або списанням"],

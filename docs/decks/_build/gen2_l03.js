@@ -3,7 +3,7 @@ const path = require("path");
 const { createDeck, notesFrom } = require("./deck_lib2");
 const SRC = process.env.DECKS_DIR || path.join(__dirname, "..");
 const N = notesFrom(path.join(SRC, "L03-script.md"));
-const D = createDeck({ lesson: 3, week: 2, fileTitle: "Мультипровайдерний gateway і маршрутизація моделей" });
+const D = createDeck({ lesson: 3, week: 2, fileTitle: "Мультипровайдерний gateway і маршрутизація моделей", notes: N });
 const { P, F, MX } = D;
 
 D.titleSlide({
@@ -248,7 +248,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Що це довело", pill: "absorb", notes: N() });
+  const s = D.slide({ title: "Що це довело", pill: "connect", notes: N() });
   D.tile(s, { x: MX, y: 1.9, w: 3.9, h: 2.0, title: "Трафік розведений", body: "дві моделі, різні лічильники — доказ, а не «код написаний»", tone: "good" });
   D.tile(s, { x: 4.72, y: 1.9, w: 3.9, h: 2.0, title: "Рішення читається", body: "уся політика в одній функції; кожен вибір — подія в лозі", tone: "acc" });
   D.tile(s, { x: 8.82, y: 1.9, w: 3.9, h: 2.0, title: "Розширення дешеве", body: "«третій провайдер» = один YAML-блок і нуль рядків коду" });
@@ -270,7 +270,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Антипатерни тижня", pill: "absorb", notes: N() });
+  const s = D.slide({ title: "Антипатерни тижня", pill: "connect", notes: N() });
   [["Рішення про модель — у конфізі адаптера", "прапорці не переносяться між інструментами, механізми — так"],
    ["Жорстке ім'я моделі по всьому коду", "заміна провайдера перетворюється на пошук рядків"],
    ["Роутинг за випадковим числом", "непередбачувано для користувача, невідтворювано для вас"],

@@ -3,7 +3,7 @@ const path = require("path");
 const { createDeck, notesFrom } = require("./deck_lib2");
 const SRC = process.env.DECKS_DIR || path.join(__dirname, "..");
 const N = notesFrom(path.join(SRC, "L01-script.md"));
-const D = createDeck({ lesson: 1, week: 1, fileTitle: "LLMOps і архітектура production LLM-системи" });
+const D = createDeck({ lesson: 1, week: 1, fileTitle: "LLMOps і архітектура production LLM-системи", notes: N });
 const { P, F, W, MX } = D;
 
 // ─── S1 титул ───
@@ -197,8 +197,10 @@ D.titleSlide({
   s.addText("час до 1-го токена", { x: MX, y: 3.45, w: 2.2, h: 0.6, align: "center", valign: "middle", fontFace: F.body, fontSize: 10.5, color: P.acc, margin: 0 });
   s.addShape("roundRect", { x: MX + 2.25, y: 3.45, w: 6.6, h: 0.6, rectRadius: 0.08, fill: { color: P.acc }, line: { type: "none" } });
   s.addText("генерація: послідовно, токен за токеном", { x: MX + 2.25, y: 3.45, w: 6.6, h: 0.6, align: "center", valign: "middle", fontFace: F.body, fontSize: 11, bold: true, color: "FFFFFF", margin: 0 });
+  s.addText("схематично: співвідношення часток, а не виміряні значення — конкретні числа побачите у власному лозі",
+    { x: MX, y: 4.12, w: 12.1, h: 0.3, fontFace: F.body, fontSize: 10.5, italic: true, color: P.faint, margin: 0 });
 
-  D.band(s, { x: MX, y: 4.45, w: 12.1, h: 1.35, tone: "crit", label: "Типова помилка",
+  D.band(s, { x: MX, y: 4.55, w: 12.1, h: 1.3, tone: "crit", label: "Типова помилка",
     text: "Читати p95 як характеристику інфраструктури. Зростання p95 однаково легко означає «відповіді подовшали», як і «провайдеру погано» — тому latency у лозі живе поряд із вихідними токенами." });
   s.addText([{ text: "time-to-first-token", options: { fontFace: F.mono, bold: true, color: P.acc } },
              { text: " — метрика для інтерфейсів, де відповідь друкується на очах. Стрімінг — свідомо за межами курсу.", options: { color: P.soft } }],
@@ -387,7 +389,7 @@ D.titleSlide({
 
 // ─── S20 що це довело ───
 {
-  const s = D.slide({ title: "Що це довело", pill: "absorb",
+  const s = D.slide({ title: "Що це довело", pill: "connect",
     notes: N() });
   D.tile(s, { x: MX, y: 1.85, w: 3.9, h: 2.1, title: "Система жива", body: "шлях запиту видно наскрізь: UI → сервіс → адаптер → mock → лог", tone: "good" });
   D.tile(s, { x: 4.72, y: 1.85, w: 3.9, h: 2.1, title: "Керування ще немає", body: "консоль «—», prompt_version і cost_usd порожні", tone: "warn" });
@@ -418,7 +420,7 @@ D.titleSlide({
 
 // ─── S22 антипатерни ───
 {
-  const s = D.slide({ title: "Антипатерни тижня", pill: "absorb",
+  const s = D.slide({ title: "Антипатерни тижня", pill: "connect",
     notes: N() });
   const anti = [["Ключ у коді застосунку", "«потім перенесемо» — не перенесете"],
                 ["Демо на одному запиті", "готовність — це чотири питання, а не скріншот"],

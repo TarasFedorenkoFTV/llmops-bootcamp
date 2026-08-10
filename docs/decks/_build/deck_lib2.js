@@ -27,18 +27,21 @@ const TONE = {
 // Повертає функцію-лічильник: кожен виклик віддає наступний блок, у порядку слайдів.
 function notesFrom(scriptPath) {
   const raw = fs.readFileSync(scriptPath, "utf8");
+  const heads = [...raw.matchAll(/\r?\n## Слайд \d+ · ([^\n]*)\r?\n/g)].map(m => m[1].trim());
   const blocks = raw.split(/\r?\n## Слайд \d+ · [^\n]*\r?\n/).slice(1).map(s => s.trim());
   let i = 0;
   const next = () => {
     if (i >= blocks.length) throw new Error(`${path.basename(scriptPath)}: блоків начитки (${blocks.length}) менше, ніж слайдів`);
     return blocks[i++];
   };
+  next.file = path.basename(scriptPath);
   next.total = blocks.length;
   next.used = () => i;
+  next.heads = heads;
   return next;
 }
 
-function createDeck({ lesson, week, fileTitle }) {
+function createDeck({ lesson, week, fileTitle, notes: reader }) {
   const pres = new pptxgen();
   pres.layout = "LAYOUT_WIDE";
   pres.author = "LLMOps Bootcamp";
@@ -275,7 +278,36 @@ function createDeck({ lesson, week, fileTitle }) {
     });
   }
 
+  // Начитка роздається блокам позиційно, а save() перезаписує .md заголовками слайдів —
+  // тому зайвий/пропущений блок мовчки зсуває весь хвіст і обрізає кінець, а файл після
+  // перезапису виглядає консистентним. Ця перевірка робить такий зсув гучним.
+  function assertNotesAligned() {
+    if (!reader) return;
+    if (reader.used() !== reader.total) {
+      const extra = reader.total - reader.used();
+      throw new Error(
+        `${reader.file}: блоків начитки ${reader.total}, слайдів ${reader.used()}. ` +
+        (extra > 0
+          ? `Зайвих блоків: ${extra} — вони мовчки зсунули б начитку і обрізали хвіст. ` +
+            `Останні прочитані: «${(reader.heads[reader.used() - 1] || "?")}»; ` +
+            `перший невикористаний: «${(reader.heads[reader.used()] || "?")}». ` +
+            `Або додайте слайд під цей блок, або злийте його з сусіднім.`
+          : `Бракує блоків — допишіть начитку для решти слайдів.`));
+    }
+    const drift = [];
+    reader.heads.forEach((h, k) => {
+      const want = String((script[k] || {}).title || "").replace(/\s*\n\s*/g, " ");
+      if (h && want && h !== want) drift.push(`  блок ${k + 1}: у .md «${h}» → слайд «${want}»`);
+    });
+    if (drift.length) {
+      console.warn(`УВАГА ${reader.file}: заголовки ${drift.length} блок(ів) не збігаються з назвами слайдів.`);
+      console.warn("Це нормально, якщо ви щойно перейменували слайд; і це зсув, якщо ні:");
+      drift.slice(0, 8).forEach(d => console.warn(d));
+    }
+  }
+
   function save(deckPath, scriptPath) {
+    assertNotesAligned();
     const md = [`# Сценарій начитки · Урок ${lesson} · ${fileTitle}`, "",
       `Слайдів: ${script.length}. Начитка: ${script.reduce((a, s) => a + (s.notes || "").split(/\s+/).filter(Boolean).length, 0)} слів.`,
       "", "---", ""];

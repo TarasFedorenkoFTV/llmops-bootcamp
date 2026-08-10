@@ -3,7 +3,7 @@ const path = require("path");
 const { createDeck, notesFrom } = require("./deck_lib2");
 const SRC = process.env.DECKS_DIR || path.join(__dirname, "..");
 const N = notesFrom(path.join(SRC, "L04-script.md"));
-const D = createDeck({ lesson: 4, week: 2, fileTitle: "Токеноміка і cost attribution" });
+const D = createDeck({ lesson: 4, week: 2, fileTitle: "Токеноміка і cost attribution", notes: N });
 const { P, F, MX } = D;
 
 D.titleSlide({
@@ -135,7 +135,7 @@ D.titleSlide({
 {
   const s = D.slide({ num: "05", title: "Один запит користувача — це не один виклик моделі", pill: "absorb", notes: N() });
   D.flow(s, { x: MX, y: 2.05, w: 12.1, h: 0.8, size: 11, items: [
-    { label: "ретрай (W7)" }, { label: "fallback (W7)", tone: "warn" }, { label: "tool-цикл (W6)" }, { label: "класифікатор (W3/W8)" }] });
+    { label: "ретрай (урок 7)" }, { label: "fallback (урок 7)", tone: "warn" }, { label: "tool-цикл (урок 6)" }, { label: "класифікатор (уроки 3 і 8)" }] });
   D.stat(s, { x: MX, y: 3.2, w: 3.9, h: 1.5, value: "1 → 4", label: "одне питання — до чотирьох викликів і чотирьох рядків лога", tone: "crit", size: 34 });
   D.band(s, { x: 4.72, y: 3.2, w: 8.0, h: 1.5, tone: "warn",
     text: "AVG по рядках рахує вартість виклику, а не звернення — помилка в рази, і завжди в бік «у нас усе дешево»." });
@@ -244,7 +244,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Що це довело", pill: "absorb", notes: N() });
+  const s = D.slide({ title: "Що це довело", pill: "connect", notes: N() });
   D.tile(s, { x: MX, y: 1.9, w: 3.9, h: 2.0, title: "Гроші видно одразу", body: "cost_usd з'являється разом із відповіддю, а не в рахунку", tone: "good" });
   D.tile(s, { x: 4.72, y: 1.9, w: 3.9, h: 2.0, title: "Важіль порахований", body: "різниця маршрутів — у доларах, а не у відчуттях", tone: "acc" });
   D.tile(s, { x: 8.82, y: 1.9, w: 3.9, h: 2.0, title: "Бюджет — сигнал", body: "плитка порівнює витрату з межею, а не показує абстрактну суму" });
@@ -266,7 +266,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Антипатерни тижня", pill: "absorb", notes: N() });
+  const s = D.slide({ title: "Антипатерни тижня", pill: "connect", notes: N() });
   [["Нуль замість null у cost_usd", "«безкоштовний запит» — брехня, яку неможливо знайти запитом"],
    ["AVG по рядках лога", "рахує вартість виклику, а не звернення — завжди в бік «дешево»"],
    ["Прайс у голові або в вікі", "застаріла ціна викривляє всі рішення, а не одне"],

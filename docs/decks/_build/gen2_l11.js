@@ -3,7 +3,7 @@ const path = require("path");
 const { createDeck, notesFrom } = require("./deck_lib2");
 const SRC = process.env.DECKS_DIR || path.join(__dirname, "..");
 const N = notesFrom(path.join(SRC, "L11-script.md"));
-const D = createDeck({ lesson: 11, week: 6, fileTitle: "CI/CD quality gates, canary і rollback" });
+const D = createDeck({ lesson: 11, week: 6, fileTitle: "CI/CD quality gates, canary і rollback", notes: N });
 const { P, F, MX } = D;
 
 D.titleSlide({
@@ -157,7 +157,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "07", title: "Feature flag, артефакти релізу, механічні перевірки", pill: "absorb", notes: N() });
+  const s = D.slide({ num: "07", title: "Feature flag і артефакти релізу", pill: "absorb", notes: N() });
   D.tile(s, { x: MX, y: 1.9, w: 5.85, h: 1.7, title: "Відкат версії промпта",
     body: "активація попередньої версії — секунди, без деплою (урок 2)", tone: "good" });
   D.tile(s, { x: 6.87, y: 1.9, w: 5.85, h: 1.7, title: "Feature flag",
@@ -168,6 +168,23 @@ D.titleSlide({
     { x: MX, y: 4.7, w: 12.1, h: 0.3, fontFace: F.body, fontSize: 12, italic: true, color: P.soft, margin: 0 });
   D.band(s, { x: MX, y: 5.2, w: 12.1, h: 1.2, tone: "crit", label: "Типова помилка",
     text: "Прапорець без плану прибирання: через рік це кладовище мертвих гілок, у якому ніхто не знає, що можна видалити." });
+}
+
+// ─── у гейті живуть не тільки evals: механічні перевірки (доважок блоку 07) ───
+{
+  const s = D.slide({ num: "07", title: "У гейті живуть не тільки evals", pill: "absorb",
+    kicker: "Клас поломок, які до моделі навіть не доходять — кілька рядків кожна", notes: N() });
+  D.table(s, { x: MX, y: 1.95, w: 12.1, colW: [5.6, 6.5], rowH: 0.58, size: 11.5,
+    head: ["перевірка", "що ловить"],
+    rows: [
+      { cells: ["Шаблон промпта: усі плейсхолдери на місці", "одна одрукована дужка — і в модель їде текст із дужками"] },
+      { cells: ["Схеми інструментів — валідний JSON Schema", "зламану схему провайдер відкине вже на проді"] },
+      { cells: ["Прайс покриває всі моделі з конфіга", "інакше cost_usd тихо стає null, і облік бреше (урок 4)"] },
+      { cells: ["Моделі запінені, а не alias'и", "«регресія без коміта» від оновлення провайдера (урок 3)"] },
+      { cells: ["У діфі немає ключів і секретів", "найдорожча помилка з найкоротшим фіксом"], tone: "crit" },
+    ] });
+  D.band(s, { x: MX, y: 5.55, w: 12.1, h: 1.1, tone: "good", label: "Порядок як у піраміді тестів",
+    text: "Найдешевше — механічні перевірки конфігів і схем, дорожче — eval-прогін зі стеком, найдорожче — модельні перевірки з реальним ключем. У цьому порядку 80% поломок ловляться за секунди, не піднімаючи жодного контейнера." });
 }
 
 {
@@ -229,7 +246,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Що це довело", pill: "absorb", notes: N() });
+  const s = D.slide({ title: "Що це довело", pill: "connect", notes: N() });
   D.tile(s, { x: MX, y: 1.9, w: 3.9, h: 2.0, title: "Регресія не пройде", body: "червоний прогін блокує merge механічно, а не за домовленістю", tone: "good" });
   D.tile(s, { x: 4.72, y: 1.9, w: 3.9, h: 2.0, title: "Гейт теж код", body: "два червоні прогони, поки він сам не запрацював, — нормальна історія", tone: "acc" });
   D.tile(s, { x: 8.82, y: 1.9, w: 3.9, h: 2.0, title: "Відкат — рішення заздалегідь", body: "умови, роль і команда записані до, а не під час інциденту" });
@@ -251,7 +268,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Антипатерни тижня", pill: "absorb", notes: N() });
+  const s = D.slide({ title: "Антипатерни тижня", pill: "connect", notes: N() });
   [["Мерж повз червоний гейт", "один прецедент — і за місяць гейт обходять усі"],
    ["Protection на неіснуючий чек", "захист, який нічого не блокує, гірший за відсутній"],
    ["Гейт, що триває пів години", "обхід стає раціональним рішенням"],

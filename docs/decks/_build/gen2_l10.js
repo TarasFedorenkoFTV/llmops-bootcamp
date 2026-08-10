@@ -3,7 +3,7 @@ const path = require("path");
 const { createDeck, notesFrom } = require("./deck_lib2");
 const SRC = process.env.DECKS_DIR || path.join(__dirname, "..");
 const N = notesFrom(path.join(SRC, "L10-script.md"));
-const D = createDeck({ lesson: 10, week: 5, fileTitle: "Golden dataset і eval suite" });
+const D = createDeck({ lesson: 10, week: 5, fileTitle: "Golden dataset і eval suite", notes: N });
 const { P, F, MX } = D;
 
 D.titleSlide({
@@ -253,7 +253,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Що це довело", pill: "absorb", notes: N() });
+  const s = D.slide({ title: "Що це довело", pill: "connect", notes: N() });
   D.tile(s, { x: MX, y: 1.9, w: 3.9, h: 2.0, title: "Якість стала числом", body: "«6/6, поріг 5» однакове для всіх, хто дивиться", tone: "good" });
   D.tile(s, { x: 4.72, y: 1.9, w: 3.9, h: 2.0, title: "Регресія ловиться командою", body: "не очима і не настроєм — відтворюваним прогоном", tone: "acc" });
   D.tile(s, { x: 8.82, y: 1.9, w: 3.9, h: 2.0, title: "Exit code готовий до CI", body: "усе, чого бракує гейту, — місце, де це запускати" });
@@ -276,7 +276,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Антипатерни тижня", pill: "absorb", notes: N() });
+  const s = D.slide({ title: "Антипатерни тижня", pill: "connect", notes: N() });
   [["Expect на цілу фразу", "зламається від першого перефразування і привчить ігнорувати червоне"],
    ["Датасет, який не росте", "через квартал перевіряє систему, якої вже немає"],
    ["Поріг «щоб позеленіло»", "зміна контракту крадькома замість обговореного релізу"],
