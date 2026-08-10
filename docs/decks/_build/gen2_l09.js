@@ -1,18 +1,19 @@
 // L09 v2 — Observability
-const { createDeck } = require("./deck_lib2");
-const V = require("./decks_dump.json")["9"].slides;
-const N = i => V[i - 1].notes;
+const path = require("path");
+const { createDeck, notesFrom } = require("./deck_lib2");
+const SRC = process.env.DECKS_DIR || path.join(__dirname, "..");
+const N = notesFrom(path.join(SRC, "L09-script.md"));
 const D = createDeck({ lesson: 9, week: 5, fileTitle: "Observability для LLM-систем" });
 const { P, F, MX } = D;
 
 D.titleSlide({
   title: "Observability\nдля LLM-систем",
   lead: "Uptime зелений, користувачі нещасні. Сьогодні консоль оживає повністю: p95 і error rate з власного лога, cache-hit і fallback з лічильників — і вміння бачити інциденти без жодної помилки.",
-  notes: N(1),
+  notes: N(),
 });
 
 {
-  const s = D.slide({ title: "Що ви зможете після уроку", pill: "absorb", kicker: "П'ять дій, які перевірите руками", notes: N(2) });
+  const s = D.slide({ title: "Що ви зможете після уроку", pill: "absorb", kicker: "П'ять дій, які перевірите руками", notes: N() });
   [["Порахувати p95 і error rate", "одним SQL по власному логу"],
    ["Оживити всі шість плиток", "цифри звірені з SQL"],
    ["Пояснити, чому p95", "а не середнє — і чому перцентилі не усереднюються"],
@@ -22,7 +23,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Маршрут на сьогодні", pill: "absorb", notes: N(3) });
+  const s = D.slide({ title: "Маршрут на сьогодні", pill: "absorb", notes: N() });
   [["01","Тихі інциденти й чотири виміри"],["02","Лог-рядок = джерело всього"],["03","p95, не середнє"],
    ["04","Розтин /observability"],["05","/providers і шість плиток"],["06","Тренд важливіший за снапшот"],
    ["07","SLI, SLO, бюджет помилок"],["08","Таксономія помилок · опційно"],["09","Трейс, спани, PII в лозі"],
@@ -34,7 +35,7 @@ D.titleSlide({
 
 {
   const s = D.slide({ title: "Терміни, якими користуватимемось", pill: "absorb", kicker: "Шість слів сьогоднішнього уроку",
-    notes: "Домовимось про шість слів. p95 — перцентиль: час, у який вкладаються дев'яносто п'ять відсотків запитів; саме він показує досвід найневдаліших користувачів. Error rate — частка запитів, що завершилися не двохсоткою. Cache-hit відсоток і fallback — наші власні лічильники з уроків 5 і 7. SLI — показник, який ви міряєте; SLO — цільове значення, про яке домовилися; а бюджет помилок — скільки невдач ви можете собі дозволити в межах цього SLO. Трейс — відновлений шлях одного запиту за його ідентифікатором. І тихий інцидент — збій, який не дає жодної помилки користувачу: система відповідає, метрики зелені, а всередині щось поїхало. Саме заради нього все це будується." });
+    notes: N() });
   D.terms(s, { x: MX, y: 1.95, w: 12.1, cols: 3, rowH: 1.3, items: [
     { term: "p95", def: "час, у який вкладаються 95% запитів — досвід найневдаліших" },
     { term: "error rate", def: "частка запитів, що завершилися не-200" },
@@ -47,7 +48,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "01", title: "Тихі інциденти: все зелене — все погано", pill: "absorb", notes: N(4) });
+  const s = D.slide({ num: "01", title: "Тихі інциденти: все зелене — все погано", pill: "absorb", notes: N() });
   [["Якість просіла", "після зміни промпта — HTTP 200"],
    ["Вартість ×3", "хтось зламав ключ кешу — HTTP 200"],
    ["Трафік поповз на слабшу", "працює fallback — HTTP 200"],
@@ -61,7 +62,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "02", title: "Один лог-рядок — джерело всього", pill: "absorb", notes: N(5) });
+  const s = D.slide({ num: "02", title: "Один лог-рядок — джерело всього", pill: "absorb", notes: N() });
   D.code(s, { x: MX, y: 1.9, w: 12.1, h: 0.85, size: 12.5, lines: [
     [{ t: "requests: request_id · model · prompt_version · latency_ms · tokens · cost_usd · status", c: "82AAFF" }],
   ] });
@@ -74,7 +75,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "02", title: "Новий зріз = нова колонка, не нова система", pill: "absorb", notes: N(6) });
+  const s = D.slide({ num: "02", title: "Новий зріз = нова колонка, не нова система", pill: "absorb", notes: N() });
   D.table(s, { x: MX, y: 1.9, w: 7.4, colW: [2.6, 2.4, 2.4], rowH: 0.6, size: 11.5,
     head: ["зріз", "груп", "агрегувати?"],
     rows: [
@@ -90,7 +91,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "03", title: "p95, не середнє", pill: "absorb", notes: N(7) });
+  const s = D.slide({ num: "03", title: "p95, не середнє", pill: "absorb", notes: N() });
   D.stat(s, { x: MX, y: 1.9, w: 3.9, h: 1.6, value: "≈ 1.1 с", label: "середнє — «прийнятно»", tone: "good", size: 32 });
   D.stat(s, { x: 4.72, y: 1.9, w: 3.9, h: 1.6, value: "p95", label: "досвід найневдаліших: у хвості живуть скарги", tone: "crit", size: 32 });
   D.stat(s, { x: 8.82, y: 1.9, w: 3.9, h: 1.6, value: "p99", label: "те саме для найгіршого відсотка", tone: "warn", size: 32 });
@@ -101,7 +102,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "04", title: "Розтин: GET /observability", pill: "absorb", notes: N(8) });
+  const s = D.slide({ num: "04", title: "Розтин: GET /observability", pill: "absorb", notes: N() });
   D.code(s, { x: MX, y: 1.9, w: 12.1, h: 2.15, size: 11.5, lines: [
     [{ t: "SELECT count(*),", c: "82AAFF" }],
     [{ t: "  COALESCE(percentile_cont(0.95) WITHIN GROUP (ORDER BY latency_ms), 0),", c: P.darktext }],
@@ -117,7 +118,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "05", title: "Плитка — це відповідь на питання", pill: "absorb", notes: N(10) });
+  const s = D.slide({ num: "05", title: "Плитка — це відповідь на питання", pill: "absorb", notes: N() });
   D.table(s, { x: MX, y: 1.9, w: 12.1, colW: [3.0, 5.4, 3.7], rowH: 0.54, size: 11.5,
     head: ["плитка", "операційне питання", "звідки цифра"],
     rows: [
@@ -133,7 +134,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "05", title: "GET /providers: статус не має права брехати", pill: "absorb", notes: N(9) });
+  const s = D.slide({ num: "05", title: "GET /providers: статус не має права брехати", pill: "absorb", notes: N() });
   D.states(s, { x: MX + 1.8, y: 2.1, items: [
     { label: "ok", sub: "перший успішний виклик", tone: "good", edge: "N збоїв" },
     { label: "degraded", sub: "поспіль збої в ланцюзі", tone: "warn" },
@@ -147,7 +148,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "06", title: "Тренд важливіший за снапшот", pill: "absorb", notes: N(11) });
+  const s = D.slide({ num: "06", title: "Тренд важливіший за снапшот", pill: "absorb", notes: N() });
   [["fallback росте щогодини", "основна модель деградує, а ви «не бачите» — відповіді ж ідуть"],
    ["cache-hit падає тиждень", "зламали ключ правкою або змінився профіль трафіку"],
    ["розподіл поїхав на strong", "або ескалацій більше, або роутер зламаний — бюджет горить удвічі"],
@@ -158,7 +159,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "07", title: "Скільки — це нормально: SLI, SLO, бюджет помилок", pill: "absorb", notes: N(12) });
+  const s = D.slide({ num: "07", title: "Скільки — це нормально: SLI, SLO, бюджет помилок", pill: "absorb", notes: N() });
   D.layers(s, { x: MX, y: 1.95, w: 12.1, h: 0.75, gap: 0.12, items: [
     { label: "SLI", body: "показник, який ви міряєте: частка успішних відповідей, p95 latency" },
     { label: "SLO", body: "цільове значення, про яке домовилися: «99% успішних», «p95 ≤ 3 с»", tone: "acc" },
@@ -171,7 +172,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "07", title: "Алерт — це прохання прокинутися", pill: "absorb", notes: N(13) });
+  const s = D.slide({ num: "07", title: "Алерт — це прохання прокинутися", pill: "absorb", notes: N() });
   [["Симптом, не причина", "«частка успішних упала» — будити завжди; «429 зросло» — причина, будити нечесно"],
    ["«Прокинутися» ≠ «подивитися вранці»", "будити — лише те, що шкодить зараз; решта — черга завдань"],
    ["Кожен алерт має інструкцію", "спрацював — що робити першим? Це runbook останнього уроку"],
@@ -183,7 +184,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "08", title: "Таксономія помилок: категорія визначає дію", pill: "absorb", opt: true, notes: N(14) });
+  const s = D.slide({ num: "08", title: "Таксономія помилок: категорія визначає дію", pill: "absorb", opt: true, notes: N() });
   D.table(s, { x: MX, y: 2.1, w: 12.1, colW: [3.4, 4.4, 4.3], rowH: 0.64, size: 11.5,
     head: ["категорія", "приклад", "що робити"],
     rows: [
@@ -196,7 +197,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "09", title: "Трейс, спани — і чого не має бути в лозі", pill: "absorb", notes: N(15) });
+  const s = D.slide({ num: "09", title: "Трейс, спани — і чого не має бути в лозі", pill: "absorb", notes: N() });
   D.flow(s, { x: MX, y: 2.05, w: 12.1, h: 0.78, size: 11, items: [
     { label: "request_id", tone: "acc" }, { label: "+ step" }, { label: "+ attempt" }, { label: "шлях запиту відновлено", tone: "good" }] });
   [["Повні тіла — не за замовчуванням", "текст запиту й відповіді роздувають лог і тягнуть за собою PII"],
@@ -208,7 +209,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "10", title: "У продукті чи індустріальний стек", pill: "absorb", notes: N(16) });
+  const s = D.slide({ num: "10", title: "У продукті чи індустріальний стек", pill: "absorb", notes: N() });
   D.tile(s, { x: MX, y: 2.0, w: 5.85, h: 1.95, title: "Обов'язкова доріжка: у продукті",
     body: "метрики живуть усередині системи, поверх власного лога: жодної нової інфраструктури", tone: "acc" });
   D.tile(s, { x: 6.87, y: 2.0, w: 5.85, h: 1.95, title: "Індустріальний стек — надбудова",
@@ -220,7 +221,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Зараз ви побачите — і навіщо", pill: "do", notes: N(17) });
+  const s = D.slide({ title: "Зараз ви побачите — і навіщо", pill: "do", notes: N() });
   [["psql-агрегати руками", "count, p95, error rate — одним запитом"],
    ["GET /observability", "ті самі цифри + cache-hit і fallback"],
    ["консоль: усі шість плиток", "живі, з числами замість «—»"],
@@ -231,7 +232,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Лабораторна: чотири кроки + опційний", pill: "do", notes: N(18) });
+  const s = D.slide({ title: "Лабораторна: чотири кроки + опційний", pill: "do", notes: N() });
   [["Порахувати руками", "psql: count, p95, error rate по сьогоднішньому дню", false],
    ["Оживити /observability", "SQL-агрегати + лічильники в один ендпоінт", false],
    ["Звірити плитки з SQL", "шість плиток показують те саме, що запит", false],
@@ -248,7 +249,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Що це довело", pill: "absorb", notes: N(19) });
+  const s = D.slide({ title: "Що це довело", pill: "absorb", notes: N() });
   D.tile(s, { x: MX, y: 1.9, w: 3.9, h: 2.0, title: "Моніторинг — це ваш лог", body: "SQL по таблиці, яку ви писали з першого уроку", tone: "good" });
   D.tile(s, { x: 4.72, y: 1.9, w: 3.9, h: 2.0, title: "Плитки відповідають на питання", body: "шість цифр, кожна з приводу, а не для краси", tone: "acc" });
   D.tile(s, { x: 8.82, y: 1.9, w: 3.9, h: 2.0, title: "Тихий інцидент видно", body: "fallback і error rate ростуть, поки uptime зелений", tone: "crit" });
@@ -257,7 +258,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Перевір себе", pill: "connect", notes: N(20) });
+  const s = D.slide({ title: "Перевір себе", pill: "connect", notes: N() });
   s.addShape("roundRect", { x: MX, y: 1.95, w: 12.1, h: 2.05, rectRadius: 0.12, fill: { color: P.card }, line: { color: P.line, width: 1 } });
   D.checklist(s, { x: MX + 0.45, y: 2.3, w: 11.3, cols: 2, items: [
     "усі шість плиток живі й звірені з SQL",
@@ -270,7 +271,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Антипатерни тижня", pill: "absorb", notes: N(21) });
+  const s = D.slide({ title: "Антипатерни тижня", pill: "absorb", notes: N() });
   [["Алерт на середню latency", "згладить і сплеск таймаутів, і деградацію провайдера"],
    ["Алерт на кожну помилку", "десять повідомлень щодня і жодної реакції"],
    ["Плитка без питання", "прикраса, яку перестають помічати за тиждень"],
@@ -288,7 +289,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Домашнє завдання", pill: "do", notes: N(22) });
+  const s = D.slide({ title: "Домашнє завдання", pill: "do", notes: N() });
   D.tile(s, { x: MX, y: 1.9, w: 5.85, h: 2.4, title: "Обов'язково — без здачі",
     body: "• закріпити лабу: всі шість плиток живі, звірені з SQL\n\n• відтворити «детектива»: інцидент видно в метриках, користувач не бачить 500\n\n• сформулювати по одному операційному питанню на кожну плитку" });
   D.tile(s, { x: 6.87, y: 1.9, w: 5.85, h: 2.4, title: "Опційно", tone: "warn",
@@ -309,7 +310,8 @@ D.closingSlide({
   ],
   nextTitle: "Наступний крок → Урок 10 · Golden dataset і eval suite",
   nextBody: "Ви бачите, що система робить. Але «відповіді стали гіршими» жодна з шести плиток не покаже. Наступний урок дає якості число: golden dataset, grader, поріг і exit code — той самий, що на тижні 6 стане гейтом у CI.",
-  notes: N(23),
+  notes: N(),
 });
 
-D.save("C:/Work/llmops-course-decks/L09.pptx", "C:/Work/llmops-course-decks/scripts/L09-script.md");
+const OUT = process.env.DECKS_OUT || SRC;
+D.save(path.join(OUT, "L09.pptx"), path.join(OUT, "L09-script.md"));

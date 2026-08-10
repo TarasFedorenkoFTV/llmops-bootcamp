@@ -1,18 +1,19 @@
 // L04 v2 — Токеноміка і cost attribution
-const { createDeck } = require("./deck_lib2");
-const V = require("./decks_dump.json")["4"].slides;
-const N = i => V[i - 1].notes;
+const path = require("path");
+const { createDeck, notesFrom } = require("./deck_lib2");
+const SRC = process.env.DECKS_DIR || path.join(__dirname, "..");
+const N = notesFrom(path.join(SRC, "L04-script.md"));
 const D = createDeck({ lesson: 4, week: 2, fileTitle: "Токеноміка і cost attribution" });
 const { P, F, MX } = D;
 
 D.titleSlide({
   title: "Токеноміка\nі cost attribution",
   lead: "«Скільки коштує наш AI?» — питання, на яке більшість команд відповідає рахунком наприкінці місяця. Це запізно. Сьогодні система знатиме вартість кожного запиту в момент відповіді.",
-  notes: N(1),
+  notes: N(),
 });
 
 {
-  const s = D.slide({ title: "Що ви зможете після уроку", pill: "absorb", kicker: "П'ять дій, які перевірите руками", notes: N(2) });
+  const s = D.slide({ title: "Що ви зможете після уроку", pill: "absorb", kicker: "П'ять дій, які перевірите руками", notes: N() });
   [["Завести прайс у сервісі", "поруч із Route(), де ухвалюється рішення"],
    ["Порахувати вартість запиту", "у момент відповіді, а не в рахунку"],
    ["Показати різницю SELECT'ом", "ескалація дорожча за FAQ"],
@@ -22,7 +23,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Маршрут на сьогодні", pill: "absorb", notes: N(3) });
+  const s = D.slide({ title: "Маршрут на сьогодні", pill: "absorb", notes: N() });
   [["01","Рахунок як спосіб дізнатися"],["02","Usage — джерело правди"],["03","Прайс у control plane"],
    ["04","Розрахунок: три рядки"],["05","Звернення ≠ виклик"],["06","Атрибуція важливіша за суму"],
    ["07","GET /cost і бюджет"],["08","Routing × cost"],["09","Budget-політика · опційно"],
@@ -34,7 +35,7 @@ D.titleSlide({
 
 {
   const s = D.slide({ title: "Терміни, якими користуватимемось", pill: "absorb", kicker: "Шість слів сьогоднішнього уроку",
-    notes: "Домовимось про шість слів. Usage — блок у відповіді провайдера з кількістю токенів: prompt_tokens це вхід, completion_tokens це вихід. Прайс — таблиця цін за тисячу токенів, окремо вхідних і вихідних; у нас вона живе в коді сервісу поруч із роутером. cost_usd — поле лога, куди ми запишемо пораховану вартість запиту; з уроку 1 воно стояло порожнім. Атрибуція — розклад витрат за розрізами: за моделлю, за днем, за версією промпта; саме вона перетворює тривогу на дію. Звернення — це питання користувача, а виклик — це похід у модель; одне звернення легко дає чотири виклики, і плутати їх дорого. І бюджет — цифра, з якою порівнюється сьогоднішня витрата: без неї сума нічого не означає. Далі кожне слово побачимо в коді." });
+    notes: N() });
   D.terms(s, { x: MX, y: 1.95, w: 12.1, cols: 3, rowH: 1.3, items: [
     { term: "usage", def: "prompt_tokens (вхід) і completion_tokens (вихід) у відповіді" },
     { term: "прайс", def: "ціни за 1k токенів, окремо вхідних і вихідних" },
@@ -47,7 +48,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "01", title: "Рахунок як спосіб дізнатися про катастрофу", pill: "absorb", notes: N(4) });
+  const s = D.slide({ num: "01", title: "Рахунок як спосіб дізнатися про катастрофу", pill: "absorb", notes: N() });
   D.flow(s, { x: MX, y: 2.1, w: 12.1, h: 0.85, size: 11, items: [
     { label: "фіча злітає", tone: "good" }, { label: "рахунок ×10", tone: "crit" },
     { label: "археологія: хто? на чому?", tone: "warn" }, { label: "лог мовчить", tone: "crit" }] });
@@ -60,7 +61,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "02", title: "Usage — єдине джерело правди", pill: "absorb", notes: N(5) });
+  const s = D.slide({ num: "02", title: "Usage — єдине джерело правди", pill: "absorb", notes: N() });
   D.code(s, { x: MX, y: 1.9, w: 6.3, h: 1.35, size: 13, lines: [
     [{ t: '"usage"', c: "82AAFF" }, { t: ": { ", c: P.darktext }, { t: '"prompt_tokens"', c: "82AAFF" }, { t: ": 184,", c: P.darktext }],
     [{ t: "          ", c: P.darktext }, { t: '"completion_tokens"', c: "82AAFF" }, { t: ": 46 }", c: P.darktext }],
@@ -74,7 +75,7 @@ D.titleSlide({
 
 {
   const s = D.slide({ num: "02", title: "Скільки коштує ваша мова", pill: "absorb",
-    kicker: "Українською той самий зміст обходиться дорожче — кирилиця скромніше представлена у словниках токенізаторів", notes: N(6) });
+    kicker: "Українською той самий зміст обходиться дорожче — кирилиця скромніше представлена у словниках токенізаторів", notes: N() });
   [["Мова системного промпта", "він їде в кожному запиті — довжина множиться на весь трафік"],
    ["Скільки історії тягнути", "контекст оплачується повторно на кожному кроці"],
    ["Де тримати довгі інструкції", "стабільне — на початок промпта, щоб підхопив кеш префікса"],
@@ -84,7 +85,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "03", title: "Прайс живе в control plane", pill: "absorb", notes: N(7) });
+  const s = D.slide({ num: "03", title: "Прайс живе в control plane", pill: "absorb", notes: N() });
   D.code(s, { x: MX, y: 1.9, w: 7.4, h: 2.0, size: 11.5, lines: [
     [{ t: "// [W2] прайс за 1k токенів (in, out) — навчальні числа", c: P.dim }],
     [{ t: "var prices = new Dictionary<string, (decimal In, decimal Out)>", c: "82AAFF" }],
@@ -102,7 +103,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "03", title: "Прайс — живі дані, і цін уже не дві, а три", pill: "absorb", notes: N(8) });
+  const s = D.slide({ num: "03", title: "Прайс — живі дані, і цін уже не дві, а три", pill: "absorb", notes: N() });
   D.tile(s, { x: MX, y: 1.9, w: 5.85, h: 1.65, title: "Застарілі ціни — систематична помилка",
     body: "не разовий баг, а викривлення всіх рішень, які ви ухвалюєте за цифрами", tone: "crit" });
   D.tile(s, { x: 6.87, y: 1.9, w: 5.85, h: 1.65, title: "Кешовані вхідні токени",
@@ -117,7 +118,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "04", title: "Розрахунок: три рядки після відповіді", pill: "absorb", notes: N(9) });
+  const s = D.slide({ num: "04", title: "Розрахунок: три рядки після відповіді", pill: "absorb", notes: N() });
   D.code(s, { x: MX, y: 1.9, w: 12.1, h: 1.9, size: 12, lines: [
     [{ t: "// [W2] cost: tokens * ціна моделі", c: P.dim }],
     [{ t: "decimal? costUsd = prices.TryGetValue(model, out var pr)", c: "82AAFF" }],
@@ -132,7 +133,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "05", title: "Один запит користувача — це не один виклик моделі", pill: "absorb", notes: N(10) });
+  const s = D.slide({ num: "05", title: "Один запит користувача — це не один виклик моделі", pill: "absorb", notes: N() });
   D.flow(s, { x: MX, y: 2.05, w: 12.1, h: 0.8, size: 11, items: [
     { label: "ретрай (W7)" }, { label: "fallback (W7)", tone: "warn" }, { label: "tool-цикл (W6)" }, { label: "класифікатор (W3/W8)" }] });
   D.stat(s, { x: MX, y: 3.2, w: 3.9, h: 1.5, value: "1 → 4", label: "одне питання — до чотирьох викликів і чотирьох рядків лога", tone: "crit", size: 34 });
@@ -143,7 +144,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "05", title: "Скільки коштує результат, а не токен", pill: "absorb", notes: N(11) });
+  const s = D.slide({ num: "05", title: "Скільки коштує результат, а не токен", pill: "absorb", notes: N() });
   D.tile(s, { x: MX, y: 1.95, w: 5.85, h: 1.9, title: "Ціна вирішеного звернення",
     body: "облік по request_id + ознака результату (ескалація сталася чи ні) — і цифра готова", tone: "acc" });
   D.tile(s, { x: 6.87, y: 1.95, w: 5.85, h: 1.9, title: "Мова, зрозуміла керівництву",
@@ -153,7 +154,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "06", title: "Атрибуція важливіша за суму", pill: "absorb", notes: N(12) });
+  const s = D.slide({ num: "06", title: "Атрибуція важливіша за суму", pill: "absorb", notes: N() });
   D.stat(s, { x: MX, y: 1.9, w: 3.0, h: 1.5, value: "$400", label: "тривога без дії", tone: "crit", size: 36 });
   D.stat(s, { x: 3.82, y: 1.9, w: 8.9, h: 1.5, value: "$310 — ескалації на strong", label: "третина могла піти на mini: рішення з порахованим ефектом", tone: "good", size: 28 });
   D.code(s, { x: MX, y: 3.6, w: 6.9, h: 1.75, size: 11, lines: [
@@ -170,7 +171,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "07", title: "GET /cost: бюджет поруч із витратою", pill: "absorb", notes: N(13) });
+  const s = D.slide({ num: "07", title: "GET /cost: бюджет поруч із витратою", pill: "absorb", notes: N() });
   D.code(s, { x: MX, y: 1.9, w: 7.2, h: 2.2, size: 11.5, lines: [
     [{ t: "// SELECT COALESCE(SUM(cost_usd), 0) FROM requests", c: P.dim }],
     [{ t: "//  WHERE created_at::date = CURRENT_DATE", c: P.dim }],
@@ -189,7 +190,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "08", title: "Routing × cost: важіль стає видимим", pill: "absorb", notes: N(14) });
+  const s = D.slide({ num: "08", title: "Routing × cost: важіль стає видимим", pill: "absorb", notes: N() });
   D.code(s, { x: MX, y: 1.9, w: 12.1, h: 0.8, size: 12.5, lines: [
     [{ t: "SELECT model, cost_usd FROM requests ORDER BY created_at DESC LIMIT 2;", c: "82AAFF" }],
   ] });
@@ -204,7 +205,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "09", title: "Budget-політика: що робити при 80%", pill: "absorb", opt: true, notes: N(15) });
+  const s = D.slide({ num: "09", title: "Budget-політика: що робити при 80%", pill: "absorb", opt: true, notes: N() });
   D.layers(s, { x: MX, y: 2.0, w: 12.1, h: 0.95, gap: 0.18, items: [
     { label: "Алерт", body: "при 80% бюджету — подія в лог; найм'якше і найчастіше достатнє" },
     { label: "Деградація", body: "вище порогу неескалаційний трафік іде на дешевшу модель", tone: "warn" },
@@ -215,7 +216,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Зараз ви побачите — і навіщо", pill: "do", notes: N(16) });
+  const s = D.slide({ title: "Зараз ви побачите — і навіщо", pill: "do", notes: N() });
   [["прайс у коді сервісу", "mock-mini і mock-strong, чотири числа"],
    ["питання обох типів", "звичайне та ескалація — роутер розводить"],
    ["SELECT model, cost_usd", "в ескалації цифра помітно більша"],
@@ -226,7 +227,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Лабораторна: чотири частини + опційна", pill: "do", notes: N(17) });
+  const s = D.slide({ title: "Лабораторна: чотири частини + опційна", pill: "do", notes: N() });
   [["Завести прайс", "словник цін поруч із Route() у service/Program.cs", false],
    ["Порахувати вартість", "три рядки після відповіді → cost_usd у LogRequest", false],
    ["Перевірити атрибуцію", "GROUP BY model і за днем: цифри сходяться з очікуванням", false],
@@ -243,7 +244,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Що це довело", pill: "absorb", notes: N(18) });
+  const s = D.slide({ title: "Що це довело", pill: "absorb", notes: N() });
   D.tile(s, { x: MX, y: 1.9, w: 3.9, h: 2.0, title: "Гроші видно одразу", body: "cost_usd з'являється разом із відповіддю, а не в рахунку", tone: "good" });
   D.tile(s, { x: 4.72, y: 1.9, w: 3.9, h: 2.0, title: "Важіль порахований", body: "різниця маршрутів — у доларах, а не у відчуттях", tone: "acc" });
   D.tile(s, { x: 8.82, y: 1.9, w: 3.9, h: 2.0, title: "Бюджет — сигнал", body: "плитка порівнює витрату з межею, а не показує абстрактну суму" });
@@ -252,7 +253,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Перевір себе", pill: "connect", notes: N(19) });
+  const s = D.slide({ title: "Перевір себе", pill: "connect", notes: N() });
   s.addShape("roundRect", { x: MX, y: 1.95, w: 12.1, h: 2.05, rectRadius: 0.12, fill: { color: P.card }, line: { color: P.line, width: 1 } });
   D.checklist(s, { x: MX + 0.45, y: 2.3, w: 11.3, cols: 2, items: [
     "cost_usd заповнений ненульовими значеннями",
@@ -265,7 +266,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Антипатерни тижня", pill: "absorb", notes: N(20) });
+  const s = D.slide({ title: "Антипатерни тижня", pill: "absorb", notes: N() });
   [["Нуль замість null у cost_usd", "«безкоштовний запит» — брехня, яку неможливо знайти запитом"],
    ["AVG по рядках лога", "рахує вартість виклику, а не звернення — завжди в бік «дешево»"],
    ["Прайс у голові або в вікі", "застаріла ціна викривляє всі рішення, а не одне"],
@@ -282,7 +283,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Домашнє завдання", pill: "do", notes: N(21) });
+  const s = D.slide({ title: "Домашнє завдання", pill: "do", notes: N() });
   s.addShape("roundRect", { x: MX, y: 1.85, w: 12.1, h: 2.55, rectRadius: 0.14, fill: { color: P.card }, line: { color: P.acc, width: 1.5 } });
   s.addText("Обов'язково · ДЗ тижня 2: routing + cost", { x: MX + 0.3, y: 2.05, w: 11.5, h: 0.4, fontFace: F.body, fontSize: 15.5, bold: true, color: P.acc, margin: 0 });
   s.addText("Обидва уроки тижня здаються одним PR: маршрутизація з уроку 3 плюс сьогоднішній облік вартості.",
@@ -307,7 +308,8 @@ D.closingSlide({
   ],
   nextTitle: "Наступний крок → Урок 5 · Кешування: точний кеш, метрика і semantic cache",
   nextBody: "Ми навчилися платити менше за той самий трафік. Наступний крок радикальніший: найдешевший запит — той, якого не було. Тиждень 3 починаємо з кешу: коли можна не ходити в модель узагалі і чому кеш без метрики — це віра, а не інженерія.",
-  notes: N(22),
+  notes: N(),
 });
 
-D.save("C:/Work/llmops-course-decks/L04.pptx", "C:/Work/llmops-course-decks/scripts/L04-script.md");
+const OUT = process.env.DECKS_OUT || SRC;
+D.save(path.join(OUT, "L04.pptx"), path.join(OUT, "L04-script.md"));

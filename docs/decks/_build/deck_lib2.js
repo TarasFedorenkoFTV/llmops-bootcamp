@@ -23,6 +23,21 @@ const TONE = {
   card: { bg: P.card,   fg: P.ink },
 };
 
+// Начитка живе в LNN-script.md і читається звідти: файл сценарію — джерело правди.
+// Повертає функцію-лічильник: кожен виклик віддає наступний блок, у порядку слайдів.
+function notesFrom(scriptPath) {
+  const raw = fs.readFileSync(scriptPath, "utf8");
+  const blocks = raw.split(/\r?\n## Слайд \d+ · [^\n]*\r?\n/).slice(1).map(s => s.trim());
+  let i = 0;
+  const next = () => {
+    if (i >= blocks.length) throw new Error(`${path.basename(scriptPath)}: блоків начитки (${blocks.length}) менше, ніж слайдів`);
+    return blocks[i++];
+  };
+  next.total = blocks.length;
+  next.used = () => i;
+  return next;
+}
+
 function createDeck({ lesson, week, fileTitle }) {
   const pres = new pptxgen();
   pres.layout = "LAYOUT_WIDE";
@@ -276,4 +291,4 @@ function createDeck({ lesson, week, fileTitle }) {
            stat, tile, arrow, flow, bars, states, layers, timeline, band, code, table, checklist, terms, save };
 }
 
-module.exports = { createDeck, P, F, W, H, MX };
+module.exports = { createDeck, notesFrom, P, F, W, H, MX };

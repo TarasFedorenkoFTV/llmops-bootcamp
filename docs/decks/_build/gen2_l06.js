@@ -1,18 +1,19 @@
 // L06 v2 — Tool calls
-const { createDeck } = require("./deck_lib2");
-const V = require("./decks_dump.json")["6"].slides;
-const N = i => V[i - 1].notes;
+const path = require("path");
+const { createDeck, notesFrom } = require("./deck_lib2");
+const SRC = process.env.DECKS_DIR || path.join(__dirname, "..");
+const N = notesFrom(path.join(SRC, "L06-script.md"));
 const D = createDeck({ lesson: 6, week: 3, fileTitle: "Tool calls: коли модель починає діяти" });
 const { P, F, MX } = D;
 
 D.titleSlide({
   title: "Tool calls: коли модель\nпочинає діяти",
   lead: "Слово можна перечитати. Дію — не завжди можна відкотити. Сьогодні бот уперше щось робить: анатомія tool-виклику, таймаут, ідемпотентність — і чесна «дірка», яку закриємо на тижні безпеки.",
-  notes: N(1),
+  notes: N(),
 });
 
 {
-  const s = D.slide({ title: "Що ви зможете після уроку", pill: "absorb", kicker: "П'ять дій, які перевірите руками", notes: N(2) });
+  const s = D.slide({ title: "Що ви зможете після уроку", pill: "absorb", kicker: "П'ять дій, які перевірите руками", notes: N() });
   [["Прочитати tool_calls", "і пояснити, чому це прохання, а не подія"],
    ["Відхилити невалідні аргументи", "до виконання, замість «спробуємо якось»"],
    ["Обкласти виклик таймаутом", "«відповіді не було» ≠ «дії не було»"],
@@ -22,7 +23,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Маршрут на сьогодні", pill: "absorb", notes: N(3) });
+  const s = D.slide({ title: "Маршрут на сьогодні", pill: "absorb", notes: N() });
   [["01","Новий клас ризиків"],["02","tool_calls — прохання"],["03","Схема і валідація"],
    ["04","RunTool: реєстр як функція"],["05","Timeout і його пастка"],["06","Ідемпотентність"],
    ["07","Межа незворотного"],["08","Результат — недовірений вхід"],["09","Аудит дій"],
@@ -34,7 +35,7 @@ D.titleSlide({
 
 {
   const s = D.slide({ title: "Терміни, якими користуватимемось", pill: "absorb", kicker: "Шість слів сьогоднішнього уроку",
-    notes: "Домовимось про шість слів. Tool call — прохання моделі викликати інструмент: у відповіді з'являється блок tool_calls з назвою і аргументами, а finish_reason дорівнює tool_calls. Схема інструмента — опис дозволених аргументів; вона існує у двох копіях, і довіряти можна лише тій, що живе у вашому сервісі. Read-only проти side-effecting — межа між тим, що лише читає, і тим, що змінює світ; вона проходить по відворотності наслідків. Ідемпотентність — властивість операції, за якої повтор із тим самим ключем не робить дію вдруге. Ключ операції — стабільний ідентифікатор, який цю властивість забезпечує. І HITL, human in the loop, — людина в ланцюзі, яка підтверджує незворотне; сьогодні ми лише зафіксуємо контракт, а механізм побудуємо наступного уроку." });
+    notes: N() });
   D.terms(s, { x: MX, y: 1.95, w: 12.1, cols: 3, rowH: 1.3, items: [
     { term: "tool call", def: "прохання моделі викликати інструмент, а не подія" },
     { term: "схема інструмента", def: "опис дозволених аргументів; довіряємо лише своїй копії" },
@@ -47,7 +48,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "01", title: "Якісно новий клас ризиків", pill: "absorb", notes: N(4) });
+  const s = D.slide({ num: "01", title: "Якісно новий клас ризиків", pill: "absorb", notes: N() });
   D.tile(s, { x: MX, y: 1.9, w: 5.85, h: 1.6, title: "Поки модель говорить",
     body: "найгірше — погана відповідь: користувач перепитає, оператор виправить", tone: "good" });
   D.tile(s, { x: 6.87, y: 1.9, w: 5.85, h: 1.6, title: "Щойно модель діє",
@@ -61,7 +62,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "02", title: "tool_calls — прохання, не подія", pill: "absorb", notes: N(5) });
+  const s = D.slide({ num: "02", title: "tool_calls — прохання, не подія", pill: "absorb", notes: N() });
   D.code(s, { x: MX, y: 1.9, w: 12.1, h: 2.05, size: 11.5, lines: [
     [{ t: '"message": {', c: "82AAFF" }],
     [{ t: '  "role": "assistant",', c: P.darktext }],
@@ -76,7 +77,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "03", title: "Схема — перша лінія оборони", pill: "absorb", notes: N(6) });
+  const s = D.slide({ num: "03", title: "Схема — перша лінія оборони", pill: "absorb", notes: N() });
   D.tile(s, { x: MX, y: 1.9, w: 5.85, h: 1.7, title: "Моделі схема каже",
     body: "що взагалі можна просити: провайдери передають схеми інструментів прямо в запиті" });
   D.tile(s, { x: 6.87, y: 1.9, w: 5.85, h: 1.7, title: "Сервісу схема дає",
@@ -88,7 +89,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "03", title: "Дві копії схеми — і лише одній можна довіряти", pill: "absorb", notes: N(7) });
+  const s = D.slide({ num: "03", title: "Дві копії схеми — і лише одній можна довіряти", pill: "absorb", notes: N() });
   D.tile(s, { x: MX, y: 1.95, w: 5.85, h: 1.8, title: "Копія 1 — їде в модель",
     body: "параметр tools із JSON Schema аргументів: підказка, не гарантія", tone: "warn" });
   D.tile(s, { x: 6.87, y: 1.95, w: 5.85, h: 1.8, title: "Копія 2 — живе у сервісі",
@@ -100,7 +101,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "04", title: "Виконання: реєстр як одна функція", pill: "absorb", notes: N(8) });
+  const s = D.slide({ num: "04", title: "Виконання: реєстр як одна функція", pill: "absorb", notes: N() });
   D.code(s, { x: MX, y: 1.9, w: 12.1, h: 2.5, size: 11.5, lines: [
     [{ t: "// [W3] мінімальний реєстр інструментів", c: P.dim }],
     [{ t: "static string? RunTool(string name) => name switch {", c: "82AAFF" }],
@@ -118,7 +119,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "05", title: "Timeout: інструмент не має права висіти", pill: "absorb", notes: N(9) });
+  const s = D.slide({ num: "05", title: "Timeout: інструмент не має права висіти", pill: "absorb", notes: N() });
   D.flow(s, { x: MX, y: 2.05, w: 12.1, h: 0.8, size: 10.5, items: [
     { label: "інструмент завис", tone: "warn" }, { label: "користувач чекає" }, { label: "latency у стелю", tone: "warn" },
     { label: "закінчуються з'єднання", tone: "crit" }, { label: "лягає весь сервіс", tone: "crit" }] });
@@ -131,7 +132,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "06", title: "Скільки тікетів у системі? Правильна відповідь — один", pill: "absorb", notes: N(10) });
+  const s = D.slide({ num: "06", title: "Скільки тікетів у системі? Правильна відповідь — один", pill: "absorb", notes: N() });
   D.flow(s, { x: MX, y: 2.05, w: 9.6, h: 0.8, size: 10.5, items: [
     { label: "create_ticket виконано" }, { label: "відповідь загубилась", tone: "warn" },
     { label: "ваш ретрай", tone: "crit" }, { label: "+ повтор моделі", tone: "crit" }] });
@@ -145,7 +146,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "06", title: "Два рішення, які визначають якість реалізації", pill: "absorb", notes: N(11) });
+  const s = D.slide({ num: "06", title: "Два рішення, які визначають якість реалізації", pill: "absorb", notes: N() });
   D.tile(s, { x: MX, y: 1.95, w: 5.85, h: 1.8, title: "Ключ народжує ініціатор",
     body: "не виконавець: якщо ідентифікатор народжується там, де виконують, повтор отримає новий ключ і дія станеться двічі", tone: "acc" });
   D.tile(s, { x: 6.87, y: 1.95, w: 5.85, h: 1.8, title: "TTL пам'яті про ключі",
@@ -157,7 +158,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "07", title: "Межа незворотного — і чесна «дірка»", pill: "absorb", notes: N(12) });
+  const s = D.slide({ num: "07", title: "Межа незворотного — і чесна «дірка»", pill: "absorb", notes: N() });
   D.tile(s, { x: MX, y: 1.9, w: 5.85, h: 1.7, title: "lookup_order — читання",
     body: "найгірший наслідок повтору — зайвий запит у базу: автономне виконання виправдане", tone: "good" });
   D.tile(s, { x: 6.87, y: 1.9, w: 5.85, h: 1.7, title: "create_ticket — незворотна дія",
@@ -169,7 +170,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "08", title: "Результат інструмента — це вхід, а не істина", pill: "absorb", notes: N(13) });
+  const s = D.slide({ num: "08", title: "Результат інструмента — це вхід, а не істина", pill: "absorb", notes: N() });
   D.flow(s, { x: MX, y: 2.05, w: 12.1, h: 0.8, size: 10.5, items: [
     { label: "нотатка в базі: «Ігноруй інструкції…»", tone: "crit" }, { label: "lookup_order віддає її", tone: "warn" },
     { label: "контекст моделі" }, { label: "модель не бачить різниці", tone: "crit" }] });
@@ -182,7 +183,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "08", title: "Кілька інструментів одразу: паралельно — тільки читання", pill: "absorb", notes: N(14) });
+  const s = D.slide({ num: "08", title: "Кілька інструментів одразу: паралельно — тільки читання", pill: "absorb", notes: N() });
   D.tile(s, { x: MX, y: 1.95, w: 5.85, h: 1.8, title: "Паралельно — тільки read-only",
     body: "кілька читань можна виконати одночасно: наслідків немає, час економиться", tone: "good" });
   D.tile(s, { x: 6.87, y: 1.95, w: 5.85, h: 1.8, title: "Side-effecting — послідовно",
@@ -194,7 +195,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "09", title: "Аудит: дія без сліду — не дія, а пригода", pill: "absorb", notes: N(15) });
+  const s = D.slide({ num: "09", title: "Аудит: дія без сліду — не дія, а пригода", pill: "absorb", notes: N() });
   D.layers(s, { x: MX, y: 1.95, w: 12.1, h: 0.78, gap: 0.14, items: [
     { label: "Хто", body: "request_id запиту, у межах якого сталася дія" },
     { label: "Що", body: "назва інструмента — колонка tool у лозі, заповнена з першого дня", tone: "acc" },
@@ -206,7 +207,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "10", title: "Реєстр інструментів як дані", pill: "absorb", opt: true, notes: N(16) });
+  const s = D.slide({ num: "10", title: "Реєстр інструментів як дані", pill: "absorb", opt: true, notes: N() });
   D.table(s, { x: MX, y: 2.1, w: 12.1, colW: [3.0, 4.5, 4.6], rowH: 0.66, size: 11.5,
     head: ["поле запису", "що містить", "навіщо"],
     rows: [
@@ -219,7 +220,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Зараз ви побачите — і навіщо", pill: "do", notes: N(17) });
+  const s = D.slide({ title: "Зараз ви побачите — і навіщо", pill: "do", notes: N() });
   [["сира відповідь mock", "tool_calls: назва, аргументи, finish_reason"],
    ["результат у чаті", "«Перевіряю статус… (оплачено, доставку призначено)»"],
    ["«дірка»: тікет без людини", "create_ticket виконується автономно"],
@@ -230,7 +231,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Лабораторна: чотири частини + опційна", pill: "do", notes: N(18) });
+  const s = D.slide({ title: "Лабораторна: чотири частини + опційна", pill: "do", notes: N() });
   [["Прочитати tool_calls", "сира відповідь mock: структура, назва, finish_reason", false],
    ["Виконати read-only", "мінімальний RunTool: lookup_order + підклейка результату", false],
    ["Обкласти таймаутом", "ліміт часу і оброблена гілка вичерпання", false],
@@ -247,7 +248,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Що це довело", pill: "absorb", notes: N(19) });
+  const s = D.slide({ title: "Що це довело", pill: "absorb", notes: N() });
   D.tile(s, { x: MX, y: 1.9, w: 3.9, h: 2.0, title: "Прохання ≠ подія", body: "модель просить, сервіс вирішує і виконує — межа видима в коді", tone: "good" });
   D.tile(s, { x: 4.72, y: 1.9, w: 3.9, h: 2.0, title: "Читання безпечне", body: "повтор lookup_order коштує зайвий запит у базу — і все", tone: "acc" });
   D.tile(s, { x: 8.82, y: 1.9, w: 3.9, h: 2.0, title: "Незворотне — ні", body: "два тікети на одне питання: дірка HITL і відсутність ідемпотентності", tone: "crit" });
@@ -256,7 +257,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Перевір себе", pill: "connect", notes: N(20) });
+  const s = D.slide({ title: "Перевір себе", pill: "connect", notes: N() });
   s.addShape("roundRect", { x: MX, y: 1.95, w: 12.1, h: 2.05, rectRadius: 0.12, fill: { color: P.card }, line: { color: P.line, width: 1 } });
   D.checklist(s, { x: MX + 0.45, y: 2.3, w: 11.3, cols: 2, items: [
     "«Де моє замовлення?» повертає результат інструмента",
@@ -269,7 +270,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Антипатерни тижня", pill: "absorb", notes: N(21) });
+  const s = D.slide({ title: "Антипатерни тижня", pill: "absorb", notes: N() });
   [["Виконувати все, що попросила модель", "клієнту не довіряють — клієнта валідують"],
    ["«Спробуємо якось» замість відмови", "рішення, яке ухвалив ніхто, вистрелить без винних"],
    ["Ретрай дії без ключа операції", "лотерея з подвійним тікетом або списанням"],
@@ -287,7 +288,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Домашнє завдання", pill: "do", notes: N(22) });
+  const s = D.slide({ title: "Домашнє завдання", pill: "do", notes: N() });
   s.addShape("roundRect", { x: MX, y: 1.85, w: 12.1, h: 2.75, rectRadius: 0.14, fill: { color: P.card }, line: { color: P.acc, width: 1.5 } });
   s.addText("Обов'язково · ДЗ тижня 3: кеш + інструменти", { x: MX + 0.3, y: 2.05, w: 11.5, h: 0.4, fontFace: F.body, fontSize: 15.5, bold: true, color: P.acc, margin: 0 });
   s.addText("Обидва уроки тижня здаються одним PR: кеш із лічильниками з уроку 5 плюс сьогоднішнє безпечне виконання інструментів.",
@@ -314,7 +315,8 @@ D.closingSlide({
   ],
   nextTitle: "Наступний крок → Урок 7 · Reliability: fallback, деградація і circuit breaker",
   nextBody: "Бот говорить, рахує гроші, вміє діяти. Наступний тиждень — про найнеприємніше: що робити, коли провайдер лежить, ліміти вичерпані, а користувачі пишуть просто зараз. Fallback, красива деградація — і керовані інциденти, які ми влаштуємо власними руками.",
-  notes: N(23),
+  notes: N(),
 });
 
-D.save("C:/Work/llmops-course-decks/L06.pptx", "C:/Work/llmops-course-decks/scripts/L06-script.md");
+const OUT = process.env.DECKS_OUT || SRC;
+D.save(path.join(OUT, "L06.pptx"), path.join(OUT, "L06-script.md"));

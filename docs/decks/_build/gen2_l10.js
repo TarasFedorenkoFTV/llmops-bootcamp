@@ -1,18 +1,19 @@
 // L10 v2 — Golden dataset і eval suite
-const { createDeck } = require("./deck_lib2");
-const V = require("./decks_dump.json")["10"].slides;
-const N = i => V[i - 1].notes;
+const path = require("path");
+const { createDeck, notesFrom } = require("./deck_lib2");
+const SRC = process.env.DECKS_DIR || path.join(__dirname, "..");
+const N = notesFrom(path.join(SRC, "L10-script.md"));
 const D = createDeck({ lesson: 10, week: 5, fileTitle: "Golden dataset і eval suite" });
 const { P, F, MX } = D;
 
 D.titleSlide({
   title: "Golden dataset\nі eval suite",
   lead: "«Я потикав у чат — ніби норм» — це не перевірка, а настрій. Сьогодні якість отримує число: датасет, grader, поріг і exit code, який на тижні 6 стане гейтом у CI.",
-  notes: N(1),
+  notes: N(),
 });
 
 {
-  const s = D.slide({ title: "Що ви зможете після уроку", pill: "absorb", kicker: "П'ять дій, які перевірите руками", notes: N(2) });
+  const s = D.slide({ title: "Що ви зможете після уроку", pill: "absorb", kicker: "П'ять дій, які перевірите руками", notes: N() });
   [["Прогнати eval suite", "число для людини, exit code для машин"],
    ["Зловити регресію командою", "червоний прогін → відкат → зелений"],
    ["Додати власні кейси", "позитивний і негативний, перерахувати поріг"],
@@ -22,7 +23,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Маршрут на сьогодні", pill: "absorb", notes: N(3) });
+  const s = D.slide({ title: "Маршрут на сьогодні", pill: "absorb", notes: N() });
   [["01","«Ніби норм» — це настрій"],["02","Golden dataset — контракт"],["03","Шість кейсів = п'ять тижнів"],
    ["04","Звідки беруться кейси"],["05","Rule-based grader"],["06","Runner і два виходи"],
    ["07","Поріг і його класи поломок"],["08","Зламали → зловили → відкат"],["09","LLM-as-judge · опційно"],
@@ -34,7 +35,7 @@ D.titleSlide({
 
 {
   const s = D.slide({ title: "Терміни, якими користуватимемось", pill: "absorb", kicker: "Шість слів сьогоднішнього уроку",
-    notes: "Домовимось про шість слів. Golden dataset — набір кейсів, на яких ви перевіряєте поведінку системи; кожен кейс це вхід плюс очікування. Expect — що мусить бути у відповіді; forbid — чого бути не має; expect_refusal — очікуємо відмову, це наші red-team кейси з уроку 8. Grader — код, який вирішує, чи кейс пройшов; у нас він на правилах, тобто безкоштовний і детермінований. Поріг — скільки кейсів має пройти, щоб прогін вважався зеленим. Exit code — нуль або одиниця, якою прогін розмовляє з машинами: саме її на тижні 6 читатиме CI. І LLM-as-judge — оцінювання відповіді іншою моделлю: опційна доріжка, у якої два цінники — гроші й недетермінізм." });
+    notes: N() });
   D.terms(s, { x: MX, y: 1.95, w: 12.1, cols: 3, rowH: 1.3, items: [
     { term: "golden dataset", def: "набір кейсів: вхід + очікування щодо відповіді" },
     { term: "expect / forbid", def: "що мусить бути — і чого бути не має" },
@@ -47,7 +48,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "01", title: "«Ніби норм» — це настрій, а не перевірка", pill: "absorb", notes: N(4) });
+  const s = D.slide({ num: "01", title: "«Ніби норм» — це настрій, а не перевірка", pill: "absorb", notes: N() });
   [["Ваш промпт", "найчастіше: «маленька правка» тихо змінює поведінку"],
    ["Ваш код", "routing, guardrails, кеш — усе впливає на відповіді"],
    ["Чужа модель", "провайдер оновив версію — поведінка попливла без вашої дії"],
@@ -59,7 +60,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "02", title: "Golden dataset — контракт поведінки", pill: "absorb", notes: N(5) });
+  const s = D.slide({ num: "02", title: "Golden dataset — контракт поведінки", pill: "absorb", notes: N() });
   D.layers(s, { x: MX, y: 1.95, w: 12.1, h: 0.78, gap: 0.12, items: [
     { label: "expect", body: "що мусить бути у відповіді: ключові слова, факти", tone: "good" },
     { label: "forbid", body: "чого бути не має: «не знаю» на типове питання — провал", tone: "crit" },
@@ -72,7 +73,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "02", title: "Звідки репрезентативність — і як писати очікування", pill: "absorb", notes: N(6) });
+  const s = D.slide({ num: "02", title: "Звідки репрезентативність — і як писати очікування", pill: "absorb", notes: N() });
   D.tile(s, { x: MX, y: 1.95, w: 5.85, h: 1.7, title: "Джерело 1 · Лог",
     body: "топ реальних інтентів вашого трафіку — список того, що ламати найдорожче", tone: "acc" });
   D.tile(s, { x: 6.87, y: 1.95, w: 5.85, h: 1.7, title: "Джерело 2 · Страхи",
@@ -84,7 +85,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "03", title: "Шість кейсів = специфікація п'яти тижнів", pill: "absorb", notes: N(7) });
+  const s = D.slide({ num: "03", title: "Шість кейсів = специфікація п'яти тижнів", pill: "absorb", notes: N() });
   D.code(s, { x: MX, y: 1.85, w: 12.1, h: 2.05, size: 10, lines: [
     [{ t: '{"id": "faq-1",    "input": "Як скинути пароль?",       "expect": ["email"], "forbid": ["не знаю"]}', c: "C3E88D" }],
     [{ t: '{"id": "faq-2",    "input": "Не працює вхід",           "expect": ["email"], "forbid": ["не знаю"]}', c: "C3E88D" }],
@@ -107,7 +108,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "03", title: "Найкоштовніший баг — кейс, що зеленіє без причини", pill: "absorb", notes: N(8) });
+  const s = D.slide({ num: "03", title: "Найкоштовніший баг — кейс, що зеленіє без причини", pill: "absorb", notes: N() });
   D.band(s, { x: MX, y: 1.9, w: 12.1, h: 1.55, tone: "crit", label: "Кейс, який проходить під час повного збою",
     text: "Кейс на подяку з expect «будь ласка» проходив, навіть коли лежало все: заглушка деградації звучить «Вибачте, тимчасові проблеми… Спробуйте, будь ласка, трохи згодом»." });
   D.stat(s, { x: MX, y: 3.65, w: 5.85, h: 1.35, value: "1 з 10", label: "казав датасет", tone: "warn", size: 32 });
@@ -119,7 +120,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "04", title: "Звідки беруться кейси — і скільки їх треба", pill: "absorb", notes: N(9) });
+  const s = D.slide({ num: "04", title: "Звідки беруться кейси — і скільки їх треба", pill: "absorb", notes: N() });
   D.table(s, { x: MX, y: 1.9, w: 12.1, colW: [4.2, 4.0, 3.9], rowH: 0.72, size: 11.5,
     head: ["джерело", "що дає", "чому цінне"],
     rows: [
@@ -132,7 +133,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "05", title: "Rule-based grader: дешево і детерміновано", pill: "absorb", notes: N(10) });
+  const s = D.slide({ num: "05", title: "Rule-based grader: дешево і детерміновано", pill: "absorb", notes: N() });
   D.code(s, { x: MX, y: 1.9, w: 12.1, h: 2.5, size: 11.5, lines: [
     [{ t: "def grade(case, answer):", c: "82AAFF" }],
     [{ t: "    a = answer.lower()", c: P.darktext }],
@@ -150,7 +151,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "06", title: "Runner: число для людини, exit code для машин", pill: "absorb", notes: N(11) });
+  const s = D.slide({ num: "06", title: "Runner: число для людини, exit code для машин", pill: "absorb", notes: N() });
   D.flow(s, { x: MX, y: 2.05, w: 12.1, h: 0.8, size: 10.5, items: [
     { label: "golden.jsonl", tone: "acc" }, { label: "POST /chat" }, { label: "grade()" },
     { label: "passed / total" }, { label: "exit 0 | 1", tone: "good" }] });
@@ -165,7 +166,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "07", title: "Поріг: чому не 100%", pill: "absorb", notes: N(12) });
+  const s = D.slide({ num: "07", title: "Поріг: чому не 100%", pill: "absorb", notes: N() });
   D.stat(s, { x: MX, y: 1.95, w: 3.9, h: 1.6, value: "5 / 6", label: "дефолтний поріг стартера", tone: "acc", size: 34 });
   D.tile(s, { x: 4.72, y: 1.95, w: 8.0, h: 1.6, title: "Чому не всі шість",
     body: "недетермінізм моделі робить сотку крихкою: один мигаючий кейс — і команда починає ігнорувати червоне" });
@@ -178,7 +179,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "08", title: "Та сама регресія — тепер командою", pill: "absorb", notes: N(14) });
+  const s = D.slide({ num: "08", title: "Та сама регресія — тепер командою", pill: "absorb", notes: N() });
   D.code(s, { x: MX, y: 1.9, w: 7.3, h: 2.5, size: 11, lines: [
     [{ t: "$ python evals/run.py --dataset evals/golden.jsonl --threshold 5", c: "82AAFF" }],
     [{ t: "eval: 6/6 passed, threshold 5     # зелено", c: "C3E88D" }],
@@ -200,7 +201,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "09", title: "LLM-as-judge: два цінники", pill: "absorb", opt: true, notes: N(15) });
+  const s = D.slide({ num: "09", title: "LLM-as-judge: два цінники", pill: "absorb", opt: true, notes: N() });
   D.tile(s, { x: MX, y: 2.0, w: 5.85, h: 1.8, title: "Ціна перша — гроші",
     body: "кожна перевірка стає викликом моделі: eval-прогони починають коштувати як трафік", tone: "warn" });
   D.tile(s, { x: 6.87, y: 2.0, w: 5.85, h: 1.8, title: "Ціна друга — недетермінізм",
@@ -212,7 +213,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "10", title: "Ріст датасету: «полагодили» і «злякалися»", pill: "absorb", notes: N(17) });
+  const s = D.slide({ num: "10", title: "Ріст датасету: «полагодили» і «злякалися»", pill: "absorb", notes: N() });
   D.flow(s, { x: MX, y: 2.2, w: 12.1, h: 0.85, size: 11, items: [
     { label: "інцидент", tone: "crit" }, { label: "полагодили" }, { label: "кейс у датасет", tone: "good" }, { label: "більше не повториться тихо", tone: "good" }] });
   D.band(s, { x: MX, y: 3.4, w: 12.1, h: 1.35, tone: "warn", label: "Лайфхак",
@@ -222,7 +223,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Зараз ви побачите — і навіщо", pill: "do", notes: N(18) });
+  const s = D.slide({ title: "Зараз ви побачите — і навіщо", pill: "do", notes: N() });
   [["golden.jsonl", "шість кейсів — специфікація п'яти тижнів"],
    ["run.py → 6/6", "зелений прогін, exit 0"],
    ["activate v1 → 3/6", "ЧЕРВОНО, exit 1 — регресія спіймана"],
@@ -235,7 +236,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Лабораторна: чотири кроки + опційний", pill: "do", notes: N(19) });
+  const s = D.slide({ title: "Лабораторна: чотири кроки + опційний", pill: "do", notes: N() });
   [["Анатомія кейса", "прочитати golden.jsonl: expect, forbid, expect_refusal", false],
    ["Прогнати suite", "run.py: число, деталі кожного кейса, exit code", false],
    ["Зламати і зловити", "rollback на v1 → 3/6 → повернути v2 → 6/6", false],
@@ -252,7 +253,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Що це довело", pill: "absorb", notes: N(20) });
+  const s = D.slide({ title: "Що це довело", pill: "absorb", notes: N() });
   D.tile(s, { x: MX, y: 1.9, w: 3.9, h: 2.0, title: "Якість стала числом", body: "«6/6, поріг 5» однакове для всіх, хто дивиться", tone: "good" });
   D.tile(s, { x: 4.72, y: 1.9, w: 3.9, h: 2.0, title: "Регресія ловиться командою", body: "не очима і не настроєм — відтворюваним прогоном", tone: "acc" });
   D.tile(s, { x: 8.82, y: 1.9, w: 3.9, h: 2.0, title: "Exit code готовий до CI", body: "усе, чого бракує гейту, — місце, де це запускати" });
@@ -261,7 +262,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Перевір себе", pill: "connect", notes: N(21) });
+  const s = D.slide({ title: "Перевір себе", pill: "connect", notes: N() });
   s.addShape("roundRect", { x: MX, y: 1.95, w: 12.1, h: 2.55, rectRadius: 0.12, fill: { color: P.card }, line: { color: P.line, width: 1 } });
   D.checklist(s, { x: MX + 0.45, y: 2.3, w: 11.3, cols: 2, items: [
     "прогін дає число і правильний exit code",
@@ -275,7 +276,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Антипатерни тижня", pill: "absorb", notes: N(22) });
+  const s = D.slide({ title: "Антипатерни тижня", pill: "absorb", notes: N() });
   [["Expect на цілу фразу", "зламається від першого перефразування і привчить ігнорувати червоне"],
    ["Датасет, який не росте", "через квартал перевіряє систему, якої вже немає"],
    ["Поріг «щоб позеленіло»", "зміна контракту крадькома замість обговореного релізу"],
@@ -293,7 +294,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Домашнє завдання", pill: "do", notes: N(23) });
+  const s = D.slide({ title: "Домашнє завдання", pill: "do", notes: N() });
   s.addShape("roundRect", { x: MX, y: 1.85, w: 12.1, h: 2.55, rectRadius: 0.14, fill: { color: P.card }, line: { color: P.acc, width: 1.5 } });
   s.addText("Обов'язково · ДЗ тижня 5: observability + evals", { x: MX + 0.3, y: 2.05, w: 11.5, h: 0.4, fontFace: F.body, fontSize: 15.5, bold: true, color: P.acc, margin: 0 });
   s.addText("Обидва уроки тижня здаються одним PR: живі плитки консолі з уроку 9 плюс розширений eval-контур.",
@@ -318,7 +319,8 @@ D.closingSlide({
   ],
   nextTitle: "Наступний крок → Урок 11 · CI/CD quality gates, canary і rollback",
   nextBody: "Прогін, який треба не забути запустити, не працює. Наступного уроку eval-suite переїжджає в CI: гейт на кожен PR, червоний прогін як подарунок, порядок викочування промпта й коду — і критерії відкату, записані до інциденту.",
-  notes: N(24),
+  notes: N(),
 });
 
-D.save("C:/Work/llmops-course-decks/L10.pptx", "C:/Work/llmops-course-decks/scripts/L10-script.md");
+const OUT = process.env.DECKS_OUT || SRC;
+D.save(path.join(OUT, "L10.pptx"), path.join(OUT, "L10-script.md"));

@@ -1,19 +1,20 @@
-// L02 v2 — Prompt lifecycle. Начитка успадкована з перевіреної версії (decks_dump.json).
-const { createDeck } = require("./deck_lib2");
-const V = require("./decks_dump.json")["2"].slides;
-const N = i => V[i - 1].notes;                       // i — номер слайда попередньої версії
+// L02 v2 — Prompt lifecycle
+const path = require("path");
+const { createDeck, notesFrom } = require("./deck_lib2");
+const SRC = process.env.DECKS_DIR || path.join(__dirname, "..");
+const N = notesFrom(path.join(SRC, "L02-script.md"));
 const D = createDeck({ lesson: 2, week: 1, fileTitle: "Prompt lifecycle: промпт як production-артефакт" });
 const { P, F, MX } = D;
 
 D.titleSlide({
   title: "Prompt lifecycle: промпт\nяк production-артефакт",
   lead: "Одне речення в промпті може зробити більше шкоди, ніж поганий деплой, — бо деплой хоча б лишає слід. Сьогодні промпт переїжджає з коду в реєстр із версіями, promote і rollback.",
-  notes: N(1),
+  notes: N(),
 });
 
 // LO
 {
-  const s = D.slide({ title: "Що ви зможете після уроку", pill: "absorb", kicker: "П'ять дій, які перевірите руками", notes: N(2) });
+  const s = D.slide({ title: "Що ви зможете після уроку", pill: "absorb", kicker: "П'ять дій, які перевірите руками", notes: N() });
   [["Перенести промпт у реєстр", "із хардкоду в базу, дві версії"],
    ["Розділити інструкції й дані", "не відкрити вектор injection"],
    ["Зробити activate атомарним", "promote і rollback — одна операція"],
@@ -24,7 +25,7 @@ D.titleSlide({
 
 // карта
 {
-  const s = D.slide({ title: "Маршрут на сьогодні", pill: "absorb", notes: N(3) });
+  const s = D.slide({ title: "Маршрут на сьогодні", pill: "absorb", notes: N() });
   [["01","Регресія без коміта"],["02","Промпт — не «просто текст»"],["03","Анатомія промпта"],
    ["04","Змінні й підстановка"],["05","Реєстр у базі"],["06","Сервіс читає активну версію"],
    ["07","Promote і rollback"],["08","Чому mock відчуває промпт"],["09","Дисципліна версій"],
@@ -38,7 +39,7 @@ D.titleSlide({
 {
   const s = D.slide({ title: "Терміни, якими користуватимемось", pill: "absorb",
     kicker: "Шість слів сьогоднішнього уроку — щоб вони не відволікали по ходу",
-    notes: "Домовимось про шість слів. Реєстр промптів — таблиця в базі, де кожна версія промпта лежить окремим рядком; активна лише одна. Версія — незмінний текст промпта: активну версію ми ніколи не редагуємо, замість цього створюємо нову. Promote — зробити версію активною; rollback — зробити активною попередню; у нас це буде одна й та сама операція, тому відкат коштує секунду. prompt_version — поле в кожному рядку лога, яке каже, котра версія відповідала користувачу; саме з нього починається будь-яке розслідування якості. Few-shot — кілька показових пар «питання-відповідь» просто в промпті: найдешевший спосіб домовитися про тон і формат. І prompt injection — коли текст, який приїхав від користувача або з бази, модель читає як інструкцію; сьогодні ми лише закладемо шов, який це унеможливлює, а докладно розберемо в уроці 8." });
+    notes: N() });
   D.terms(s, { x: MX, y: 1.95, w: 12.1, cols: 3, rowH: 1.3, items: [
     { term: "реєстр промптів", def: "таблиця в базі: кожна версія — рядок, активна одна" },
     { term: "версія", def: "незмінний текст промпта; активну не редагуємо ніколи" },
@@ -52,7 +53,7 @@ D.titleSlide({
 
 // 01 регресія — таймлайн
 {
-  const s = D.slide({ num: "01", title: "Регресія без коміта: git чистий, система зламана", pill: "absorb", notes: N(4) });
+  const s = D.slide({ num: "01", title: "Регресія без коміта: git чистий, система зламана", pill: "absorb", notes: N() });
   D.timeline(s, { x: MX + 1.2, y: 2.65, w: 9.7, marks: [
     { time: "П'ятниця", label: "хтось «трохи уточнив формулювання»", tone: "acc" },
     { time: "Понеділок", label: "підтримка тоне у скаргах: бот відповідає не по темі", tone: "warn" },
@@ -64,7 +65,7 @@ D.titleSlide({
 
 // 02 код vs промпт
 {
-  const s = D.slide({ num: "02", title: "Як живе код — і як живе типовий промпт", pill: "absorb", notes: N(5) });
+  const s = D.slide({ num: "02", title: "Як живе код — і як живе типовий промпт", pill: "absorb", notes: N() });
   D.table(s, { x: MX, y: 1.85, w: 12.1, colW: [3.2, 3.4, 5.5], rowH: 0.62, size: 12,
     head: ["питання", "код", "промпт у типовій команді"],
     rows: [
@@ -81,7 +82,7 @@ D.titleSlide({
 // 03 анатомія
 {
   const s = D.slide({ num: "03", title: "Анатомія промпта: що саме ви версіонуєте", pill: "absorb",
-    kicker: "Чотири частини — і те, як кожна ламається", notes: N(6) });
+    kicker: "Чотири частини — і те, як кожна ламається", notes: N() });
   D.layers(s, { x: MX, y: 1.85, w: 12.1, h: 0.85, gap: 0.14, items: [
     { label: "Роль і межа", body: "ким модель себе вважає · без межі консультує з будь-чого вашим голосом", tone: "acc" },
     { label: "Правила", body: "тон, довжина, коли ескалювати · побажання не змінюють нічого" },
@@ -94,7 +95,7 @@ D.titleSlide({
 
 // 04 правила
 {
-  const s = D.slide({ num: "03", title: "Правила, які працюють, і ціна прикладів", pill: "absorb", notes: N(7) });
+  const s = D.slide({ num: "03", title: "Правила, які працюють, і ціна прикладів", pill: "absorb", notes: N() });
   D.tile(s, { x: MX, y: 1.85, w: 5.85, h: 1.8, title: "Побажання — не інструкція",
     body: "«будь точним», «не вигадуй» — немає нічого, що модель могла б порушити перевірюваним чином", tone: "crit" });
   D.tile(s, { x: 6.87, y: 1.85, w: 5.85, h: 1.8, title: "Перевірювана вимога — дія і межа",
@@ -109,7 +110,7 @@ D.titleSlide({
 
 // 04 injection
 {
-  const s = D.slide({ num: "04", title: "Шов підстановки: тут народжується injection", pill: "absorb", notes: N(8) });
+  const s = D.slide({ num: "04", title: "Шов підстановки: тут народжується injection", pill: "absorb", notes: N() });
   D.code(s, { x: MX, y: 1.9, w: 12.1, h: 1.5, size: 13, lines: [
     [{ t: "// так робити не треба", c: P.dim }],
     [{ t: "var systemPrompt = template + ", c: P.darktext }, { t: '"\\n\\nДані клієнта: "', c: "C3E88D" }, { t: " + customerNotes;", c: P.darktext }],
@@ -122,7 +123,7 @@ D.titleSlide({
 
 // 04 підстановка
 {
-  const s = D.slide({ num: "04", title: "Підстановка — в одному місці", pill: "absorb", notes: N(9) });
+  const s = D.slide({ num: "04", title: "Підстановка — в одному місці", pill: "absorb", notes: N() });
   D.code(s, { x: MX, y: 1.9, w: 12.1, h: 2.05, size: 12.5, lines: [
     [{ t: "// шаблон із реєстру: \"Ти асистент підтримки {service}. Відповідай {lang}.\"", c: P.dim }],
     [{ t: "var systemPrompt = template", c: P.darktext }],
@@ -136,7 +137,7 @@ D.titleSlide({
 
 // 05 реєстр
 {
-  const s = D.slide({ num: "05", title: "Реєстр у базі: розтин таблиці prompts", pill: "absorb", notes: N(10) });
+  const s = D.slide({ num: "05", title: "Реєстр у базі: розтин таблиці prompts", pill: "absorb", notes: N() });
   D.code(s, { x: MX, y: 1.85, w: 6.6, h: 2.9, size: 12, lines: [
     [{ t: "CREATE TABLE IF NOT EXISTS prompts (", c: "82AAFF" }],
     [{ t: "  name        TEXT NOT NULL,", c: P.darktext }],
@@ -155,7 +156,7 @@ D.titleSlide({
 
 // 06 сервіс читає
 {
-  const s = D.slide({ num: "06", title: "Сервіс читає реєстр — і пише версію в лог", pill: "absorb", notes: N(11) });
+  const s = D.slide({ num: "06", title: "Сервіс читає реєстр — і пише версію в лог", pill: "absorb", notes: N() });
   D.code(s, { x: MX, y: 1.85, w: 7.2, h: 1.85, size: 12, lines: [
     [{ t: "// [W1] промпт беремо з реєстру — активну версію, а не хардкод", c: P.dim }],
     [{ t: "SELECT", c: "82AAFF" }, { t: " version, body ", c: P.darktext }, { t: "FROM", c: "82AAFF" }, { t: " prompts", c: P.darktext }],
@@ -170,7 +171,7 @@ D.titleSlide({
 
 // 07 promote / rollback
 {
-  const s = D.slide({ num: "07", title: "Promote і rollback — одна операція", pill: "absorb", notes: N(12) });
+  const s = D.slide({ num: "07", title: "Promote і rollback — одна операція", pill: "absorb", notes: N() });
   D.code(s, { x: MX, y: 1.85, w: 6.4, h: 1.45, size: 13, lines: [
     [{ t: "UPDATE", c: "82AAFF" }, { t: " prompts", c: P.darktext }],
     [{ t: "   SET", c: "82AAFF" }, { t: " active = (version = @v)", c: P.darktext }],
@@ -186,7 +187,7 @@ D.titleSlide({
 
 // 07 A/B
 {
-  const s = D.slide({ num: "07", title: "А якщо порівняти дві версії на живому трафіку?", pill: "absorb", notes: N(13) });
+  const s = D.slide({ num: "07", title: "А якщо порівняти дві версії на живому трафіку?", pill: "absorb", notes: N() });
   [["Ділити за користувачем", "не за запитом: інакше одна людина отримає дві манери — поміряєте плутанину"],
    ["Метрика — заздалегідь", "назвати метрику й тривалість: інакше експеримент вічний"],
    ["Відкат — одна операція", "та сама активація; експеримент без виходу — не експеримент"],
@@ -197,7 +198,7 @@ D.titleSlide({
 
 // 08 mock
 {
-  const s = D.slide({ num: "08", title: "Чому mock відчуває промпт", pill: "absorb", notes: N(14) });
+  const s = D.slide({ num: "08", title: "Чому mock відчуває промпт", pill: "absorb", notes: N() });
   D.code(s, { x: MX, y: 1.85, w: 12.1, h: 1.15, size: 12.5, lines: [
     [{ t: "// «розумні» відповіді — тільки коли промпт правильний", c: P.dim }],
     [{ t: "var promptOk = system.Contains(", c: P.darktext }, { t: '"support"', c: "C3E88D" }, { t: ", StringComparison.OrdinalIgnoreCase);", c: P.darktext }],
@@ -212,7 +213,7 @@ D.titleSlide({
 
 // 09 дисципліна
 {
-  const s = D.slide({ num: "09", title: "Дисципліна версій: що вважати новою версією", pill: "absorb", notes: N(15) });
+  const s = D.slide({ num: "09", title: "Дисципліна версій: що вважати новою версією", pill: "absorb", notes: N() });
   [["Активну не редагуємо ніколи", "створюємо нову і promote'имо її"],
    ["Стара лишається в історії", "для порівняння «що саме змінили» і для відкату"],
    ["Одруківка — теж нова версія", "дешевше зайвий рядок, ніж «та сама v3» з різною поведінкою"],
@@ -223,7 +224,7 @@ D.titleSlide({
 
 // 09 версія моделі
 {
-  const s = D.slide({ num: "09", title: "Версія моделі й рецепт контексту — та сама логіка", pill: "absorb", notes: N(16) });
+  const s = D.slide({ num: "09", title: "Версія моделі й рецепт контексту — та сама логіка", pill: "absorb", notes: N() });
   D.layers(s, { x: MX, y: 1.95, w: 12.1, h: 0.9, gap: 0.16, items: [
     { label: "Версія моделі", body: "провайдери оновлюють «ту саму» модель — фіксуйте снапшот" },
     { label: "Рецепт контексту", body: "вхід збирається з інструкцій, схем інструментів, фактів — версіонуйте рецепт, не текст", tone: "acc" },
@@ -235,7 +236,7 @@ D.titleSlide({
 
 // 10 audit trail — опційно
 {
-  const s = D.slide({ num: "10", title: "Audit trail: хто, коли, що активував", pill: "absorb", opt: true, notes: N(17) });
+  const s = D.slide({ num: "10", title: "Audit trail: хто, коли, що активував", pill: "absorb", opt: true, notes: N() });
   D.tile(s, { x: MX, y: 2.1, w: 5.85, h: 1.9, title: "Журнал активацій", body: "окрема таблиця, куди activate дописує рядок: версія, час, хто", tone: "acc" });
   D.tile(s, { x: 6.87, y: 2.1, w: 5.85, h: 1.9, title: "Версії з міткою часу", body: "замість ручних v1/v2 — час створення в самій назві версії", tone: "acc" });
   D.band(s, { x: MX, y: 4.35, w: 12.1, h: 1.2, tone: "card",
@@ -244,7 +245,7 @@ D.titleSlide({
 
 // місток
 {
-  const s = D.slide({ title: "Зараз ви побачите — і навіщо", pill: "do", notes: N(18) });
+  const s = D.slide({ title: "Зараз ви побачите — і навіщо", pill: "do", notes: N() });
   [["SELECT з prompts", "у реєстрі дві версії, активна v2"],
    ["чат відповідає по суті", "з активною v2"],
    ["activate v1", "«погана» версія стає активною"],
@@ -259,7 +260,7 @@ D.titleSlide({
 
 // лаба
 {
-  const s = D.slide({ title: "Лабораторна: чотири частини + опційна", pill: "do", notes: N(19) });
+  const s = D.slide({ title: "Лабораторна: чотири частини + опційна", pill: "do", notes: N() });
   [["Наповнити реєстр", "seed v1 + v2 (активна v2) → down -v && up -d", false],
    ["Прибрати хардкод", "GetActivePrompt у service/Program.cs; версію → LogRequest", false],
    ["Оживити консоль", "GET /prompts + POST /prompts/{version}/activate", false],
@@ -277,7 +278,7 @@ D.titleSlide({
 
 // що це довело
 {
-  const s = D.slide({ title: "Що це довело", pill: "absorb", notes: N(20) });
+  const s = D.slide({ title: "Що це довело", pill: "absorb", notes: N() });
   D.tile(s, { x: MX, y: 1.9, w: 3.9, h: 2.0, title: "Регресія без коміта — реальна", body: "activate v1 зламав відповіді: git чистий, деплою не було", tone: "crit" });
   D.tile(s, { x: 4.72, y: 1.9, w: 3.9, h: 2.0, title: "Rollback — одна операція", body: "activate v2 полагодив за секунди: той самий ендпоінт", tone: "good" });
   D.tile(s, { x: 8.82, y: 1.9, w: 3.9, h: 2.0, title: "Лог знає, кого винуватити", body: "сплеск «не знаю» збігається з активацією v1", tone: "acc" });
@@ -289,7 +290,7 @@ D.titleSlide({
 
 // перевір себе
 {
-  const s = D.slide({ title: "Перевір себе", pill: "connect", notes: N(21) });
+  const s = D.slide({ title: "Перевір себе", pill: "connect", notes: N() });
   s.addShape("roundRect", { x: MX, y: 1.95, w: 12.1, h: 2.05, rectRadius: 0.12, fill: { color: P.card }, line: { color: P.line, width: 1 } });
   D.checklist(s, { x: MX + 0.45, y: 2.3, w: 11.3, cols: 2, items: [
     "промпт живе в БД — хардкоду в сервісі немає",
@@ -303,7 +304,7 @@ D.titleSlide({
 
 // антипатерни
 {
-  const s = D.slide({ title: "Антипатерни тижня", pill: "absorb", notes: N(22) });
+  const s = D.slide({ title: "Антипатерни тижня", pill: "absorb", notes: N() });
   [["Правити активний промпт «на живу»", "знищує можливість порівняти «до» і «після»; нова версія — один INSERT"],
    ["Промпт у коді, у документі або в голові тімліда", "усі три означають одне: система не знає, що нею керує"],
    ["Лог без prompt_version", "реєстр є, а розслідування наосліп"],
@@ -321,7 +322,7 @@ D.titleSlide({
 
 // ДЗ
 {
-  const s = D.slide({ title: "Домашнє завдання", pill: "do", notes: N(23) });
+  const s = D.slide({ title: "Домашнє завдання", pill: "do", notes: N() });
   D.tile(s, { x: MX, y: 1.9, w: 5.85, h: 2.2, title: "Обов'язково",
     body: "здати ДЗ тижня 1 одним PR у своєму репозиторії — це рівно те, що ми пройшли за два уроки: у лабах більша частина зроблена руками, вдома довести до чистого стану" });
   D.tile(s, { x: 6.87, y: 1.9, w: 5.85, h: 2.2, title: "Опційно (не оцінюється)",
@@ -342,7 +343,8 @@ D.closingSlide({
   ],
   nextTitle: "Наступний крок → Урок 3 · Мультипровайдерний gateway і маршрутизація моделей",
   nextBody: "Промпт під контролем — тепер під контроль береться модель. Наступного уроку з'являється другий елемент ланцюга і точка рішення: яке питання куди відправити, чому «одна модель на все» дорога, і як розподіл трафіку стає видимим у лозі.",
-  notes: N(24),
+  notes: N(),
 });
 
-D.save("C:/Work/llmops-course-decks/L02.pptx", "C:/Work/llmops-course-decks/scripts/L02-script.md");
+const OUT = process.env.DECKS_OUT || SRC;
+D.save(path.join(OUT, "L02.pptx"), path.join(OUT, "L02-script.md"));

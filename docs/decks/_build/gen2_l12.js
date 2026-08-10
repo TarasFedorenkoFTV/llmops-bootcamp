@@ -1,18 +1,19 @@
 // L12 v2 — Фінал: LLMOps operating model
-const { createDeck } = require("./deck_lib2");
-const V = require("./decks_dump.json")["12"].slides;
-const N = i => V[i - 1].notes;
+const path = require("path");
+const { createDeck, notesFrom } = require("./deck_lib2");
+const SRC = process.env.DECKS_DIR || path.join(__dirname, "..");
+const N = notesFrom(path.join(SRC, "L12-script.md"));
 const D = createDeck({ lesson: 12, week: 6, fileTitle: "Фінал: LLMOps operating model" });
 const { P, F, MX } = D;
 
 D.titleSlide({
   title: "Фінал: LLMOps\noperating model",
   lead: "Система зібрана. Останній крок — переконатися, що ви нею володієте: наскрізний прогін із чистого клону, інцидент за рунбуком і вміння говорити про це мовою, за яку дають бюджет.",
-  notes: N(1),
+  notes: N(),
 });
 
 {
-  const s = D.slide({ title: "Що ви зможете після уроку", pill: "absorb", kicker: "П'ять дій, які перевірите руками", notes: N(2) });
+  const s = D.slide({ title: "Що ви зможете після уроку", pill: "absorb", kicker: "П'ять дій, які перевірите руками", notes: N() });
   [["Прогнати систему наскрізь", "з чистого клону, без «тут ще одна змінна»"],
    ["Відпрацювати інцидент", "за рунбуком, із таймлайном"],
    ["Зафіксувати постмортем", "механізмами, а не прізвищами"],
@@ -22,7 +23,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Маршрут на сьогодні", pill: "absorb", notes: N(3) });
+  const s = D.slide({ title: "Маршрут на сьогодні", pill: "absorb", notes: N() });
   [["01","Від трьох рядків до контуру"],["02","Точка Б: сценарій наскрізь"],["03","Runbook як сценарій"],
    ["04","Інцидент наживо: таймлайн"],["05","KPI-мова"],["06","30-day rollout"],
    ["07","/metrics · опційно"],["08","Наступний шар — за сигналом"],["09","Куди поїде через рік"],
@@ -34,7 +35,7 @@ D.titleSlide({
 
 {
   const s = D.slide({ title: "Терміни, якими користуватимемось", pill: "absorb", kicker: "Шість слів сьогоднішнього уроку",
-    notes: "Домовимось про шість слів. Operating model — спосіб експлуатувати систему: хто що робить, коли і за яким сценарієм; саме це відрізняє зібраний проєкт від системи, якою володіють. Runbook — сценарій дій при відомому симптомі: чотири такти — симптом, підтвердити, дія, переконатися. Постмортем — розбір інциденту після: що сталося, що спрацювало, що змінюємо; про механізми, а не про винних. KPI-мова — переклад інженерних фактів у наслідки для грошей, користувачів і ризику. Rollout-план — порядок, у якому практики переносяться у вашу команду. І dry-run — режим, у якому автоматика проходить повний цикл, але замість дій пише звіт «що я б зробила». Далі кожне побачимо в роботі." });
+    notes: N() });
   D.terms(s, { x: MX, y: 1.95, w: 12.1, cols: 3, rowH: 1.3, items: [
     { term: "operating model", def: "як систему експлуатують: хто, що, коли і за яким сценарієм" },
     { term: "runbook", def: "симптом → підтвердити → дія → переконатися" },
@@ -47,7 +48,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "01", title: "Від трьох рядків до контуру", pill: "absorb", notes: N(4) });
+  const s = D.slide({ num: "01", title: "Від трьох рядків до контуру", pill: "absorb", notes: N() });
   D.tile(s, { x: MX, y: 1.9, w: 5.85, h: 1.65, title: "Тоді",
     body: "три рядки коду + чотири питання без відповідей: гроші, надійність, якість, видимість", tone: "crit" });
   D.tile(s, { x: 6.87, y: 1.9, w: 5.85, h: 1.65, title: "Тепер",
@@ -61,7 +62,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "02", title: "Точка Б: один сценарій наскрізь", pill: "absorb", notes: N(5) });
+  const s = D.slide({ num: "02", title: "Точка Б: один сценарій наскрізь", pill: "absorb", notes: N() });
   D.flow(s, { x: MX, y: 2.0, w: 12.1, h: 0.75, size: 10, items: [
     { label: "питання в чат" }, { label: "routing → модель", tone: "acc" }, { label: "кеш?" },
     { label: "відповідь + версія" }, { label: "лог" }, { label: "консоль", tone: "good" }] });
@@ -82,7 +83,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "03", title: "Runbook — сценарій, а не есе", pill: "absorb", notes: N(6) });
+  const s = D.slide({ num: "03", title: "Runbook — сценарій, а не есе", pill: "absorb", notes: N() });
   D.table(s, { x: MX, y: 1.9, w: 12.1, colW: [2.4, 3.4, 6.3], rowH: 0.66, size: 11.5,
     head: ["такт", "питання", "у нашому інциденті"],
     rows: [
@@ -98,7 +99,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "04", title: "Інцидент наживо: таймлайн", pill: "absorb", notes: N(8) });
+  const s = D.slide({ num: "04", title: "Інцидент наживо: таймлайн", pill: "absorb", notes: N() });
   D.timeline(s, { x: MX + 1.0, y: 2.9, w: 10.1, marks: [
     { time: "10:00", label: "норма: питання → відповідь", tone: "good" },
     { time: "10:03", label: "__fail_503: спроби падають, користувач бачить заглушку", tone: "crit" },
@@ -112,7 +113,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "05", title: "KPI-мова: за що дають бюджет", pill: "absorb", notes: N(9) });
+  const s = D.slide({ num: "05", title: "KPI-мова: за що дають бюджет", pill: "absorb", notes: N() });
   D.table(s, { x: MX, y: 1.9, w: 12.1, colW: [5.0, 7.1], rowH: 0.6, size: 11.5,
     head: ["інженерне", "KPI-мовою"],
     rows: [
@@ -128,7 +129,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "06", title: "30-day rollout для своєї команди", pill: "absorb", notes: N(10) });
+  const s = D.slide({ num: "06", title: "30-day rollout для своєї команди", pill: "absorb", notes: N() });
   D.layers(s, { x: MX, y: 1.95, w: 12.1, h: 0.82, gap: 0.14, items: [
     { label: "Тиждень 1", body: "unified logging + вартість · зроблено = питання про гроші закривається SQL", tone: "acc" },
     { label: "Тиждень 2", body: "промпти з коду в реєстр · зроблено = відкат за секунди зі слідом" },
@@ -140,7 +141,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "07", title: "/metrics і зовнішні дашборди", pill: "absorb", opt: true, notes: N(11) });
+  const s = D.slide({ num: "07", title: "/metrics і зовнішні дашборди", pill: "absorb", opt: true, notes: N() });
   D.flow(s, { x: MX + 1.2, y: 2.4, w: 9.7, h: 0.85, size: 11.5, items: [
     { label: "ваш лог", tone: "acc" }, { label: "/metrics" }, { label: "зовнішній дашборд", tone: "warn" }] });
   D.tile(s, { x: MX, y: 3.7, w: 5.85, h: 1.7, title: "Що дає",
@@ -152,7 +153,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "08", title: "Наступний шар — за сигналом, а не за модою", pill: "absorb", notes: N(12) });
+  const s = D.slide({ num: "08", title: "Наступний шар — за сигналом, а не за модою", pill: "absorb", notes: N() });
   D.table(s, { x: MX, y: 1.9, w: 12.1, colW: [3.0, 4.9, 4.2], rowH: 0.6, size: 11,
     head: ["наступний шар", "сигнал, що час", "чого не робити раніше"],
     rows: [
@@ -167,7 +168,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "09", title: "Куди поїде система через рік", pill: "absorb", notes: N(13) });
+  const s = D.slide({ num: "09", title: "Куди поїде система через рік", pill: "absorb", notes: N() });
   [["Більше автономності", "агентні сценарії — і та сама межа: незворотне через людину"],
    ["Більше провайдерів", "той самий контур; змінюється лише список імен у конфізі"],
    ["Більше вимог ззовні", "аудит, регуляції — і ваш лог уже містить те, що спитають"],
@@ -177,7 +178,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "10", title: "За межами курсу — надбудови, які не ламають контур", pill: "absorb", notes: N(14) });
+  const s = D.slide({ num: "10", title: "За межами курсу — надбудови, які не ламають контур", pill: "absorb", notes: N() });
   const items = ["RAG і робота зі знаннями", "мультиагентні сценарії", "донавчання під домен", "стрімінг і голос",
                  "мультимодальність", "自own-hosted моделі", "розширений FinOps", "командні платформи промптів"];
   items.forEach((t, i) => {
@@ -190,7 +191,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Зараз ви побачите — і навіщо", pill: "do", notes: N(15) });
+  const s = D.slide({ title: "Зараз ви побачите — і навіщо", pill: "do", notes: N() });
   [["чистий клон", "docker compose up --build з нуля"],
    ["наскрізний сценарій", "питання → routing → кеш → лог → консоль"],
    ["інцидент за рунбуком", "__fail_503 → деградація → відновлення з таймлайном"],
@@ -201,7 +202,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Лабораторна: чотири кроки + опційний", pill: "do", notes: N(16) });
+  const s = D.slide({ title: "Лабораторна: чотири кроки + опційний", pill: "do", notes: N() });
   [["Прогін із чистого клону", "нова тека, docker compose up --build, наскрізний сценарій", false],
    ["Інцидент за рунбуком", "__fail_503 → чотири такти → таймлайн у файл", false],
    ["KPI-проходка", "кожна плитка — одне речення мовою наслідків", false],
@@ -218,7 +219,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Що це довело", pill: "absorb", notes: N(17) });
+  const s = D.slide({ title: "Що це довело", pill: "absorb", notes: N() });
   D.tile(s, { x: MX, y: 1.9, w: 3.9, h: 2.0, title: "Система відтворювана", body: "з чистого клону, без прихованих кроків і локальних змінних", tone: "good" });
   D.tile(s, { x: 4.72, y: 1.9, w: 3.9, h: 2.0, title: "Інцидент керований", body: "деградація, метрики, відновлення — за сценарієм, не імпровізацією", tone: "acc" });
   D.tile(s, { x: 8.82, y: 1.9, w: 3.9, h: 2.0, title: "Робота пояснювана", body: "кожна плитка перекладається мовою грошей і ризику" });
@@ -227,7 +228,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Перевір себе", pill: "connect", notes: N(18) });
+  const s = D.slide({ title: "Перевір себе", pill: "connect", notes: N() });
   s.addShape("roundRect", { x: MX, y: 1.95, w: 12.1, h: 2.05, rectRadius: 0.12, fill: { color: P.card }, line: { color: P.line, width: 1 } });
   D.checklist(s, { x: MX + 0.45, y: 2.3, w: 11.3, cols: 2, items: [
     "система піднімається з чистого клону",
@@ -240,7 +241,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Антипатерни фіналу", pill: "absorb", notes: N(19) });
+  const s = D.slide({ title: "Антипатерни фіналу", pill: "absorb", notes: N() });
   [["«Працює на моїй машині»", "система, яку не підняти з чистого клону, не передається нікому"],
    ["Постмортем із винними", "механізми лагодять інциденти; прізвища — ні"],
    ["Демо без артефактів", "твердження без скріншота плитки чи рядка лога — просто слова"],
@@ -257,7 +258,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Домашнє завдання", pill: "do", notes: N(20) });
+  const s = D.slide({ title: "Домашнє завдання", pill: "do", notes: N() });
   s.addShape("roundRect", { x: MX, y: 1.85, w: 12.1, h: 2.95, rectRadius: 0.14, fill: { color: P.card }, line: { color: P.acc, width: 1.5 } });
   s.addText("ДЗ тижня 6: CI-гейт + інцидент", { x: MX + 0.3, y: 2.05, w: 11.5, h: 0.4, fontFace: F.body, fontSize: 15.5, bold: true, color: P.acc, margin: 0 });
   s.addText("Останнє ДЗ, і воно ж ваш зібраний капстоун.",
@@ -283,7 +284,8 @@ D.closingSlide({
   ],
   nextTitle: "Наступний крок → ваша система",
   nextBody: "Здайте ДЗ тижня 6 — ваш зібраний капстоун. Далі: додавайте реальний ключ, підключайте справжніх провайдерів, тягніть практики в робочі проєкти — по шару на тиждень, як у rollout-плані. Контур, який ви збудували, — не навчальний макет, а зменшена копія того, як LLM-системи експлуатують у проді; різниця тільки в масштабі.",
-  notes: N(21),
+  notes: N(),
 });
 
-D.save("C:/Work/llmops-course-decks/L12.pptx", "C:/Work/llmops-course-decks/scripts/L12-script.md");
+const OUT = process.env.DECKS_OUT || SRC;
+D.save(path.join(OUT, "L12.pptx"), path.join(OUT, "L12-script.md"));

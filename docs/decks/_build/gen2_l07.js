@@ -1,18 +1,19 @@
 // L07 v2 — Reliability
-const { createDeck } = require("./deck_lib2");
-const V = require("./decks_dump.json")["7"].slides;
-const N = i => V[i - 1].notes;
+const path = require("path");
+const { createDeck, notesFrom } = require("./deck_lib2");
+const SRC = process.env.DECKS_DIR || path.join(__dirname, "..");
+const N = notesFrom(path.join(SRC, "L07-script.md"));
 const D = createDeck({ lesson: 7, week: 4, fileTitle: "Reliability: fallback, деградація і circuit breaker" });
 const { P, F, MX } = D;
 
 D.titleSlide({
   title: "Reliability: fallback,\nдеградація і circuit breaker",
   lead: "Провайдер ляже. Питання не «чи», а «що побачить користувач, коли це станеться». Будуємо план Б — і влаштовуємо власний інцидент, бо mock уміє падати на замовлення.",
-  notes: N(1),
+  notes: N(),
 });
 
 {
-  const s = D.slide({ title: "Що ви зможете після уроку", pill: "absorb", kicker: "П'ять дій, які перевірите руками", notes: N(2) });
+  const s = D.slide({ title: "Що ви зможете після уроку", pill: "absorb", kicker: "П'ять дій, які перевірите руками", notes: N() });
   [["Зробити збій значенням", "виклик у функції, де помилка — не виняток"],
    ["Побудувати fallback-ланцюг", "спробуй наступного, лічильник переходів"],
    ["Віддати ввічливу заглушку", "замість 500-ки, з чесним 503 у лозі"],
@@ -22,7 +23,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Маршрут на сьогодні", pill: "absorb", notes: N(3) });
+  const s = D.slide({ title: "Маршрут на сьогодні", pill: "absorb", notes: N() });
   [["01","Падіння має бути керованим"],["02","Retry ≠ fallback"],["03","Збій як значення"],
    ["04","Fallback-ланцюг"],["05","Право на повтор і лавина"],["06","Сходинки деградації"],
    ["07","Помилки мають бути швидкими"],["08","Circuit breaker · опційно"],["09","Слід у метриках"],
@@ -34,7 +35,7 @@ D.titleSlide({
 
 {
   const s = D.slide({ title: "Терміни, якими користуватимемось", pill: "absorb", kicker: "Шість слів сьогоднішнього уроку",
-    notes: "Домовимось про шість слів. Retry — повторити ще раз туди само; доречний на минущих збоях і обов'язково з паузою. Fallback — піти в інше місце: на іншу модель або провайдера, за явно оголошеним порядком. Backoff — та сама пауза перед повтором: фіксована, експоненційна або з джитером, тобто випадковим зсувом. Graceful degradation — ввічлива деградація: замість помилки користувач отримує чесну відповідь нижчої якості. Circuit breaker — запобіжник, який після кількох збоїв перестає стукати в мертвий сервіс; він має три стани, і сьогодні ми їх побачимо. Half-open — стан пробного запиту: breaker пускає один запит подивитися, чи ожив провайдер. Без half-open запобіжник перетворюється на самостріл — і це ми теж розберемо." });
+    notes: N() });
   D.terms(s, { x: MX, y: 1.95, w: 12.1, cols: 3, rowH: 1.3, items: [
     { term: "retry", def: "ще раз туди само — на минущих збоях, обов'язково з паузою" },
     { term: "fallback", def: "в інше місце: інша модель за оголошеним порядком" },
@@ -47,7 +48,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "01", title: "Чужа інфраструктура: падіння має бути керованим", pill: "absorb", notes: N(4) });
+  const s = D.slide({ num: "01", title: "Чужа інфраструктура: падіння має бути керованим", pill: "absorb", notes: N() });
   D.flow(s, { x: MX, y: 2.0, w: 12.1, h: 0.8, size: 11, items: [
     { label: "стрибки latency" }, { label: "429 у пік", tone: "warn" }, { label: "5xx на боці провайдера", tone: "crit" }, { label: "зміни API" }] });
   s.addText("це не аномалії — це нормальний режим роботи інтернету",
@@ -61,7 +62,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "02", title: "Retry ≠ fallback: словник рішень", pill: "absorb", notes: N(5) });
+  const s = D.slide({ num: "02", title: "Retry ≠ fallback: словник рішень", pill: "absorb", notes: N() });
   D.table(s, { x: MX, y: 1.9, w: 12.1, colW: [3.1, 4.5, 4.5], rowH: 0.62, size: 11.5,
     head: ["", "retry", "fallback"],
     rows: [
@@ -75,7 +76,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "02", title: "Backoff: фіксований, експоненційний, jitter", pill: "absorb", notes: N(6) });
+  const s = D.slide({ num: "02", title: "Backoff: фіксований, експоненційний, jitter", pill: "absorb", notes: N() });
   D.layers(s, { x: MX, y: 1.95, w: 12.1, h: 0.85, gap: 0.14, items: [
     { label: "Фіксований", body: "«чекай секунду» — найпростіший; на масовому збої всі клієнти повертаються синхронно", tone: "warn" },
     { label: "Експоненційний", body: "кожна наступна спроба чекає довше — трафік згасає замість наростання" },
@@ -86,7 +87,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "03", title: "Розтин: збій стає значенням, а не винятком", pill: "absorb", notes: N(7) });
+  const s = D.slide({ num: "03", title: "Розтин: збій стає значенням, а не винятком", pill: "absorb", notes: N() });
   D.code(s, { x: MX, y: 1.9, w: 12.1, h: 2.6, size: 11.5, lines: [
     [{ t: "// один виклик через gateway; ok=false, якщо збій або статус >= 400", c: P.dim }],
     [{ t: "static async Task<(bool ok, string answer, string? tool,", c: "82AAFF" }],
@@ -105,7 +106,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "04", title: "Fallback-ланцюг: спробуй наступного", pill: "absorb", notes: N(8) });
+  const s = D.slide({ num: "04", title: "Fallback-ланцюг: спробуй наступного", pill: "absorb", notes: N() });
   D.code(s, { x: MX, y: 1.9, w: 12.1, h: 2.35, size: 11.5, lines: [
     [{ t: "// [W4] fallback: пробуємо по черзі", c: P.dim }],
     [{ t: 'var chain = defaultModel == "mock" ? new[] { model, "mock" }', c: "82AAFF" }],
@@ -123,7 +124,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "05", title: "Право на повтор: не кожну операцію можна ретраїти", pill: "absorb", notes: N(9) });
+  const s = D.slide({ num: "05", title: "Право на повтор: не кожну операцію можна ретраїти", pill: "absorb", notes: N() });
   D.table(s, { x: MX, y: 1.9, w: 12.1, colW: [4.2, 3.0, 4.9], rowH: 0.62, size: 11.5,
     head: ["операція", "повторювати?", "умова"],
     rows: [
@@ -137,7 +138,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "05", title: "Retry storm: ваша стійкість добиває провайдера", pill: "absorb", notes: N(10) });
+  const s = D.slide({ num: "05", title: "Retry storm: ваша стійкість добиває провайдера", pill: "absorb", notes: N() });
   D.flow(s, { x: MX, y: 2.05, w: 12.1, h: 0.8, size: 10.5, items: [
     { label: "усі отримали помилку", tone: "warn" }, { label: "усі повторюють одночасно", tone: "crit" },
     { label: "друга хвиля", tone: "crit" }, { label: "провайдер не встає", tone: "crit" }] });
@@ -150,7 +151,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "06", title: "Деградація має сходинки", pill: "absorb", notes: N(11) });
+  const s = D.slide({ num: "06", title: "Деградація має сходинки", pill: "absorb", notes: N() });
   D.table(s, { x: MX, y: 1.9, w: 12.1, colW: [1.0, 6.3, 4.8], rowH: 0.58, size: 11.5,
     head: ["#", "що віддаємо", "що втрачає користувач"],
     rows: [
@@ -165,7 +166,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "06", title: "Остання лінія — це UX-рішення", pill: "absorb", notes: N(12) });
+  const s = D.slide({ num: "06", title: "Остання лінія — це UX-рішення", pill: "absorb", notes: N() });
   D.code(s, { x: MX, y: 1.9, w: 12.1, h: 1.75, size: 12, lines: [
     [{ t: "if (!ok) {", c: "82AAFF" }],
     [{ t: '    answer = "Вибачте, тимчасові проблеми на нашому боці. ', c: "C3E88D" }],
@@ -182,7 +183,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "07", title: "Помилки мають бути швидкими", pill: "absorb", notes: N(13) });
+  const s = D.slide({ num: "07", title: "Помилки мають бути швидкими", pill: "absorb", notes: N() });
   D.code(s, { x: MX, y: 1.9, w: 12.1, h: 1.1, size: 13, lines: [
     [{ t: "# gateway/litellm-config.yaml", c: P.dim }],
     [{ t: "num_retries: 0", c: "C3E88D" }, { t: "   # тепер ви знаєте, навіщо", c: P.dim }],
@@ -196,7 +197,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "08", title: "Circuit breaker: перестати стукати в мертве", pill: "absorb", opt: true, notes: N(14) });
+  const s = D.slide({ num: "08", title: "Circuit breaker: перестати стукати в мертве", pill: "absorb", opt: true, notes: N() });
   D.code(s, { x: MX, y: 1.9, w: 12.1, h: 1.75, size: 12, lines: [
     [{ t: "// [W4 · опційно] 3 збої поспіль → open на 30 с", c: P.dim }],
     [{ t: "if (failures >= 3 && DateTime.UtcNow < openUntil)", c: "82AAFF" }],
@@ -211,7 +212,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "08", title: "Три стани — і чому half-open обов'язковий", pill: "absorb", opt: true, notes: N(15) });
+  const s = D.slide({ num: "08", title: "Три стани — і чому half-open обов'язковий", pill: "absorb", opt: true, notes: N() });
   D.states(s, { x: MX + 1.5, y: 2.2, items: [
     { label: "closed", sub: "усе працює", tone: "good", edge: "3 збої" },
     { label: "open", sub: "не питаємо зовсім", tone: "crit", edge: "~30 с" },
@@ -224,7 +225,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "09", title: "Слід у метриках: інцидент без сліду повториться", pill: "absorb", notes: N(16) });
+  const s = D.slide({ num: "09", title: "Слід у метриках: інцидент без сліду повториться", pill: "absorb", notes: N() });
   D.layers(s, { x: MX, y: 1.95, w: 12.1, h: 0.8, gap: 0.14, items: [
     { label: "fallback_events", body: "лічильник переходів росте з кожним спрацюванням ланцюга", tone: "acc" },
     { label: "статуси збоїв", body: "503, 429, 0 лежать у лозі поруч зі звичайними 200" },
@@ -237,7 +238,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Зараз ви побачите — і навіщо", pill: "do", notes: N(17) });
+  const s = D.slide({ title: "Зараз ви побачите — і навіщо", pill: "do", notes: N() });
   [["__fail_503 → заглушка", "ввічлива відмова замість 500-ки", "good"],
    ["той самий маркер удруге", "збій коштує мілісекунди", "good"],
    ["перехід fallback — у діфі коду", "лічильник на цьому тижні не віддається нічим", "warn"],
@@ -249,7 +250,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Лабораторна: три кроки + опційний", pill: "do", notes: N(18) });
+  const s = D.slide({ title: "Лабораторна: три кроки + опційний", pill: "do", notes: N() });
   [["Побудувати ланцюг", "CallGateway + цикл по chain + лічильник переходів", false],
    ["Довести інцидент до дна", "__fail_503 → заглушка з 503 у лозі, а не 500 користувачу", false],
    ["Перевірити слід", "статуси і лічильник fallback ростуть правильно", false],
@@ -265,7 +266,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Що це довело", pill: "absorb", notes: N(19) });
+  const s = D.slide({ title: "Що це довело", pill: "absorb", notes: N() });
   D.tile(s, { x: MX, y: 1.9, w: 3.9, h: 2.0, title: "Збій швидкий", body: "мілісекунди замість восьми секунд прихованих ретраїв", tone: "good" });
   D.tile(s, { x: 4.72, y: 1.9, w: 3.9, h: 2.0, title: "Користувач бачить ввічливість", body: "заглушка замість 500-ки — чат живий", tone: "acc" });
   D.tile(s, { x: 8.82, y: 1.9, w: 3.9, h: 2.0, title: "Система бачить правду", body: "503 у лозі й лічильник переходів, а не «все добре»" });
@@ -274,7 +275,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Перевір себе", pill: "connect", notes: N(20) });
+  const s = D.slide({ title: "Перевір себе", pill: "connect", notes: N() });
   s.addShape("roundRect", { x: MX, y: 1.95, w: 12.1, h: 2.05, rectRadius: 0.12, fill: { color: P.card }, line: { color: P.line, width: 1 } });
   D.checklist(s, { x: MX + 0.45, y: 2.3, w: 11.3, cols: 2, items: [
     "__fail_503 дає ввічливу заглушку, не 500",
@@ -287,7 +288,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Антипатерни тижня", pill: "absorb", notes: N(21) });
+  const s = D.slide({ title: "Антипатерни тижня", pill: "absorb", notes: N() });
   [["Retry без паузи і без стелі", "ваш код стає другою половиною інциденту"],
    ["Заглушка зі статусом 200", "моніторинг бачить здорову систему, коли всі бачать вибачення"],
    ["Ретраї в кількох шарах одразу", "бюджети часу перемножуються — «швидка відмова» на пів хвилини"],
@@ -305,7 +306,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Домашнє завдання", pill: "do", notes: N(22) });
+  const s = D.slide({ title: "Домашнє завдання", pill: "do", notes: N() });
   D.tile(s, { x: MX, y: 1.9, w: 5.85, h: 2.4, title: "Обов'язково — без здачі",
     body: "• закріпити лабу: __fail_503 → fallback → ввічлива заглушка\n\n• переконатися, що збій швидкий і лишає чесний статус у лозі\n\n• проговорити свою драбину деградації" });
   D.tile(s, { x: 6.87, y: 1.9, w: 5.85, h: 2.4, title: "Опційно", tone: "warn",
@@ -326,7 +327,8 @@ D.closingSlide({
   ],
   nextTitle: "Наступний крок → Урок 8 · Safety, guardrails і human-in-the-loop",
   nextBody: "Система переживає збій провайдера. Наступного уроку — про збої іншого роду: коли шкоду завдає не інфраструктура, а зміст. Injection, витік даних і незворотні дії, які мусить підтвердити людина — та сама «дірка», яку ми лишили відкритою на уроці 6.",
-  notes: N(23),
+  notes: N(),
 });
 
-D.save("C:/Work/llmops-course-decks/L07.pptx", "C:/Work/llmops-course-decks/scripts/L07-script.md");
+const OUT = process.env.DECKS_OUT || SRC;
+D.save(path.join(OUT, "L07.pptx"), path.join(OUT, "L07-script.md"));

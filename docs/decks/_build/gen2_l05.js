@@ -1,18 +1,19 @@
 // L05 v2 — Кешування
-const { createDeck } = require("./deck_lib2");
-const V = require("./decks_dump.json")["5"].slides;
-const N = i => V[i - 1].notes;
+const path = require("path");
+const { createDeck, notesFrom } = require("./deck_lib2");
+const SRC = process.env.DECKS_DIR || path.join(__dirname, "..");
+const N = notesFrom(path.join(SRC, "L05-script.md"));
 const D = createDeck({ lesson: 5, week: 3, fileTitle: "Кешування: точний кеш, метрика і semantic cache" });
 const { P, F, MX } = D;
 
 D.titleSlide({
   title: "Кешування: точний кеш,\nметрика і semantic cache",
   lead: "Найшвидша і найдешевша відповідь — та, по яку не треба йти в модель. Сьогодні обгорнемо виклик кешем, зберемо ключ, який не бреше, і увімкнемо лічильники з першої хвилини.",
-  notes: N(1),
+  notes: N(),
 });
 
 {
-  const s = D.slide({ title: "Що ви зможете після уроку", pill: "absorb", kicker: "П'ять дій, які перевірите руками", notes: N(2) });
+  const s = D.slide({ title: "Що ви зможете після уроку", pill: "absorb", kicker: "П'ять дій, які перевірите руками", notes: N() });
   [["Обгорнути виклик кешем", "hit віддає збережене, miss іде в модель"],
    ["Зібрати ключ, що не бреше", "модель + промпт + повідомлення"],
    ["Увімкнути лічильники", "hit/miss в одному діфі з кешем"],
@@ -22,7 +23,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Маршрут на сьогодні", pill: "absorb", notes: N(3) });
+  const s = D.slide({ title: "Маршрут на сьогодні", pill: "absorb", notes: N() });
   [["01","Подвійний податок на повтори"],["02","Межі: що можна, що заборонено"],["03","Ключ = контракт коректності"],
    ["04","Розтин: гілка miss"],["05","Hit ratio і що з нього"],["06","Кеш детермінізує — двосічно"],
    ["07","Інвалідація і TTL"],["08","Semantic cache · опційно"],["09","Лабораторна"],["10","Антипатерни"],
@@ -33,7 +34,7 @@ D.titleSlide({
 
 {
   const s = D.slide({ title: "Терміни, якими користуватимемось", pill: "absorb", kicker: "Шість слів сьогоднішнього уроку",
-    notes: "Домовимось про шість слів. Hit і miss — влучання і промах: hit означає, що відповідь знайшлася в кеші й у модель ми не пішли. Hit ratio — частка запитів, які обійшлися без моделі; це головна метрика уроку. Ключ кешу — рядок, за яким ми шукаємо збережену відповідь; сьогодні побачимо, що він є контрактом коректності, а не технічною дрібницею. TTL — час життя запису: скільки відповідь вважається придатною. Інвалідація — вихід записів з обігу, коли вони більше не відповідають дійсності; у нас вона станеться автоматично через промпт у ключі. І semantic cache — кеш, який шукає не точний збіг, а схоже за змістом питання; це опційна частина уроку, і в комплекті з ним приходить своя ціна. Далі кожне побачимо в коді." });
+    notes: N() });
   D.terms(s, { x: MX, y: 1.95, w: 12.1, cols: 3, rowH: 1.3, items: [
     { term: "hit / miss", def: "влучання і промах: hit — у модель не пішли" },
     { term: "hit ratio", def: "частка запитів, що обійшлися без моделі" },
@@ -46,7 +47,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "01", title: "Подвійний податок на повтори", pill: "absorb", notes: N(4) });
+  const s = D.slide({ num: "01", title: "Подвійний податок на повтори", pill: "absorb", notes: N() });
   D.stat(s, { x: MX, y: 1.9, w: 5.85, h: 1.5, value: "Гроші", label: "«Як скинути пароль?» — сотні разів на день майже однаковими словами", tone: "crit", size: 30 });
   D.stat(s, { x: 6.87, y: 1.9, w: 5.85, h: 1.5, value: "Час", label: "однакова відповідь — а користувач щоразу чекає похід у модель", tone: "warn", size: 30 });
   D.band(s, { x: MX, y: 3.65, w: 12.1, h: 1.15, tone: "crit", label: "Пастка: кеш вмикають — і не міряють",
@@ -56,7 +57,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "02", title: "Що кешувати можна — а що заборонено", pill: "absorb", notes: N(5) });
+  const s = D.slide({ num: "02", title: "Що кешувати можна — а що заборонено", pill: "absorb", notes: N() });
   D.tile(s, { x: MX, y: 1.9, w: 5.85, h: 1.85, title: "Ідеальний кандидат",
     body: "детермінована (завжди відповідаємо так) і не-персональна: «Як скинути пароль?», «Які у вас тарифи?»", tone: "good" });
   [["Персональні відповіді", "«Де моє замовлення?» — закешували одному, віддали іншому: інцидент із чужими даними"],
@@ -69,7 +70,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "03", title: "Ключ кешу — це контракт коректності", pill: "absorb", notes: N(6) });
+  const s = D.slide({ num: "03", title: "Ключ кешу — це контракт коректності", pill: "absorb", notes: N() });
   D.code(s, { x: MX, y: 1.9, w: 12.1, h: 0.85, size: 13, lines: [
     [{ t: "var cacheKey = ", c: P.darktext }, { t: '$"{model}|{systemPrompt}|{body.Message}"', c: "C3E88D" }, { t: ";", c: P.darktext }],
   ] });
@@ -82,7 +83,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "03", title: "Нормалізація — рішення про еквівалентність", pill: "absorb", notes: N(7) });
+  const s = D.slide({ num: "03", title: "Нормалізація — рішення про еквівалентність", pill: "absorb", notes: N() });
   D.layers(s, { x: MX, y: 1.95, w: 12.1, h: 0.9, gap: 0.16, items: [
     { label: "Зайві пробіли", body: "безпечно: на зміст повідомлення не впливає", tone: "good" },
     { label: "Нижній регістр", body: "майже завжди правда: регістр рідко змінює зміст питання" },
@@ -93,7 +94,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "04", title: "Розтин коду: виклик моделі стає гілкою miss", pill: "absorb", notes: N(8) });
+  const s = D.slide({ num: "04", title: "Розтин коду: виклик моделі стає гілкою miss", pill: "absorb", notes: N() });
   D.code(s, { x: MX, y: 1.9, w: 12.1, h: 2.65, size: 11.5, lines: [
     [{ t: "// [W3] простий in-memory кеш + лічильники", c: P.dim }],
     [{ t: "if (cache.TryGetValue(cacheKey, out var cached)) {", c: "82AAFF" }],
@@ -112,7 +113,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "04", title: "Про що цей код мовчить", pill: "absorb", notes: N(9) });
+  const s = D.slide({ num: "04", title: "Про що цей код мовчить", pill: "absorb", notes: N() });
   [["Пам'ять росте необмежено", "кожне унікальне питання — запис назавжди; на проді потрібна стеля або LRU"],
    ["Два одночасні miss", "обидва підуть у модель і обидва заплатять; другий перезапише перший"],
    ["Thundering herd", "сотні запитів б'ють по одному холодному ключу: лок або «запит-лідер»"],
@@ -122,7 +123,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "05", title: "Hit ratio: що рахуємо і що з цим робимо", pill: "absorb", notes: N(10) });
+  const s = D.slide({ num: "05", title: "Hit ratio: що рахуємо і що з цим робимо", pill: "absorb", notes: N() });
   D.stat(s, { x: MX, y: 1.9, w: 3.5, h: 1.55, value: "hit ratio", label: "частка запитів, що обійшлися без моделі", tone: "acc", size: 26 });
   [["Зекономлені виклики", "хіти × середня вартість miss із лога = економія в доларах"],
    ["Latency до / після", "хіт ~0 мс проти сотень мілісекунд походу в модель"],
@@ -139,7 +140,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "06", title: "Кеш детермінізує систему — і це двосічно", pill: "absorb", notes: N(11) });
+  const s = D.slide({ num: "06", title: "Кеш детермінізує систему — і це двосічно", pill: "absorb", notes: N() });
   D.tile(s, { x: MX, y: 1.95, w: 5.85, h: 1.8, title: "Острівець передбачуваності",
     body: "перший запит зафіксував відповідь — усі наступні однакові: недетермінізм зник для повторів", tone: "good" });
   D.tile(s, { x: 6.87, y: 1.95, w: 5.85, h: 1.8, title: "Кеш консервує помилку",
@@ -151,7 +152,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "06", title: "Скидання кешу — операційна процедура", pill: "absorb", notes: N(12) });
+  const s = D.slide({ num: "06", title: "Скидання кешу — операційна процедура", pill: "absorb", notes: N() });
   D.flow(s, { x: MX, y: 2.1, w: 12.1, h: 0.8, size: 10.5, items: [
     { label: "провайдер ліг на 2 хв", tone: "crit" }, { label: "заглушки «тимчасові проблеми»", tone: "warn" },
     { label: "поїхали в кеш", tone: "crit" }, { label: "провайдер піднявся", tone: "good" }, { label: "заглушки ще годину", tone: "crit" }] });
@@ -164,7 +165,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "07", title: "Свіжість: віддати старе — і оновити у фоні", pill: "absorb", notes: N(13) });
+  const s = D.slide({ num: "07", title: "Свіжість: віддати старе — і оновити у фоні", pill: "absorb", notes: N() });
   D.tile(s, { x: MX, y: 1.95, w: 5.85, h: 1.7, title: "Жорсткий TTL — вибір із двох зол",
     body: "короткий — кеш майже не влучає; довгий — роздаєте застаріле", tone: "warn" });
   D.tile(s, { x: 6.87, y: 1.95, w: 5.85, h: 1.7, title: "Третій варіант: два строки",
@@ -176,7 +177,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "07", title: "Інвалідація і драбина сховищ", pill: "absorb", notes: N(14) });
+  const s = D.slide({ num: "07", title: "Інвалідація і драбина сховищ", pill: "absorb", notes: N() });
   D.flow(s, { x: MX + 1.4, y: 2.3, w: 9.5, h: 0.85, size: 12, items: [
     { label: "in-memory", tone: "acc" }, { label: "Redis (advanced-профіль)", tone: "good" }] });
   D.tile(s, { x: MX, y: 3.5, w: 5.85, h: 1.7, title: "Промпт-у-ключі + TTL",
@@ -188,7 +189,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "08", title: "Semantic cache: коли точного збігу мало", pill: "absorb", opt: true, notes: N(15) });
+  const s = D.slide({ num: "08", title: "Semantic cache: коли точного збігу мало", pill: "absorb", opt: true, notes: N() });
   [["Поріг схожості", "надто високий — кеш не влучає; надто низький — віддасте відповідь на інше питання"],
    ["Вартість", "кожен запит — виклик за векторами: кеш перестає бути безкоштовним"],
    ["Сховище й індекс", "вектори треба десь тримати й оновлювати — ще одна залежність"],
@@ -198,7 +199,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Зараз ви побачите — і навіщо", pill: "do", notes: N(16) });
+  const s = D.slide({ title: "Зараз ви побачите — і навіщо", pill: "do", notes: N() });
   [["те саме питання двічі", "вдруге latency_ms < 50 і нульові токени"],
    ["rollback-тест ключа", "зміна версії промпта робить кеш недосяжним"],
    ["«Де моє замовлення #10482?»", "не кешується — персональна відповідь"],
@@ -209,7 +210,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Лабораторна: чотири частини + опційна", pill: "do", notes: N(17) });
+  const s = D.slide({ title: "Лабораторна: чотири частини + опційна", pill: "do", notes: N() });
   [["Обгорнути виклик кешем", "гілка hit/miss у service/Program.cs + лічильники", false],
    ["Побачити ефект", "те саме питання двічі: latency і токени в лозі", false],
    ["Rollback-тест ключа", "activate іншої версії → кеш недосяжний", false],
@@ -226,7 +227,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Що це довело", pill: "absorb", notes: N(18) });
+  const s = D.slide({ title: "Що це довело", pill: "absorb", notes: N() });
   D.tile(s, { x: MX, y: 1.9, w: 3.9, h: 2.0, title: "Метрика, а не віра", body: "hit/miss ростуть на очах: економія порахована, а не заявлена", tone: "good" });
   D.tile(s, { x: 4.72, y: 1.9, w: 3.9, h: 2.0, title: "Ключ вирішує коректність", body: "промпт у ключі — і rollback не залишає стару поведінку", tone: "acc" });
   D.tile(s, { x: 8.82, y: 1.9, w: 3.9, h: 2.0, title: "Межа проведена", body: "персональне й tool-відповіді не кешуються ніколи", tone: "crit" });
@@ -235,7 +236,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Перевір себе", pill: "connect", notes: N(19) });
+  const s = D.slide({ title: "Перевір себе", pill: "connect", notes: N() });
   s.addShape("roundRect", { x: MX, y: 1.95, w: 12.1, h: 2.05, rectRadius: 0.12, fill: { color: P.card }, line: { color: P.line, width: 1 } });
   D.checklist(s, { x: MX + 0.45, y: 2.3, w: 11.3, cols: 2, items: [
     "повторний запит відповідає ~миттєво",
@@ -248,7 +249,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Антипатерни тижня", pill: "absorb", notes: N(20) });
+  const s = D.slide({ title: "Антипатерни тижня", pill: "absorb", notes: N() });
   [["Кеш без лічильників", "«начебто економимо» — цифри немає, рішення теж"],
    ["Промпт поза ключем", "rollback полагодив регресію, а користувачі бачать стару поведінку"],
    ["Кешувати персональні відповіді", "це не продуктивність, це чужі дані в чужих руках"],
@@ -265,7 +266,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Домашнє завдання", pill: "do", notes: N(21) });
+  const s = D.slide({ title: "Домашнє завдання", pill: "do", notes: N() });
   D.tile(s, { x: MX, y: 1.9, w: 5.85, h: 2.4, title: "Обов'язково — без здачі",
     body: "• закріпити лабу: повторний запит ~0 мс, лічильники ростуть\n\n• перевірити rollback-експеримент — промпт у ключі рятує\n\n• сформулювати список «що в моїй системі кешувати заборонено»" });
   D.tile(s, { x: 6.87, y: 1.9, w: 5.85, h: 2.4, title: "Опційно", tone: "warn",
@@ -286,7 +287,8 @@ D.closingSlide({
   ],
   nextTitle: "Наступний крок → Урок 6 · Tool calls: коли модель починає діяти",
   nextBody: "Досі бот тільки говорив — найгірше, що він міг, це відповісти неправильно. Наступного уроку він почне діяти: tool-виклики, зовнішні інтеграції, реальні наслідки. Дія потребує схеми, таймаута та ідемпотентності — а незворотна дія ще й людини, яка скаже «так».",
-  notes: N(22),
+  notes: N(),
 });
 
-D.save("C:/Work/llmops-course-decks/L05.pptx", "C:/Work/llmops-course-decks/scripts/L05-script.md");
+const OUT = process.env.DECKS_OUT || SRC;
+D.save(path.join(OUT, "L05.pptx"), path.join(OUT, "L05-script.md"));
