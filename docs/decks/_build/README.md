@@ -32,3 +32,22 @@ python overlap.py ../L*.pptx   # накладання і виходи за ме�
 
 Плюс валідація OOXML (`scripts/office/validate.py` зі скіл-набору pptx, з
 `PYTHONUTF8=1`) і візуальний контроль рендером через LibreOffice.
+
+## Прохід у справжньому PowerPoint
+
+LibreOffice дає близьку, але не тотожну картинку: інші autofit, інший авто-ріст
+рядків таблиці, інший фолбек гліфів. Плюс у контейнері немає Calibri — він
+підміняється ширшим Noto Sans, тож перенос рядків там не показовий (для
+контрольного рендера змонтуйте `C:\Windows\Fonts` у `/usr/share/fonts/win`).
+
+Знімок рушієм самого PowerPoint — на машині, де стоїть десктопний Office:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File docs\decks\_build\pptx_export.ps1
+```
+
+Кладе PNG у `docs/decks/_render/LNN/LNN-01.png…` плюс `manifest.json` із
+кількістю слайдів. Тека `_render/` — тимчасова, у git не потрапляє.
+
+Запускати треба у звичайній інтерактивній сесії: у Session 0 (WinRM, служба)
+Office COM зазвичай не стартує.

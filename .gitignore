@@ -26,3 +26,6 @@ dist/
 Thumbs.db
 .idea/
 .vscode/
+
+# рендери колод (тимчасові)
+docs/decks/_render/
