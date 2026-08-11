@@ -72,7 +72,7 @@ D.titleSlide({
 {
   const s = D.slide({ num: "03", title: "Ключ кешу — це контракт коректності", pill: "absorb", notes: N() });
   D.code(s, { x: MX, y: 1.9, w: 12.1, h: 0.85, size: 13, lines: [
-    [{ t: "var cacheKey = ", c: P.darktext }, { t: '$"{model}|{systemPrompt}|{body.Message}"', c: "C3E88D" }, { t: ";", c: P.darktext }],
+    [{ t: "var cacheKey = ", c: P.darktext }, { t: '$"{model}|{systemPrompt}|{body.Message}"', c: "177245" }, { t: ";", c: P.darktext }],
   ] });
   D.flow(s, { x: MX, y: 3.05, w: 12.1, h: 0.78, size: 11.5, items: [
     { label: "модель", tone: "acc" }, { label: "текст промпта", tone: "acc" }, { label: "повідомлення", tone: "acc" }] });
@@ -97,14 +97,14 @@ D.titleSlide({
   const s = D.slide({ num: "04", title: "Розтин коду: виклик моделі стає гілкою miss", pill: "absorb", notes: N() });
   D.code(s, { x: MX, y: 1.9, w: 12.1, h: 2.65, size: 11.5, lines: [
     [{ t: "// [W3] простий in-memory кеш + лічильники", c: P.dim }],
-    [{ t: "if (cache.TryGetValue(cacheKey, out var cached)) {", c: "82AAFF" }],
+    [{ t: "if (cache.TryGetValue(cacheKey, out var cached)) {", c: "5A05F4" }],
     [{ t: "    answer = cached;", c: P.darktext }],
-    [{ t: "    Interlocked.Increment(ref stats.CacheHits);", c: "C3E88D" }],
-    [{ t: "} else {", c: "82AAFF" }],
-    [{ t: "    Interlocked.Increment(ref stats.CacheMisses);", c: "F78C6C" }],
+    [{ t: "    Interlocked.Increment(ref stats.CacheHits);", c: "177245" }],
+    [{ t: "} else {", c: "5A05F4" }],
+    [{ t: "    Interlocked.Increment(ref stats.CacheMisses);", c: "B45309" }],
     [{ t: "    // ... виклик моделі, парсинг, як раніше ...", c: P.dim }],
     [{ t: "    if (status == 200 && toolCall == null) cache[cacheKey] = answer;", c: P.darktext }],
-    [{ t: "}", c: "82AAFF" }],
+    [{ t: "}", c: "5A05F4" }],
   ] });
   [["Тільки 200 у кеш", "заглушки й помилки не консервуємо"],
    ["toolCall == null", "результати інструментів не кешуються ніколи"],

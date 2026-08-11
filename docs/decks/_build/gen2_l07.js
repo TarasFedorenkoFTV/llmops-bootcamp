@@ -90,13 +90,13 @@ D.titleSlide({
   const s = D.slide({ num: "03", title: "Розтин: збій стає значенням, а не винятком", pill: "absorb", notes: N() });
   D.code(s, { x: MX, y: 1.9, w: 12.1, h: 2.6, size: 11.5, lines: [
     [{ t: "// один виклик через gateway; ok=false, якщо збій або статус >= 400", c: P.dim }],
-    [{ t: "static async Task<(bool ok, string answer, string? tool,", c: "82AAFF" }],
-    [{ t: "        int pt, int ct, int status)> CallGateway(…)", c: "82AAFF" }],
+    [{ t: "static async Task<(bool ok, string answer, string? tool,", c: "5A05F4" }],
+    [{ t: "        int pt, int ct, int status)> CallGateway(…)", c: "5A05F4" }],
     [{ t: "{", c: P.darktext }],
     [{ t: "    try {", c: P.darktext }],
-    [{ t: "        if (status >= 400) return (false, \"\", null, 0, 0, status);", c: "F78C6C" }],
-    [{ t: "        return (true, answer, tool, pt, ct, status);", c: "C3E88D" }],
-    [{ t: "    } catch { return (false, \"\", null, 0, 0, 0); }", c: "F78C6C" }],
+    [{ t: "        if (status >= 400) return (false, \"\", null, 0, 0, status);", c: "B45309" }],
+    [{ t: "        return (true, answer, tool, pt, ct, status);", c: "177245" }],
+    [{ t: "    } catch { return (false, \"\", null, 0, 0, 0); }", c: "B45309" }],
     [{ t: "}", c: P.darktext }],
   ] });
   [["Значення, не виняток", "виклик стає рішенням, а не аварією"],
@@ -109,12 +109,12 @@ D.titleSlide({
   const s = D.slide({ num: "04", title: "Fallback-ланцюг: спробуй наступного", pill: "absorb", notes: N() });
   D.code(s, { x: MX, y: 1.9, w: 12.1, h: 2.35, size: 11.5, lines: [
     [{ t: "// [W4] fallback: пробуємо по черзі", c: P.dim }],
-    [{ t: 'var chain = defaultModel == "mock" ? new[] { model, "mock" }', c: "82AAFF" }],
-    [{ t: '                                   : new[] { model, "azure-gpt-4o" };', c: "82AAFF" }],
+    [{ t: 'var chain = defaultModel == "mock" ? new[] { model, "mock" }', c: "5A05F4" }],
+    [{ t: '                                   : new[] { model, "azure-gpt-4o" };', c: "5A05F4" }],
     [{ t: "for (int i = 0; i < chain.Length && !ok; i++) {", c: P.darktext }],
-    [{ t: "    if (i > 0) Interlocked.Increment(ref stats.Fallbacks);", c: "F78C6C" }],
+    [{ t: "    if (i > 0) Interlocked.Increment(ref stats.Fallbacks);", c: "B45309" }],
     [{ t: "    var res = await CallGateway(http, gateway, chain[i], …);", c: P.darktext }],
-    [{ t: "    if (res.ok) { ok = true; model = chain[i]; answer = res.answer; }", c: "C3E88D" }],
+    [{ t: "    if (res.ok) { ok = true; model = chain[i]; answer = res.answer; }", c: "177245" }],
     [{ t: "}", c: P.darktext }],
   ] });
   [["Лічильник переходів", "fallback, що спрацював непомітно, — замаскована проблема"],
@@ -168,11 +168,11 @@ D.titleSlide({
 {
   const s = D.slide({ num: "06", title: "Остання лінія — це UX-рішення", pill: "absorb", notes: N() });
   D.code(s, { x: MX, y: 1.9, w: 12.1, h: 2.05, size: 12, lines: [
-    [{ t: "if (!ok) {", c: "82AAFF" }],
-    [{ t: '    answer = "Вибачте, тимчасові проблеми на нашому боці. ', c: "C3E88D" }],
-    [{ t: '             Спробуйте, будь ласка, трохи згодом.";', c: "C3E88D" }],
-    [{ t: "    status = (status == 200 || status == 0) ? 503 : status;", c: "F78C6C" }],
-    [{ t: "}", c: "82AAFF" }],
+    [{ t: "if (!ok) {", c: "5A05F4" }],
+    [{ t: '    answer = "Вибачте, тимчасові проблеми на нашому боці. ', c: "177245" }],
+    [{ t: '             Спробуйте, будь ласка, трохи згодом.";', c: "177245" }],
+    [{ t: "    status = (status == 200 || status == 0) ? 503 : status;", c: "B45309" }],
+    [{ t: "}", c: "5A05F4" }],
   ] });
   D.tile(s, { x: MX, y: 3.95, w: 5.85, h: 1.6, title: "Текст — для людини",
     body: "ввічливе, чесне повідомлення; чат живий, жодного стек-трейса", tone: "good" });
@@ -186,7 +186,7 @@ D.titleSlide({
   const s = D.slide({ num: "07", title: "Помилки мають бути швидкими", pill: "absorb", notes: N() });
   D.code(s, { x: MX, y: 1.9, w: 12.1, h: 1.1, size: 13, lines: [
     [{ t: "# gateway/litellm-config.yaml", c: P.dim }],
-    [{ t: "num_retries: 0", c: "C3E88D" }, { t: "   # тепер ви знаєте, навіщо", c: P.dim }],
+    [{ t: "num_retries: 0", c: "177245" }, { t: "   # тепер ви знаєте, навіщо", c: P.dim }],
   ] });
   D.band(s, { x: MX, y: 3.25, w: 12.1, h: 1.3, tone: "crit", label: "Приховані ретраї в кількох шарах",
     text: "Бюджети часу перемножуються: два ретраї в адаптері × два в сервісі × таймаут — і «швидка відмова» триває пів хвилини." });
@@ -200,9 +200,9 @@ D.titleSlide({
   const s = D.slide({ num: "08", title: "Circuit breaker: перестати стукати в мертве", pill: "absorb", opt: true, notes: N() });
   D.code(s, { x: MX, y: 1.9, w: 12.1, h: 2.05, size: 12, lines: [
     [{ t: "// [W4 · опційно] 3 збої поспіль → open на 30 с", c: P.dim }],
-    [{ t: "var br = breakers.GetOrAdd(chain[i], _ => new Breaker());", c: "82AAFF" }],
-    [{ t: "if (br.OpenUntil > now)", c: "82AAFF" }],
-    [{ t: "    continue;            ", c: "F78C6C" }, { t: "// у провайдера навіть не питаємо", c: P.dim }],
+    [{ t: "var br = breakers.GetOrAdd(chain[i], _ => new Breaker());", c: "5A05F4" }],
+    [{ t: "if (br.OpenUntil > now)", c: "5A05F4" }],
+    [{ t: "    continue;            ", c: "B45309" }, { t: "// у провайдера навіть не питаємо", c: P.dim }],
   ] });
   D.tile(s, { x: MX, y: 3.9, w: 5.85, h: 1.65, title: "Навіщо",
     body: "перестати витрачати час користувача на виклик, який майже напевно впаде", tone: "good" });

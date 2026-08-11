@@ -111,10 +111,10 @@ D.titleSlide({
     notes: N() });
   D.code(s, { x: MX, y: 1.75, w: 6.1, h: 2.75, size: 11.5, lines: [
     [{ t: "{", c: P.darktext }],
-    [{ t: '  "model"', c: "82AAFF" }, { t: ': "mock",', c: "C3E88D" }],
-    [{ t: '  "messages"', c: "82AAFF" }, { t: ": [", c: P.darktext }],
-    [{ t: '    {"role":"system", "content":"…"},', c: "C3E88D" }],
-    [{ t: '    {"role":"user",   "content":"…"}', c: "C3E88D" }],
+    [{ t: '  "model"', c: "5A05F4" }, { t: ': "mock",', c: "177245" }],
+    [{ t: '  "messages"', c: "5A05F4" }, { t: ": [", c: P.darktext }],
+    [{ t: '    {"role":"system", "content":"…"},', c: "177245" }],
+    [{ t: '    {"role":"user",   "content":"…"}', c: "177245" }],
     [{ t: "  ]", c: P.darktext }],
     [{ t: "}", c: P.darktext }],
     [{ t: "// саме це шле service/Program.cs", c: P.dim }],
@@ -242,7 +242,7 @@ D.titleSlide({
   D.arrow(s, { x: 6.3, y: 3.35, len: 0.9, dir: "down", color: P.good, dashed: true });
   s.addShape("roundRect", { x: 5.25, y: 4.3, w: 2.1, h: 0.62, rectRadius: 0.1, fill: { color: P.goodbg }, line: { type: "none" } });
   s.addText("Лог у БД", { x: 5.25, y: 4.3, w: 2.1, h: 0.62, align: "center", valign: "middle", fontFace: F.mono, fontSize: 12, bold: true, color: P.good, margin: 0 });
-  D.code(s, { x: MX, y: 5.35, w: 5.6, h: 0.72, size: 13, lines: [[{ t: "docker compose up", c: "C3E88D" }, { t: "  # п'ять компонентів", c: P.dim }]] });
+  D.code(s, { x: MX, y: 5.35, w: 5.6, h: 0.72, size: 13, lines: [[{ t: "docker compose up", c: "177245" }, { t: "  # п'ять компонентів", c: P.dim }]] });
   D.band(s, { x: 6.6, y: 5.35, w: 6.12, h: 0.72, tone: "card",
     text: "Ті самі ролі ви зустрінете в будь-якому проді — незалежно від інструментів." });
 }
@@ -287,7 +287,7 @@ D.titleSlide({
   const s = D.slide({ num: "07", title: "Unified log: рядок, з якого виростає весь курс", pill: "absorb",
     notes: N() });
   D.code(s, { x: MX, y: 1.8, w: 12.1, h: 1.0, size: 13, lines: [
-    [{ t: "request_id · model · ", c: P.darktext }, { t: "prompt_version", c: "F78C6C" }, { t: " · latency_ms · prompt_tokens · completion_tokens · ", c: P.darktext }, { t: "cost_usd", c: "F78C6C" }, { t: " · status", c: P.darktext }],
+    [{ t: "request_id · model · ", c: P.darktext }, { t: "prompt_version", c: "B45309" }, { t: " · latency_ms · prompt_tokens · completion_tokens · ", c: P.darktext }, { t: "cost_usd", c: "B45309" }, { t: " · status", c: P.darktext }],
   ] });
   s.addText("помаранчеві поля сьогодні порожні — це ваша робота на два тижні",
     { x: MX, y: 2.9, w: 12, h: 0.3, fontFace: F.body, fontSize: 11.5, italic: true, color: P.faint, margin: 0 });
@@ -336,9 +336,9 @@ D.titleSlide({
   const s = D.slide({ num: "09", title: "Реальний ключ і розширений стек", pill: "absorb", opt: true,
     notes: N() });
   D.code(s, { x: MX, y: 1.8, w: 12.1, h: 1.65, size: 12.5, lines: [
-    [{ t: "cp gateway/.env.example gateway/.env", c: "C3E88D" }, { t: "   # вписати ключ", c: P.dim }],
-    [{ t: "MODEL=назва-моделі docker compose up", c: "C3E88D" }, { t: "   # реальний провайдер", c: P.dim }],
-    [{ t: "docker compose --profile advanced up", c: "C3E88D" }, { t: "   # + Redis (W3)", c: P.dim }],
+    [{ t: "cp gateway/.env.example gateway/.env", c: "177245" }, { t: "   # вписати ключ", c: P.dim }],
+    [{ t: "MODEL=назва-моделі docker compose up", c: "177245" }, { t: "   # реальний провайдер", c: P.dim }],
+    [{ t: "docker compose --profile advanced up", c: "177245" }, { t: "   # + Redis (W3)", c: P.dim }],
   ] });
   D.tile(s, { x: MX, y: 3.75, w: 3.9, h: 1.9, title: "Зміниться", body: "якість відповідей, багатоходовий діалог, цифри вартості", tone: "card" });
   D.tile(s, { x: 4.72, y: 3.75, w: 3.9, h: 1.9, title: "Не зміниться", body: "жоден механізм контуру: routing, лог, кеш, fallback, гейти", tone: "acc" });

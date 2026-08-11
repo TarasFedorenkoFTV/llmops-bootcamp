@@ -15,7 +15,7 @@ const P = {
   bg: "FFFFFF", card: "FFFFFF", ink: "111318", soft: "555B66", faint: "9AA1AD", line: "E6E7EC",
   acc: "5A05F4", acctint: "EFEAFE", accsoft: "C9B8FB",
   good: "1B8A5A", goodbg: "E9F4EF", warn: "9A5B12", warnbg: "F8F0E2", crit: "C62A2A", critbg: "FBE9E9",
-  dark: "141018", darktext: "ECE8F6", dim: "6A7385",
+  codebg: "F5F4FA", darktext: "23262F", dim: "8A7FA6",
   cover: "1B0942", coverGlow: "3A1189", coverInk: "FFFFFF", coverSub: "C9B8FB",
 };
 const F = { body: "Montserrat", mono: "Courier New" };
@@ -277,7 +277,7 @@ function createDeck({ lesson, week, fileTitle, notes: reader }) {
   }
 
   function code(s, { x, y, w, h, lines, size = 12 }) {
-    s.addShape("roundRect", { x, y, w, h, rectRadius: 0.12, fill: { color: P.dark }, line: { type: "none" } });
+    s.addShape("roundRect", { x, y, w, h, rectRadius: 0.12, fill: { color: P.codebg }, line: { color: P.line, width: 1 } });
     const runs = [];
     lines.forEach((ln, i) => ln.forEach((sg, j) =>
       runs.push({ text: sg.t, options: { fontFace: F.mono, fontSize: size, color: sg.c || P.darktext, breakLine: j === ln.length - 1 && i < lines.length - 1 } })));

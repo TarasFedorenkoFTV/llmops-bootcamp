@@ -64,7 +64,7 @@ D.titleSlide({
 {
   const s = D.slide({ num: "02", title: "Один лог-рядок — джерело всього", pill: "absorb", notes: N() });
   D.code(s, { x: MX, y: 1.9, w: 12.1, h: 0.85, size: 12.5, lines: [
-    [{ t: "requests: request_id · model · prompt_version · latency_ms · tokens · cost_usd · status", c: "82AAFF" }],
+    [{ t: "requests: request_id · model · prompt_version · latency_ms · tokens · cost_usd · status", c: "5A05F4" }],
   ] });
   [["Трейс", "за request_id відновлюється шлях: яка модель, яка версія, скільки тривало"],
    ["Метрика", "p95 по latency_ms, error rate як частка не-200, сума cost_usd"],
@@ -104,10 +104,10 @@ D.titleSlide({
 {
   const s = D.slide({ num: "04", title: "Розтин: GET /observability", pill: "absorb", notes: N() });
   D.code(s, { x: MX, y: 1.9, w: 12.1, h: 2.15, size: 11.5, lines: [
-    [{ t: "SELECT count(*),", c: "82AAFF" }],
+    [{ t: "SELECT count(*),", c: "5A05F4" }],
     [{ t: "  COALESCE(percentile_cont(0.95) WITHIN GROUP (ORDER BY latency_ms), 0),", c: P.darktext }],
     [{ t: "  COALESCE(AVG(CASE WHEN status <> '200' THEN 1.0 ELSE 0 END) * 100, 0)", c: P.darktext }],
-    [{ t: "FROM requests WHERE created_at::date = CURRENT_DATE;", c: "82AAFF" }],
+    [{ t: "FROM requests WHERE created_at::date = CURRENT_DATE;", c: "5A05F4" }],
   ] });
   D.tile(s, { x: MX, y: 4.3, w: 5.85, h: 1.75, title: "З бази: requests · p95 · error rate",
     body: "переживають рестарт, історичні — по них видно тренд", tone: "good" });

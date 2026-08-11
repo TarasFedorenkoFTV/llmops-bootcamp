@@ -113,7 +113,7 @@ D.titleSlide({
   const s = D.slide({ num: "04", title: "Шов підстановки: тут народжується injection", pill: "absorb", notes: N() });
   D.code(s, { x: MX, y: 1.9, w: 12.1, h: 1.5, size: 13, lines: [
     [{ t: "// так робити не треба", c: P.dim }],
-    [{ t: "var systemPrompt = template + ", c: P.darktext }, { t: '"\\n\\nДані клієнта: "', c: "C3E88D" }, { t: " + customerNotes;", c: P.darktext }],
+    [{ t: "var systemPrompt = template + ", c: P.darktext }, { t: '"\\n\\nДані клієнта: "', c: "177245" }, { t: " + customerNotes;", c: P.darktext }],
   ] });
   D.flow(s, { x: MX, y: 3.7, w: 12.1, h: 0.8, size: 11.5, items: [
     { label: "ваші правила" }, { label: "+ дані клієнта", tone: "crit" }, { label: "один потік тексту для моделі", tone: "crit" }] });
@@ -127,8 +127,8 @@ D.titleSlide({
   D.code(s, { x: MX, y: 1.9, w: 12.1, h: 2.05, size: 12.5, lines: [
     [{ t: "// шаблон із реєстру: \"Ти асистент підтримки {service}. Відповідай {lang}.\"", c: P.dim }],
     [{ t: "var systemPrompt = template", c: P.darktext }],
-    [{ t: '    .Replace("{service}", "SupportGW")', c: "82AAFF" }],
-    [{ t: '    .Replace("{lang}", "українською");', c: "82AAFF" }],
+    [{ t: '    .Replace("{service}", "SupportGW")', c: "5A05F4" }],
+    [{ t: '    .Replace("{lang}", "українською");', c: "5A05F4" }],
     [{ t: "// дані користувача сюди НЕ підставляються — вони йдуть окремим user-повідомленням", c: P.dim }],
   ] });
   D.band(s, { x: MX, y: 4.25, w: 12.1, h: 1.75, tone: "crit", label: "Типова помилка",
@@ -139,14 +139,14 @@ D.titleSlide({
 {
   const s = D.slide({ num: "05", title: "Реєстр у базі: розтин таблиці prompts", pill: "absorb", notes: N() });
   D.code(s, { x: MX, y: 1.85, w: 6.6, h: 2.9, size: 12, lines: [
-    [{ t: "CREATE TABLE IF NOT EXISTS prompts (", c: "82AAFF" }],
+    [{ t: "CREATE TABLE IF NOT EXISTS prompts (", c: "5A05F4" }],
     [{ t: "  name        TEXT NOT NULL,", c: P.darktext }],
     [{ t: "  version     TEXT NOT NULL,", c: P.darktext }],
     [{ t: "  body        TEXT NOT NULL,", c: P.darktext }],
     [{ t: "  active      BOOLEAN NOT NULL DEFAULT false,", c: P.darktext }],
     [{ t: "  created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),", c: P.darktext }],
-    [{ t: "  PRIMARY KEY (name, version)", c: "F78C6C" }],
-    [{ t: ");", c: "82AAFF" }],
+    [{ t: "  PRIMARY KEY (name, version)", c: "B45309" }],
+    [{ t: ");", c: "5A05F4" }],
   ] });
   D.tile(s, { x: 7.6, y: 1.85, w: 5.12, h: 1.4, title: "У стартері таблиця порожня", body: "навмисно: наповнюєте ви — v1 і v2", tone: "warn" });
   D.tile(s, { x: 7.6, y: 3.4, w: 5.12, h: 1.35, title: "Ключ (name, version)", body: "одна назва — багато версій, кожна незмінна" });
@@ -159,8 +159,8 @@ D.titleSlide({
   const s = D.slide({ num: "06", title: "Сервіс читає реєстр — і пише версію в лог", pill: "absorb", notes: N() });
   D.code(s, { x: MX, y: 1.85, w: 7.2, h: 1.85, size: 12, lines: [
     [{ t: "// [W1] промпт беремо з реєстру — активну версію, а не хардкод", c: P.dim }],
-    [{ t: "SELECT", c: "82AAFF" }, { t: " version, body ", c: P.darktext }, { t: "FROM", c: "82AAFF" }, { t: " prompts", c: P.darktext }],
-    [{ t: "WHERE", c: "82AAFF" }, { t: " active = true ", c: P.darktext }, { t: "ORDER BY", c: "82AAFF" }, { t: " created_at DESC LIMIT 1;", c: P.darktext }],
+    [{ t: "SELECT", c: "5A05F4" }, { t: " version, body ", c: P.darktext }, { t: "FROM", c: "5A05F4" }, { t: " prompts", c: P.darktext }],
+    [{ t: "WHERE", c: "5A05F4" }, { t: " active = true ", c: P.darktext }, { t: "ORDER BY", c: "5A05F4" }, { t: " created_at DESC LIMIT 1;", c: P.darktext }],
   ] });
   D.tile(s, { x: 8.2, y: 1.85, w: 4.52, h: 1.85, title: "Fail-visible", body: "реєстр порожній → версія «none» і дефолт без «support»: поломка помітна", tone: "crit" });
   D.flow(s, { x: MX, y: 4.15, w: 12.1, h: 0.8, size: 11.5, items: [
@@ -173,9 +173,9 @@ D.titleSlide({
 {
   const s = D.slide({ num: "07", title: "Promote і rollback — одна операція", pill: "absorb", notes: N() });
   D.code(s, { x: MX, y: 1.85, w: 6.4, h: 1.45, size: 13, lines: [
-    [{ t: "UPDATE", c: "82AAFF" }, { t: " prompts", c: P.darktext }],
-    [{ t: "   SET", c: "82AAFF" }, { t: " active = (version = @v)", c: P.darktext }],
-    [{ t: " WHERE", c: "82AAFF" }, { t: " name = 'support-system';", c: P.darktext }],
+    [{ t: "UPDATE", c: "5A05F4" }, { t: " prompts", c: P.darktext }],
+    [{ t: "   SET", c: "5A05F4" }, { t: " active = (version = @v)", c: P.darktext }],
+    [{ t: " WHERE", c: "5A05F4" }, { t: " name = 'support-system';", c: P.darktext }],
   ] });
   D.tile(s, { x: 7.35, y: 1.85, w: 5.37, h: 1.45, title: "Атомарно", body: "не існує моменту, коли активні дві версії або жодної", tone: "good" });
   [["Невідома версія → 404", "чесна відмова, не тихе «ок»: одруківка не деактивує все"],
@@ -201,7 +201,7 @@ D.titleSlide({
   const s = D.slide({ num: "08", title: "Чому mock відчуває промпт", pill: "absorb", notes: N() });
   D.code(s, { x: MX, y: 1.85, w: 12.1, h: 1.15, size: 12.5, lines: [
     [{ t: "// «розумні» відповіді — тільки коли промпт правильний", c: P.dim }],
-    [{ t: "var promptOk = system.Contains(", c: P.darktext }, { t: '"support"', c: "C3E88D" }, { t: ", StringComparison.OrdinalIgnoreCase);", c: P.darktext }],
+    [{ t: "var promptOk = system.Contains(", c: P.darktext }, { t: '"support"', c: "177245" }, { t: ", StringComparison.OrdinalIgnoreCase);", c: P.darktext }],
   ] });
   D.flow(s, { x: MX, y: 3.3, w: 12.1, h: 0.75, size: 11.5, items: [
     { label: "v1 «You are an assistant.»", tone: "crit" }, { label: "маркера немає" }, { label: "«не знаю»", tone: "crit" }] });

@@ -64,11 +64,11 @@ D.titleSlide({
 {
   const s = D.slide({ num: "02", title: "tool_calls — прохання, не подія", pill: "absorb", notes: N() });
   D.code(s, { x: MX, y: 1.9, w: 12.1, h: 2.05, size: 11.5, lines: [
-    [{ t: '"message": {', c: "82AAFF" }],
+    [{ t: '"message": {', c: "5A05F4" }],
     [{ t: '  "role": "assistant",', c: P.darktext }],
-    [{ t: '  "content": "Перевіряю статус вашого замовлення…",', c: "C3E88D" }],
-    [{ t: '  "tool_calls": [ { "function": { "name": "lookup_order", … } } ]', c: "F78C6C" }],
-    [{ t: '}, "finish_reason": "tool_calls"', c: "82AAFF" }],
+    [{ t: '  "content": "Перевіряю статус вашого замовлення…",', c: "177245" }],
+    [{ t: '  "tool_calls": [ { "function": { "name": "lookup_order", … } } ]', c: "B45309" }],
+    [{ t: '}, "finish_reason": "tool_calls"', c: "5A05F4" }],
   ] });
   D.flow(s, { x: MX, y: 4.3, w: 12.1, h: 0.8, size: 11.5, items: [
     { label: "модель попросила", tone: "acc" }, { label: "сервіс вирішує" }, { label: "сервіс виконує", tone: "good" }] });
@@ -104,11 +104,11 @@ D.titleSlide({
   const s = D.slide({ num: "04", title: "Виконання: реєстр як одна функція", pill: "absorb", notes: N() });
   D.code(s, { x: MX, y: 1.9, w: 12.1, h: 2.5, size: 11.5, lines: [
     [{ t: "// [W3] мінімальний реєстр інструментів", c: P.dim }],
-    [{ t: "static string? RunTool(string name) => name switch {", c: "82AAFF" }],
-    [{ t: '    "lookup_order"  => "статус: оплачено, доставку призначено",', c: "C3E88D" }],
-    [{ t: '    "create_ticket" => "тікет #T-" + Guid.NewGuid()…,', c: "C3E88D" }],
-    [{ t: "    _ => null,", c: "F78C6C" }],
-    [{ t: "};", c: "82AAFF" }],
+    [{ t: "static string? RunTool(string name) => name switch {", c: "5A05F4" }],
+    [{ t: '    "lookup_order"  => "статус: оплачено, доставку призначено",', c: "177245" }],
+    [{ t: '    "create_ticket" => "тікет #T-" + Guid.NewGuid()…,', c: "177245" }],
+    [{ t: "    _ => null,", c: "B45309" }],
+    [{ t: "};", c: "5A05F4" }],
     [{ t: "var result = RunTool(toolCall);", c: P.darktext }],
     [{ t: 'if (result != null) answer += $" ({result})";', c: P.darktext }],
   ] });

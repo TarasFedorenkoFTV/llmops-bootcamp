@@ -76,15 +76,15 @@ D.titleSlide({
 {
   const s = D.slide({ num: "03", title: "Розтин конфіга: дві «моделі» на одному mock", pill: "absorb", notes: N() });
   D.code(s, { x: MX, y: 1.85, w: 7.0, h: 3.5, size: 11, lines: [
-    [{ t: "model_list:", c: "82AAFF" }],
-    [{ t: "  - model_name: ", c: P.darktext }, { t: "mock-mini", c: "C3E88D" }],
-    [{ t: "    litellm_params:", c: "82AAFF" }],
+    [{ t: "model_list:", c: "5A05F4" }],
+    [{ t: "  - model_name: ", c: P.darktext }, { t: "mock-mini", c: "177245" }],
+    [{ t: "    litellm_params:", c: "5A05F4" }],
     [{ t: "      model: openai/mock", c: P.darktext }],
     [{ t: "      api_base: http://mock-provider:9000/v1", c: P.darktext }],
-    [{ t: "  - model_name: ", c: P.darktext }, { t: "mock-strong", c: "C3E88D" }],
-    [{ t: "    litellm_params:   ", c: "82AAFF" }, { t: "# той самий mock", c: P.dim }],
+    [{ t: "  - model_name: ", c: P.darktext }, { t: "mock-strong", c: "177245" }],
+    [{ t: "    litellm_params:   ", c: "5A05F4" }, { t: "# той самий mock", c: P.dim }],
     [{ t: "      model: openai/mock", c: P.darktext }],
-    [{ t: "litellm_settings:", c: "82AAFF" }],
+    [{ t: "litellm_settings:", c: "5A05F4" }],
     [{ t: "  drop_params: true", c: P.darktext }],
     [{ t: "  num_retries: 0    ", c: P.darktext }, { t: "# збої йдуть у сервіс", c: P.dim }],
   ] });
@@ -109,13 +109,13 @@ D.titleSlide({
   const s = D.slide({ num: "04", title: "Route(): роутер на десять рядків", pill: "absorb", notes: N() });
   D.code(s, { x: MX, y: 1.85, w: 12.1, h: 2.35, size: 11.5, lines: [
     [{ t: "// [W2] routing: ескалація → сильна, решта → дешева", c: P.dim }],
-    [{ t: "static string Route(string message, string def) {", c: "82AAFF" }],
+    [{ t: "static string Route(string message, string def) {", c: "5A05F4" }],
     [{ t: '  if (def != "mock") return def;   ', c: P.darktext }, { t: "// реальний ключ", c: P.dim }],
     [{ t: "  var u = message.ToLowerInvariant();", c: P.darktext }],
     [{ t: '  bool escalation = u.Contains("поверн") || u.Contains("терміново")', c: P.darktext }],
     [{ t: '                 || u.Contains("refund")  || u.Contains("скарг");', c: P.darktext }],
-    [{ t: '  return escalation ? "mock-strong" : "mock-mini";', c: "C3E88D" }],
-    [{ t: "}", c: "82AAFF" }],
+    [{ t: '  return escalation ? "mock-strong" : "mock-mini";', c: "177245" }],
+    [{ t: "}", c: "5A05F4" }],
   ] });
   D.flow(s, { x: MX, y: 4.55, w: 12.1, h: 0.8, size: 11.5, items: [
     { label: "повідомлення" }, { label: "маркери ескалації", tone: "acc" }, { label: "mock-strong", tone: "crit" }] });
@@ -197,8 +197,8 @@ D.titleSlide({
 {
   const s = D.slide({ num: "08", title: "Додати провайдера — без зміни коду", pill: "absorb", notes: N() });
   D.code(s, { x: MX, y: 1.9, w: 12.1, h: 1.9, size: 12, lines: [
-    [{ t: "  - model_name: ", c: P.darktext }, { t: "azure-gpt-4o", c: "C3E88D" }],
-    [{ t: "    litellm_params:", c: "82AAFF" }],
+    [{ t: "  - model_name: ", c: P.darktext }, { t: "azure-gpt-4o", c: "177245" }],
+    [{ t: "    litellm_params:", c: "5A05F4" }],
     [{ t: "      model: azure/gpt-4o", c: P.darktext }],
     [{ t: "      api_base: os.environ/AZURE_API_BASE", c: P.darktext }],
     [{ t: "      api_key:  os.environ/AZURE_API_KEY", c: P.darktext }],
