@@ -30,7 +30,7 @@ D.titleSlide({
    ["10","Лабораторна"],["11","Антипатерни"],
   ].forEach(([n, t], i) => D.tile(s, { x: MX + (i % 3) * 4.05, y: 1.8 + Math.floor(i / 3) * 1.15, w: 3.85, h: 0.95,
       badge: n, title: t, tone: n === "08" ? "warn" : "card" }));
-  D.band(s, { x: MX, y: 6.4, w: 12.1, h: 0.62, tone: "card", text: "Reliability — не «щоб не падало». Падатиме. Щоб падіння було керованим." });
+  D.band(s, { x: MX, y: 6.32, w: 12.1, h: 0.44, tone: "card", text: "Reliability — не «щоб не падало». Падатиме. Щоб падіння було керованим." });
 }
 
 {
@@ -63,7 +63,7 @@ D.titleSlide({
 
 {
   const s = D.slide({ num: "02", title: "Retry ≠ fallback: словник рішень", pill: "absorb", notes: N() });
-  D.table(s, { x: MX, y: 1.9, w: 12.1, colW: [3.1, 4.5, 4.5], rowH: 0.62, size: 11.5,
+  D.table(s, { x: MX, y: 1.9, w: 12.1, colW: [3.1, 4.5, 4.5], rowH: 0.56, size: 11.5,
     head: ["", "retry", "fallback"],
     rows: [
       { cells: ["Що робить", "ще раз туди само", "в інше місце: інша модель"] },

@@ -46,7 +46,7 @@ D.titleSlide({
     const isOpt = n === "09";
     D.tile(s, { x, y, w: 3.85, h: 0.95, badge: n, title: t, tone: isOpt ? "warn" : (i < 5 ? "acc" : "card") });
   });
-  D.band(s, { x: MX, y: 6.4, w: 12.1, h: 0.62, tone: "card",
+  D.band(s, { x: MX, y: 6.32, w: 12.1, h: 0.44, tone: "card",
     text: "Перші п'ять блоків — об'єкт керування. Наступні — каркас, який ви будуватимете шість тижнів." });
 }
 
