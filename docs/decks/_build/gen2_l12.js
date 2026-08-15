@@ -74,7 +74,7 @@ D.titleSlide({
   let cx = MX;
   map.forEach(([t, u]) => {
     const w = 1.15;
-    s.addShape("roundRect", { x: cx, y: 4.95, w, h: 0.55, rectRadius: 0.08, fill: { color: P.accbg }, line: { type: "none" } });
+    s.addShape("roundRect", { x: cx, y: 4.95, w, h: 0.55, rectRadius: 0.08, fill: { color: P.acctint }, line: { type: "none" } });
     s.addText(t + "\n" + u, { x: cx, y: 4.95, w, h: 0.55, align: "center", valign: "middle", fontFace: F.mono, fontSize: 8.5, bold: true, color: P.acc, margin: 0 });
     cx += w + 0.11;
   });
@@ -93,9 +93,9 @@ D.titleSlide({
       { cells: ["Переконатися", "як зрозуміти, що відпустило?", "нове питання (не з кешу) відповідає; fallback не росте"], tone: "acc" },
     ] });
   D.band(s, { x: MX, y: 4.85, w: 12.1, h: 1.05, tone: "good",
-    text: "Найчастіша «дія» у добре збудованій системі — не робити нічого руками: механізми вже відпрацювали, лишається стежити." });
+    text: "Найчастіша «дія» у добре збудованій системі — не робити нічого руками." });
   D.band(s, { x: MX, y: 6.0, w: 12.1, h: 0.6, tone: "warn",
-    text: "Такт «Переконатися» перевіряють новим питанням: старе вже в кеші й «зеленіє» навіть під час збою." });
+    text: "Такт «Переконатися» перевіряють новим питанням: старе вже в кеші." });
 }
 
 {
@@ -250,7 +250,7 @@ D.titleSlide({
     const y = 2.0 + i * 1.0;
     s.addShape("roundRect", { x: MX, y, w: 12.1, h: 0.85, rectRadius: 0.1, fill: { color: P.card }, line: { color: P.line, width: 1 } });
     s.addShape("ellipse", { x: MX + 0.22, y: y + 0.21, w: 0.42, h: 0.42, fill: { color: P.critbg }, line: { type: "none" } });
-    s.addText("✕", { x: MX + 0.22, y: y + 0.21, w: 0.42, h: 0.42, align: "center", valign: "middle", fontFace: F.body, fontSize: 13, bold: true, color: P.crit, margin: 0 });
+    D.cross(s, { x: MX + 0.22, y: y + 0.21, size: 0.42, color: P.crit });
     s.addText([{ text: t + "   ", options: { bold: true, fontSize: 13.5, color: P.ink } },
                { text: b, options: { fontSize: 12, color: P.soft } }],
       { x: MX + 0.8, y, w: 11.1, h: 0.85, fontFace: F.body, valign: "middle", margin: 0 });

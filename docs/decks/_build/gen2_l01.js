@@ -64,7 +64,7 @@ D.titleSlide({
     { term: "mock-провайдер", def: "фейкова модель: падає на замовлення, реагує на промпт" },
   ] });
   D.band(s, { x: MX, y: 4.95, w: 12.1, h: 0.85, tone: "card",
-    text: "Незнайоме слово — нормально: кожне розберемо на місці. Тут вони лише щоб не спотикатися по ходу." });
+    text: "Кожне розберемо на місці — тут лише щоб не спотикатися." });
 }
 
 // ─── S5 · 01 проблема ───
@@ -97,7 +97,7 @@ D.titleSlide({
   ];
   props.forEach(([tt, bb], i) => D.tile(s, { x: MX + i * 3.08, y: 1.75, w: 2.9, h: 1.72, badge: i + 1, title: tt, body: bb, tone: "acc" }));
   D.band(s, { x: MX, y: 3.8, w: 12.1, h: 1.25, tone: "card", label: "Теза курсу",
-    text: "LLMOps — не про те, як покликати модель, а як експлуатувати її як production-сервіс: керувати вартістю, надійністю, якістю і видимістю." });
+    text: "LLMOps — це експлуатація моделі як production-сервісу." });
   D.flow(s, { x: MX, y: 5.4, w: 12.1, h: 0.66, size: 11, items: [
     { label: "W1 промпти", tone: "acc" }, { label: "W2 гроші" }, { label: "W3 кеш і дії" },
     { label: "W4 надійність" }, { label: "W5 видимість" }, { label: "W6 гейт" }] });
@@ -166,7 +166,7 @@ D.titleSlide({
   s.addText("схематично: порядок величин, а не точні коефіцієнти — прайс розбираємо в уроці 4",
     { x: 4.6, y: 4.5, w: 8.12, h: 0.3, fontFace: F.body, fontSize: 10, italic: true, color: P.faint, margin: 0 });
   D.band(s, { x: 4.6, y: 5.0, w: 8.12, h: 1.4, tone: "good", label: "Принцип",
-    text: "Вартість не виводиться з кількості запитів. Тому в лозі вхідні й вихідні токени стоять окремо — без них будь-яка цифра вартості вигадана." });
+    text: "Без окремих вхідних і вихідних токенів цифра вартості вигадана." });
 }
 
 // ─── S9 · 04 недетермінізм ───
@@ -178,7 +178,7 @@ D.titleSlide({
   D.flow(s, { x: MX, y: 3.6, w: 12.1, h: 0.7, size: 11.5, items: [
     { label: "той самий запит", tone: "acc" }, { label: "temperature = 0" }, { label: "інші слова у відповіді", tone: "crit" }] });
   D.band(s, { x: MX, y: 4.85, w: 12.1, h: 1.35, tone: "good", label: "Принцип",
-    text: "Перевіряємо властивості, а не рядки: чи є потрібне, чи немає забороненого, чи тримається формат. На цьому стоїть golden dataset уроку 10 — expect і forbid, а не «дорівнює»." });
+    text: "Перевіряємо властивості, а не рядки: expect і forbid, не «дорівнює»." });
 }
 
 // ─── S10 · 04 латентність ───
@@ -187,21 +187,21 @@ D.titleSlide({
     notes: N() });
   // діаграма: смуга часу з двох частин
   s.addText("КОРОТКА ВІДПОВІДЬ", { x: MX, y: 1.75, w: 3, h: 0.28, fontFace: F.mono, fontSize: 9.5, bold: true, color: P.faint, charSpacing: 1, margin: 0 });
-  s.addShape("roundRect", { x: MX, y: 2.1, w: 2.2, h: 0.6, rectRadius: 0.08, fill: { color: P.accbg }, line: { type: "none" } });
+  s.addShape("roundRect", { x: MX, y: 2.1, w: 2.2, h: 0.6, rectRadius: 0.08, fill: { color: P.acctint }, line: { type: "none" } });
   s.addText("час до 1-го токена", { x: MX, y: 2.1, w: 2.2, h: 0.6, align: "center", valign: "middle", fontFace: F.body, fontSize: 10.5, color: P.acc, margin: 0 });
   s.addShape("roundRect", { x: MX + 2.25, y: 2.1, w: 1.5, h: 0.6, rectRadius: 0.08, fill: { color: P.acc }, line: { type: "none" } });
   s.addText("генерація", { x: MX + 2.25, y: 2.1, w: 1.5, h: 0.6, align: "center", valign: "middle", fontFace: F.body, fontSize: 10.5, bold: true, color: "FFFFFF", margin: 0 });
 
   s.addText("ТРИ АБЗАЦИ — ТА САМА МОДЕЛЬ, ТОЙ САМИЙ ПРОВАЙДЕР", { x: MX, y: 3.1, w: 7, h: 0.28, fontFace: F.mono, fontSize: 9.5, bold: true, color: P.faint, charSpacing: 1, margin: 0 });
-  s.addShape("roundRect", { x: MX, y: 3.45, w: 2.2, h: 0.6, rectRadius: 0.08, fill: { color: P.accbg }, line: { type: "none" } });
+  s.addShape("roundRect", { x: MX, y: 3.45, w: 2.2, h: 0.6, rectRadius: 0.08, fill: { color: P.acctint }, line: { type: "none" } });
   s.addText("час до 1-го токена", { x: MX, y: 3.45, w: 2.2, h: 0.6, align: "center", valign: "middle", fontFace: F.body, fontSize: 10.5, color: P.acc, margin: 0 });
   s.addShape("roundRect", { x: MX + 2.25, y: 3.45, w: 6.6, h: 0.6, rectRadius: 0.08, fill: { color: P.acc }, line: { type: "none" } });
   s.addText("генерація: послідовно, токен за токеном", { x: MX + 2.25, y: 3.45, w: 6.6, h: 0.6, align: "center", valign: "middle", fontFace: F.body, fontSize: 11, bold: true, color: "FFFFFF", margin: 0 });
-  s.addText("схематично: співвідношення часток, а не виміряні значення — конкретні числа побачите у власному лозі",
+  s.addText("схематично: співвідношення часток, не виміряні значення",
     { x: MX, y: 4.12, w: 12.1, h: 0.3, fontFace: F.body, fontSize: 10.5, italic: true, color: P.faint, margin: 0 });
 
   D.band(s, { x: MX, y: 4.55, w: 12.1, h: 1.3, tone: "crit", label: "Типова помилка",
-    text: "Читати p95 як характеристику інфраструктури. Зростання p95 однаково легко означає «відповіді подовшали», як і «провайдеру погано» — тому latency у лозі живе поряд із вихідними токенами." });
+    text: "p95 росте і від довших відповідей, і від проблем провайдера." });
   s.addText([{ text: "time-to-first-token", options: { fontFace: F.mono, bold: true, color: P.acc } },
              { text: " — метрика для інтерфейсів, де відповідь друкується на очах. Стрімінг — свідомо за межами курсу.", options: { color: P.soft } }],
     { x: MX, y: 6.0, w: 12.1, h: 0.5, fontFace: F.body, fontSize: 12, valign: "top", margin: 0 });
@@ -228,7 +228,7 @@ D.titleSlide({
     s.addText(v, { x: 7.34, y: y + 0.58, w: 5, h: 0.5, fontFace: F.body, fontSize: 12, color: P.soft, margin: 0 });
   });
   D.band(s, { x: MX, y: 5.55, w: 12.1, h: 0.85, tone: "card",
-    text: "Дві праві категорії — причина, чому цей курс існує: їх ловить лише власний лог, перевірки якості та гейт." });
+    text: "Дві праві категорії ловить лише власний лог і гейт якості." });
 }
 
 // ─── S12 · 06 шлях запиту ───
@@ -275,9 +275,9 @@ D.titleSlide({
   s.addText("Gateway-адаптер", { x: 7.17, y: 2.35, w: 5.2, h: 0.55, fontFace: F.body, fontSize: 26, bold: true, color: P.ink, margin: 0 });
   s.addText("виклик · згладжування API · зберігання ключів", { x: 7.17, y: 2.95, w: 5.2, h: 0.8, fontFace: F.body, fontSize: 12.5, color: P.soft, valign: "top", margin: 0 });
   D.band(s, { x: MX, y: 4.2, w: 5.85, h: 1.85, tone: "good", label: "Принцип",
-    text: "Ключ провайдера живе тільки в gateway. Секрет у коді застосунку = контуру керування ще немає." });
+    text: "Ключ живе тільки в gateway — інакше контуру керування немає." });
   D.band(s, { x: 6.87, y: 4.2, w: 5.85, h: 1.85, tone: "crit", label: "Типова помилка",
-    text: "Віддати рішення адаптеру: тоді ви вчитеся клікати прапорці інструмента, а не будувати механізм." });
+    text: "Рішення в адаптері — ви клікаєте прапорці, а не будуєте механізм." });
   s.addText("Інструменти змінюються — механізми лишаються.",
     { x: MX, y: 6.25, w: 12, h: 0.35, fontFace: F.body, fontSize: 12.5, italic: true, bold: true, color: P.ink, margin: 0 });
 }
@@ -299,7 +299,7 @@ D.titleSlide({
     s.addText(f, { x: MX, y, w: 2.9, h: 0.5, fontFace: F.mono, fontSize: 11, bold: true, color: P.acc, valign: "middle", margin: 0 });
     D.arrow(s, { x: MX + 3.0, y: y + 0.25, len: 0.55 });
     s.addText(v, { x: MX + 3.7, y, w: 7.2, h: 0.5, fontFace: F.body, fontSize: 12.5, color: P.ink, valign: "middle", margin: 0 });
-    s.addShape("roundRect", { x: 11.95, y: y + 0.09, w: 0.77, h: 0.32, rectRadius: 0.06, fill: { color: P.accbg }, line: { type: "none" } });
+    s.addShape("roundRect", { x: 11.95, y: y + 0.09, w: 0.77, h: 0.32, rectRadius: 0.06, fill: { color: P.acctint }, line: { type: "none" } });
     s.addText(w, { x: 11.95, y: y + 0.09, w: 0.77, h: 0.32, align: "center", valign: "middle", fontFace: F.mono, fontSize: 9, bold: true, color: P.acc, margin: 0 });
   });
   D.band(s, { x: MX, y: 6.4, w: 12.1, h: 0.52, tone: "good", text: "Немає лога — немає операцій." });
@@ -326,7 +326,7 @@ D.titleSlide({
   D.flow(s, { x: 7.1, y: 3.15, w: 5.62, h: 0.62, size: 11, items: [
     { label: "промпт зламано", tone: "crit" }, { label: "«не знаю»" }] });
   D.band(s, { x: 7.1, y: 4.1, w: 5.62, h: 1.5, tone: "acc",
-    text: "Тому регресію промпта видно автоматично: зламали — перевірки почервоніли. На тижні 5–6 це стане гейтом у CI." });
+    text: "Регресію промпта видно автоматично: зламали — почервоніло." });
   D.band(s, { x: 7.1, y: 5.75, w: 5.62, h: 1.05, tone: "card", label: "Чому це переноситься на прод",
     text: "Механіка контуру однакова; міняється лише «мозок» на іншому кінці дроту." });
 }
@@ -343,7 +343,7 @@ D.titleSlide({
   D.tile(s, { x: MX, y: 3.75, w: 3.9, h: 1.9, title: "Зміниться", body: "якість відповідей, багатоходовий діалог, цифри вартості", tone: "card" });
   D.tile(s, { x: 4.72, y: 3.75, w: 3.9, h: 1.9, title: "Не зміниться", body: "жоден механізм контуру: routing, лог, кеш, fallback, гейти", tone: "acc" });
   D.band(s, { x: 8.82, y: 3.75, w: 3.9, h: 1.9, tone: "warn", label: "Лайфхак",
-    text: "Берете ключ — одразу поставте ліміт витрат у кабінеті провайдера. Перша операційна звичка курсу." });
+    text: "Берете ключ — одразу ставте ліміт витрат у провайдера." });
   s.addText("Радимо не вмикати в перші тижні: на mock видно механіку, а не магію моделі.",
     { x: MX, y: 5.9, w: 12, h: 0.35, fontFace: F.body, fontSize: 12, italic: true, color: P.soft, margin: 0 });
 }
@@ -431,7 +431,7 @@ D.titleSlide({
     const y = 1.85 + i * 0.95;
     s.addShape("roundRect", { x: MX, y, w: 12.1, h: 0.8, rectRadius: 0.1, fill: { color: P.card }, line: { color: P.line, width: 1 } });
     s.addShape("ellipse", { x: MX + 0.22, y: y + 0.19, w: 0.42, h: 0.42, fill: { color: P.critbg }, line: { type: "none" } });
-    s.addText("✕", { x: MX + 0.22, y: y + 0.19, w: 0.42, h: 0.42, align: "center", valign: "middle", fontFace: F.body, fontSize: 13, bold: true, color: P.crit, margin: 0 });
+    D.cross(s, { x: MX + 0.22, y: y + 0.19, size: 0.42, color: P.crit });
     s.addText([{ text: tt + "   ", options: { bold: true, fontSize: 14, color: P.ink } },
                { text: bb, options: { fontSize: 12.5, color: P.soft } }],
       { x: MX + 0.8, y, w: 11.1, h: 0.8, fontFace: F.body, valign: "middle", margin: 0 });
@@ -462,7 +462,7 @@ D.closingSlide({
     "unified log — рядок, з якого виростає весь курс",
   ],
   nextTitle: "Наступний крок → Урок 2 · Prompt lifecycle: промпт як production-артефакт",
-  nextBody: "Сьогодні ваш системний промпт захардкоджений у коді — і це остання доба, коли це прийнятно. Далі: версії, promote і rollback; що стається з якістю, коли «маленьку правку промпта» викочують без сліду; і як зробити відкат за секунди замість розкопок «а як там було вчора».",
+  nextBody: "Ваш системний промпт захардкоджений у коді — і це остання доба, коли це прийнятно. Далі: версії, promote, rollback і відкат за секунди.",
   notes: N(),
 });
 

@@ -83,13 +83,15 @@ D.titleSlide({
 {
   const s = D.slide({ num: "03", title: "Анатомія промпта: що саме ви версіонуєте", pill: "absorb",
     kicker: "Чотири частини — і те, як кожна ламається", notes: N() });
-  D.layers(s, { x: MX, y: 1.85, w: 12.1, h: 0.85, gap: 0.14, items: [
+  // заголовок тут 2-рядковий + кікер, тож маркер формату опускається до 1.86 —
+  // контент починаємо нижче, а місце добираємо меншим проміжком між шарами
+  D.layers(s, { x: MX, y: 1.94, w: 12.1, h: 0.85, gap: 0.1, items: [
     { label: "Роль і межа", body: "ким модель себе вважає · без межі консультує з будь-чого вашим голосом", tone: "acc" },
     { label: "Правила", body: "тон, довжина, коли ескалювати · побажання не змінюють нічого" },
     { label: "Формат", body: "структура відповіді · «як вийде» перетворює парсинг на лотерею" },
     { label: "Приклади", body: "1–5 показових пар · їдуть у кожному запиті й коштують грошей" },
   ] });
-  D.band(s, { x: MX, y: 5.95, w: 12.1, h: 0.8, tone: "good", label: "Принцип",
+  D.band(s, { x: MX, y: 5.88, w: 12.1, h: 0.8, tone: "good", label: "Принцип",
     text: "Разом ці чотири частини — одна незмінна версія. Змінили будь-яку — це нова версія, а не «трохи підправив»." });
 }
 
@@ -313,7 +315,7 @@ D.titleSlide({
     const y = 2.0 + i * 1.0;
     s.addShape("roundRect", { x: MX, y, w: 12.1, h: 0.85, rectRadius: 0.1, fill: { color: P.card }, line: { color: P.line, width: 1 } });
     s.addShape("ellipse", { x: MX + 0.22, y: y + 0.21, w: 0.42, h: 0.42, fill: { color: P.critbg }, line: { type: "none" } });
-    s.addText("✕", { x: MX + 0.22, y: y + 0.21, w: 0.42, h: 0.42, align: "center", valign: "middle", fontFace: F.body, fontSize: 13, bold: true, color: P.crit, margin: 0 });
+    D.cross(s, { x: MX + 0.22, y: y + 0.21, size: 0.42, color: P.crit });
     s.addText([{ text: t + "   ", options: { bold: true, fontSize: 13.5, color: P.ink } },
                { text: b, options: { fontSize: 12, color: P.soft } }],
       { x: MX + 0.8, y, w: 11.1, h: 0.85, fontFace: F.body, valign: "middle", margin: 0 });

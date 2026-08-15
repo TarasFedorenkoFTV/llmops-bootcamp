@@ -16,6 +16,14 @@ def boxes(xml):
             continue
         x, y = int(off.group(1)) / EMU, int(off.group(2)) / EMU
         w, h = int(ext.group(1)) / EMU, int(ext.group(2)) / EMU
+        # УВАГА: для таблиць pptxgenjs пише <a:ext cy> = рівно 1.00in незалежно від
+        # реальної висоти. Через це детектор міряв кожну таблицю як один дюйм і
+        # НЕ БАЧИВ наїздів таблиці на те, що стоїть під нею. Реальна висота — сума
+        # висот рядків (rowH у PowerPoint є мінімумом, але pptxgenjs віддає саме її).
+        if m.group(1) == "graphicFrame" and "<a:tbl>" in body:
+            rows = [int(r) for r in re.findall(r'<a:tr h="(\d+)"', body)]
+            if rows:
+                h = sum(rows) / EMU
         txt = " ".join(re.findall(r"<a:t(?:\s[^>]*)?>(.*?)</a:t>", body, re.S)).strip()
         # чи має форма заливку (фон) — тоді текст поверх неї це норма
         filled = bool(re.search(r"<a:solidFill>", body.split("<p:txBody>")[0] if "<p:txBody>" in body else body))

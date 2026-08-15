@@ -20,9 +20,52 @@ const P = {
 };
 const F = { body: "Montserrat", mono: "Courier New" };
 const W = 13.333, H = 7.5, MX = 0.62;
-// Зона під відео експерта — верхній правий кут (не ставимо туди суттєвого)
-const VZ = { x: 8.35, y: 0, w: W - 8.35, h: 3.3 };
-const TITLE_R = VZ.x - 0.25;   // праву межу заголовка тримаємо ліворуч від відео
+
+// ── метрики Montserrat SemiBold/Bold для заголовків ──────────────────────────
+// Ширини глифів (1/1000 em) для символів, що трапляються в заголовках. Потрібні,
+// щоб ЗНАТИ на етапі генерації, чи заголовок переноситься на другий рядок:
+// бокс заголовка має фіксовану висоту + valign:middle, тож 2-рядковий заголовок
+// росте ВНИЗ і накриває те, що стоїть під ним на фіксованому y (кікер, маркер).
+// Перевірено: збігається з кернінговим виміром PowerPoint на всіх 264 заголовках.
+const TITLE_W = (() => {
+  // формат: символ + РІВНО 4 цифри ширини (є глифи ширші за 1000: m, Ш, Щ, —)
+  const src = " 0283%0877'0230(0357)0358+0599,0262-0386.0262/0392006791039230592505958066090637:0262=0599?0589A0766B0765C0733E0671F0639G0771H0808I0328K0740L0604M0955O0844P0732R0735S0638T0618U0788X0714_0500a0617b0690c0591d0692e0631f0387g0700h0691i0301j0307k0660l0301m1049n0691o0655p0690q0690r0431s0531t0435u0687v0598x0595y0598«0568»0568×0599І0335А0799Б0738В0745Г0593Д0831З0656К0735Л0799М0963Н0817О0842П0812Р0724С0726Т0637У0724Ч0749Ш1098Щ1130Я0734а0604б0673в0622г0514д0701е0643ж0913з0563и0710й0710к0642л0666м0815н0694о0654п0685р0694с0592т0535у0614ф0849х0592ц0704ч0634ш0971щ0971ь0605ю0903я0628є0592і0305ї0301—1000≠0599";
+  const m = Object.create(null);
+  for (let i = 0; i + 4 < src.length + 1; i += 5) m[src[i]] = +src.slice(i + 1, i + 5);
+  return m;
+})();
+const TITLE_SIZE = 24;
+// Реальний крок рядка Montserrat у PowerPoint (winAscent+winDescent = 1.379 em),
+// зміряний на рендері: 69 px при 144 ppi = 0.479 in для 24 pt.
+const TITLE_LINE = (1109 + 270) / 1000 * TITLE_SIZE / 72;
+// На скільки зсувати все під заголовком за КОЖЕН додатковий рядок: бокс росте вниз
+// на пів рядка, але 0.045" «повітря» під останнім рядком у ньому вже було —
+// стільки становив зазор між низом літер і плашкою в однорядковому випадку.
+const TITLE_DROP = TITLE_LINE / 2 - 0.045;
+
+// Скільки рядків займе заголовок у боксі шириною avail (дюйми).
+function titleLines(text, avail) {
+  const wid = (s) => {
+    let t = 0;
+    for (const ch of s) t += TITLE_W[ch] !== undefined ? TITLE_W[ch] : 600;
+    return t / 1000 * TITLE_SIZE / 72;
+  };
+  let n = 0;
+  for (const para of String(text).split("\n")) {
+    let cur = "", k = 1;
+    for (const word of para.split(" ")) {
+      const t = cur ? cur + " " + word : word;
+      if (wid(t) <= avail || !cur) cur = t; else { k++; cur = word; }
+    }
+    n += k;
+  }
+  return n;
+}
+// Права межа заголовків: 8.10" ≈ 61% ширини. Це комфортна довжина рядка для 24 pt
+// Montserrat (~55-60 знаків); ширші заголовки читаються гірше з задніх рядів.
+// (Раніше межу виводили з «зони під відео експерта» у правому куті — відеовставок
+// у колодах немає, тож зона скасована, а значення лишилося як типографське.)
+const TITLE_R = 8.10;
 const WEEKS = ["W1 Основа + промпти", "W2 Routing + cost", "W3 Кеш + tools", "W4 Надійність + безпека", "W5 Observability + evals", "W6 CI + фінал"];
 const TONE = {
   acc:  { bg: P.acctint, fg: P.acc },
@@ -98,8 +141,19 @@ function createDeck({ lesson, week, fileTitle, notes: reader }) {
       s.addText(label, { x: cx, y: 6.35, w: cw, h: 0.34, align: "center", valign: "middle", fontFace: F.mono, fontSize: 9, bold: on, color: on ? "FFFFFF" : P.coverSub, margin: 0 });
       cx += cw + 0.12;
     });
+    pushNotes(s, notes);
     script.push({ n: idx, title, notes });
     return s;
+  }
+
+  // Начитка з LNN-script.md → панель нотаток PowerPoint. Без цього виклику текст
+  // ходив по колу (md → script[] → md) і в .pptx не потрапляв: усі 288 нотаток були
+  // порожні. Нотатки — місце для повного тексту виступу (Redundancy Principle),
+  // слайд лишається візуальною опорою.
+  function pushNotes(s, notes) {
+    const t = String(notes || "").trim();
+    if (!t) return;
+    s.addNotes(t.replace(/\*\*(.+?)\*\*/g, "$1").replace(/[ \t]+\n/g, "\n"));
   }
 
   function slide({ num, title, kicker, pill, opt, notes }) {
@@ -111,13 +165,18 @@ function createDeck({ lesson, week, fileTitle, notes: reader }) {
       x += 0.78;
     }
     s.addText(title, { x, y: 0.42, w: TITLE_R - x, h: 0.66, fontFace: F.body, fontSize: 24, bold: true, color: P.ink, valign: "middle", margin: 0 });
-    let ty = 1.12;
+    // Бокс заголовка — фіксовані 0.66" з valign:middle, тож 2-рядковий заголовок
+    // росте вниз на пів рядка. Усе, що нижче, зсуваємо на цю саму величину,
+    // інакше плашка маркера (малюється ПІСЛЯ тексту) зрізає хвости літер р/у/ф/ц/j.
+    const tDrop = (titleLines(title, TITLE_R - x) - 1) * TITLE_DROP;
+    let ty = 1.12 + tDrop;
     if (kicker) {
       // Montserrat ширший за Calibri: довгий кікер переноситься на 2 рядки —
       // маркер ставимо під фактичний низ кікера, а не на фіксовану висоту.
       const kLines = String(kicker).length > 74 ? 2 : 1;
-      s.addText(kicker, { x, y: 1.1, w: TITLE_R - x, h: kLines * 0.24 + 0.04, fontFace: F.body, fontSize: 13, color: P.soft, valign: "top", lineSpacingMultiple: 1.0, margin: 0 });
-      ty = 1.1 + kLines * 0.24 + 0.05;
+      const ky = 1.1 + tDrop;
+      s.addText(kicker, { x, y: ky, w: TITLE_R - x, h: kLines * 0.24 + 0.04, fontFace: F.body, fontSize: 13, color: P.soft, valign: "top", lineSpacingMultiple: 1.0, margin: 0 });
+      ty = ky + kLines * 0.24 + 0.05;
     }
     // маркер формату — маленька фіолетова плашка під заголовком (ліворуч, поза відео-зоною)
     let mx = x;
@@ -134,6 +193,7 @@ function createDeck({ lesson, week, fileTitle, notes: reader }) {
     if (opt) marker("ОПЦІЙНО", P.warnbg, P.warn);
     logo(s);
     s.slideNumber = { x: W - 0.9, y: H - 0.46, w: 0.4, h: 0.3, fontFace: F.mono, fontSize: 8.5, color: P.faint };
+    pushNotes(s, notes);
     script.push({ n: idx, title, notes });
     return s;
   }
@@ -152,6 +212,7 @@ function createDeck({ lesson, week, fileTitle, notes: reader }) {
     s.addShape("roundRect", { x: MX, y: y0, w: 12.1, h: H - y0 - 0.7, rectRadius: 0.14, fill: { color: "FFFFFF" }, line: { type: "none" } });
     s.addText(nextTitle, { x: MX + 0.28, y: y0 + 0.22, w: 11.5, h: 0.35, fontFace: F.body, fontSize: 15, bold: true, color: P.acc, margin: 0 });
     s.addText(nextBody, { x: MX + 0.28, y: y0 + 0.62, w: 11.5, h: H - y0 - 1.55, fontFace: F.body, fontSize: 12.5, color: P.ink, valign: "top", lineSpacingMultiple: 1.15, margin: 0 });
+    pushNotes(s, notes);
     script.push({ n: idx, title: "Підсумок і наступний крок", notes });
     return s;
   }
@@ -296,13 +357,34 @@ function createDeck({ lesson, week, fileTitle, notes: reader }) {
     s.addTable(data, { x, y, w, colW, rowH, border: { pt: 0.5, color: P.line }, fontFace: F.body, valign: "middle", fill: { color: P.card }, margin: 0.08 });
   }
 
+  // ✓ і ✕ (U+2713 / U+2715) ВІДСУТНІ і в Montserrat, і в Courier New — PowerPoint
+  // підставляв чужу гарнітуру (тонкі волосяні штрихи не в стилі бренду). Малюємо
+  // їх двома повернутими прямокутниками: гарнітурної залежності немає взагалі.
+  function tick(s, { x, y, size = 0.28, color = P.acc }) {
+    const k = size / 0.28, cx = x + size / 2, cy = y + size / 2, th = 0.030 * k;
+    const seg = (len, mx, my, rot) => s.addShape("rect", {
+      x: cx + mx * k - (len * k) / 2, y: cy + my * k - th / 2, w: len * k, h: th,
+      rotate: rot, fill: { color }, line: { type: "none" },
+    });
+    seg(0.0636, -0.0395, 0.0275, 45);   // коротке плече, вниз-праворуч
+    seg(0.1328, 0.0255, -0.0010, -50);  // довге плече, вгору-праворуч
+  }
+
+  function cross(s, { x, y, size = 0.42, color = P.crit }) {
+    const cx = x + size / 2, cy = y + size / 2, len = size * 0.46, th = size * 0.082;
+    [45, -45].forEach(rot => s.addShape("rect", {
+      x: cx - len / 2, y: cy - th / 2, w: len, h: th,
+      rotate: rot, fill: { color }, line: { type: "none" },
+    }));
+  }
+
   function checklist(s, { x, y, w, items, cols = 1 }) {
     const per = Math.ceil(items.length / cols), cw = w / cols;
     items.forEach((it, i) => {
       const col = Math.floor(i / per), row = i % per;
       const xx = x + col * cw, yy = y + row * 0.62;
       s.addShape("roundRect", { x: xx, y: yy + 0.06, w: 0.28, h: 0.28, rectRadius: 0.06, fill: { color: P.acctint }, line: { color: P.acc, width: 1 } });
-      s.addText("✓", { x: xx, y: yy + 0.06, w: 0.28, h: 0.28, align: "center", valign: "middle", fontFace: F.body, fontSize: 10, bold: true, color: P.acc, margin: 0 });
+      tick(s, { x: xx, y: yy + 0.06, size: 0.28, color: P.acc });
       s.addText(it, { x: xx + 0.42, y: yy, w: cw - 0.6, h: 0.42, fontFace: F.body, fontSize: 12.5, color: P.ink, valign: "middle", margin: 0 });
     });
   }
@@ -346,7 +428,8 @@ function createDeck({ lesson, week, fileTitle, notes: reader }) {
   }
 
   return { pres, P, F, W, H, MX, TONE, titleSlide, slide, closingSlide,
-           stat, tile, arrow, flow, bars, states, layers, timeline, band, code, table, checklist, terms, save };
+           stat, tile, arrow, flow, bars, states, layers, timeline, band, code, table, checklist, terms,
+           tick, cross, save };
 }
 
 module.exports = { createDeck, notesFrom, P, F, W, H, MX };

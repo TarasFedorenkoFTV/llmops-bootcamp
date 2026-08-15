@@ -68,9 +68,9 @@ D.titleSlide({
   s.addText("Адаптер", { x: 7.17, y: 2.3, w: 5.2, h: 0.5, fontFace: F.body, fontSize: 24, bold: true, color: P.ink, margin: 0 });
   s.addText("формат помилок, автентифікація, ліміти на поля — нормалізує адаптер", { x: 7.17, y: 2.85, w: 5.2, h: 0.7, fontFace: F.body, fontSize: 12, color: P.soft, valign: "top", margin: 0 });
   D.band(s, { x: MX, y: 3.95, w: 5.85, h: 1.9, tone: "good", label: "Принцип",
-    text: "Рішення — це код: його читають, тестують, логують і пояснюють на розборі. Конфіг чужого інструмента — рішення, яке ви орендуєте." });
+    text: "Рішення — це код. Конфіг чужого інструмента — орендоване рішення." });
   D.band(s, { x: 6.87, y: 3.95, w: 5.85, h: 1.9, tone: "crit", label: "Типова помилка",
-    text: "Побачити роутинг у документації адаптера і віддати рішення туди: механізми переносяться, прапорці — ні." });
+    text: "Віддати роутинг адаптеру: механізми переносяться, прапорці — ні." });
 }
 
 {
@@ -163,9 +163,9 @@ D.titleSlide({
     { label: "питання 1 → сильна", tone: "crit" }, { label: "питання 2 → дешева", tone: "warn" }, { label: "питання 3 → сильна", tone: "crit" }] });
   s.addText("співрозмовник у користувача змінюється посеред розмови", { x: MX, y: 3.05, w: 12, h: 0.3, fontFace: F.body, fontSize: 12, italic: true, color: P.soft, margin: 0 });
   D.band(s, { x: MX, y: 3.6, w: 12.1, h: 1.35, tone: "good", label: "Лікування",
-    text: "Маршрут, який не диктується задачею, тримайте стабільним у межах сесії: вибір за хешем ідентифікатора розмови, а не заново на кожну репліку. Ескалація — виняток." });
+    text: "Маршрут стабільний у межах сесії: вибір за хешем розмови, не на кожну репліку." });
   D.band(s, { x: MX, y: 5.15, w: 12.1, h: 1.25, tone: "crit", label: "Типова помилка",
-    text: "Роутинг за випадковим числом «щоб рівномірно розподілити»: непередбачувано для користувача і невідтворювано для вас." });
+    text: "Роутинг за випадковим числом: непередбачувано і невідтворювано." });
 }
 
 {
@@ -279,7 +279,7 @@ D.titleSlide({
     const y = 2.0 + i * 1.0;
     s.addShape("roundRect", { x: MX, y, w: 12.1, h: 0.85, rectRadius: 0.1, fill: { color: P.card }, line: { color: P.line, width: 1 } });
     s.addShape("ellipse", { x: MX + 0.22, y: y + 0.21, w: 0.42, h: 0.42, fill: { color: P.critbg }, line: { type: "none" } });
-    s.addText("✕", { x: MX + 0.22, y: y + 0.21, w: 0.42, h: 0.42, align: "center", valign: "middle", fontFace: F.body, fontSize: 13, bold: true, color: P.crit, margin: 0 });
+    D.cross(s, { x: MX + 0.22, y: y + 0.21, size: 0.42, color: P.crit });
     s.addText([{ text: t + "   ", options: { bold: true, fontSize: 13.5, color: P.ink } },
                { text: b, options: { fontSize: 12, color: P.soft } }],
       { x: MX + 0.8, y, w: 11.1, h: 0.85, fontFace: F.body, valign: "middle", margin: 0 });
