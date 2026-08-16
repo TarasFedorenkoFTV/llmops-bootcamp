@@ -74,11 +74,17 @@ D.titleSlide({
 
 {
   const s = D.slide({ num: "02", title: "Червоний прогін сам по собі merge не блокує", pill: "absorb", notes: N() });
-  D.layers(s, { x: MX, y: 1.95, w: 7.4, h: 0.78, gap: 0.12, items: [
+  D.layers(s, { x: MX, y: 1.95, w: 7.4, h: 0.66, gap: 0.12, items: [
     { label: "Settings → Branches", body: "у репозиторії, де живе ваш main" },
     { label: "Add branch protection", body: "захищаємо гілку main", tone: "acc" },
     { label: "Require status checks", body: "перевірка стає обов'язковою", tone: "acc" },
     { label: "Вибрати чек eval", body: "саме job, не workflow", tone: "crit" },
+  ] });
+  // Чотири кроки налаштування — це інструкція. Ланцюг показує, ЩО з чим зчеплене:
+  // protection блокує мерж лише тоді, коли посилається на job, який справді біжить.
+  D.flow(s, { x: MX, y: 5.05, w: 7.4, h: 0.46, size: 9, items: [
+    { label: "PR" }, { label: "job eval", tone: "acc" },
+    { label: "protection", tone: "good" }, { label: "merge", tone: "crit" },
   ] });
   D.band(s, { x: 8.35, y: 1.95, w: 4.37, h: 2.4, tone: "crit", label: "Пастка: job, а не workflow",
     text: "У списку — назва job (eval), а не workflow. Неіснуючий чек нічого не блокує." });

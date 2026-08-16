@@ -135,14 +135,34 @@ D.titleSlide({
 
 {
   const s = D.slide({ num: "05", title: "Що йде через чергу — і що таке HITL-театр", pill: "absorb", notes: N() });
-  D.layers(s, { x: MX, y: 1.95, w: 12.1, h: 0.78, gap: 0.12, items: [
+  D.layers(s, { x: MX, y: 1.95, w: 12.1, h: 0.66, gap: 0.12, items: [
     { label: "Незворотність", body: "насамперед: підтвердження вимагає не «важливе», а те, що не можна скасувати", tone: "acc" },
     { label: "Ціна помилки", body: "сума, юридична вага, репутаційний наслідок" },
     { label: "Чутливість даних", body: "дія торкається персональних або фінансових даних" },
   ] });
-  D.band(s, { x: MX, y: 4.75, w: 12.1, h: 1.45, tone: "crit", label: "Типова помилка: HITL-театр",
-    text: "Черга є, кнопка є, а людина штампує approve не читаючи. Це не контроль, а затримка перед тією самою дією — і хибне відчуття безпеки в усіх причетних." });
-  D.band(s, { x: MX, y: 6.2, w: 12.1, h: 0.6, tone: "card",
+  // Три критерії — це вхід у ОДНЕ рішення, і саме розгалуження тут головне:
+  // читання йде далі одразу, незворотне впирається в чергу з людиною.
+  {
+    const cy = 4.71, bh = 0.5;
+    const box = (x, w, label, tone, y, h) => {
+      const c = D.TONE[tone] || D.TONE.card;
+      s.addShape("roundRect", { x, y: y ?? cy - bh / 2, w, h: h ?? bh, rectRadius: 0.08,
+        fill: { color: c.bg }, line: tone === "card" ? { color: P.line, width: 1 } : { type: "none" } });
+      s.addText(label, { x, y: y ?? cy - bh / 2, w, h: h ?? bh, align: "center", valign: "middle",
+        fontFace: F.mono, fontSize: 10, bold: true, color: c.fg, margin: 0 });
+    };
+    box(MX, 1.9, "дія моделі", "card");
+    D.arrow(s, { x: 2.62, y: cy, len: 0.38 });
+    box(3.0, 2.3, "незворотна?", "acc");
+    D.arrow(s, { x: 5.4, y: cy, len: 0.38 });
+    box(5.85, 3.2, "ні — виконати одразу", "good", 4.36, 0.32);
+    box(5.85, 3.2, "так — черга і людина", "warn", 4.74, 0.32);
+    D.arrow(s, { x: 9.15, y: cy, len: 0.38 });
+    box(9.6, 3.12, "слід у лозі", "acc");
+  }
+  D.band(s, { x: MX, y: 5.26, w: 12.1, h: 0.9, tone: "crit", label: "Типова помилка: HITL-театр",
+    text: "Черга є, кнопка є, а людина штампує approve не читаючи. Це затримка перед тією самою дією і хибне відчуття безпеки." });
+  D.band(s, { x: MX, y: 6.26, w: 12.1, h: 0.5, tone: "card",
     text: "У нас незворотна дія одна — create_ticket; список росте, принцип відбору ні." });
 }
 

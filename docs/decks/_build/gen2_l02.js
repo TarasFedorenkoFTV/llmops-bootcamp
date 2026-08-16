@@ -193,8 +193,28 @@ D.titleSlide({
   [["Ділити за користувачем", "не за запитом: інакше одна людина отримає дві манери — поміряєте плутанину"],
    ["Метрика — заздалегідь", "назвати метрику й тривалість: інакше експеримент вічний"],
    ["Відкат — одна операція", "та сама активація; експеримент без виходу — не експеримент"],
-  ].forEach(([t, b], i) => D.tile(s, { x: MX + i * 4.05, y: 2.0, w: 3.85, h: 2.0, badge: i + 1, title: t, body: b, tone: "acc" }));
-  D.band(s, { x: MX, y: 4.4, w: 12.1, h: 1.2, tone: "card",
+  ].forEach(([t, b], i) => D.tile(s, { x: MX + i * 4.05, y: 2.0, w: 3.85, h: 1.65, badge: i + 1, title: t, body: b, tone: "acc" }));
+  // Розгалуження трафіку: три картки описують ПРАВИЛА експерименту, але не його
+  // форму. Схема показує, де саме відбувається поділ і що з гілок зводиться назад.
+  {
+    const cy = 4.30, bh = 0.5;
+    const box = (x, w, label, tone, y, h) => {
+      const c = D.TONE[tone] || D.TONE.card;
+      s.addShape("roundRect", { x, y: y ?? cy - bh / 2, w, h: h ?? bh, rectRadius: 0.08,
+        fill: { color: c.bg }, line: tone === "card" ? { color: P.line, width: 1 } : { type: "none" } });
+      s.addText(label, { x, y: y ?? cy - bh / 2, w, h: h ?? bh, align: "center", valign: "middle",
+        fontFace: F.mono, fontSize: 10, bold: true, color: c.fg, margin: 0 });
+    };
+    box(MX, 1.9, "трафік", "card");
+    D.arrow(s, { x: 2.62, y: cy, len: 0.38 });
+    box(3.0, 2.3, "хеш(user_id)", "acc");
+    D.arrow(s, { x: 5.4, y: cy, len: 0.38 });
+    box(5.85, 2.3, "v1 · 50%", "good", 3.83, 0.42);
+    box(5.85, 2.3, "v2 · 50%", "warn", 4.35, 0.42);
+    D.arrow(s, { x: 8.25, y: cy, len: 0.38 });
+    box(8.7, 4.0, "порівняння метрики", "acc");
+  }
+  D.band(s, { x: MX, y: 5.0, w: 12.1, h: 1.15, tone: "card",
     text: "Активні дві версії; «кому яку» вирішує той самий шар, що обирає модель (урок 3). У курсі це не обов'язкова доріжка — але механізм у вас уже буде." });
 }
 

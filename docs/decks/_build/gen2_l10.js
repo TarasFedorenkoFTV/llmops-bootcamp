@@ -168,14 +168,30 @@ D.titleSlide({
 
 {
   const s = D.slide({ num: "07", title: "Поріг: чому не 100%", pill: "absorb", notes: N() });
-  D.stat(s, { x: MX, y: 1.95, w: 3.9, h: 1.6, value: "5 / 6", label: "дефолтний поріг стартера", tone: "acc", size: 34 });
-  D.tile(s, { x: 4.72, y: 1.95, w: 8.0, h: 1.6, title: "Чому не всі шість",
+  D.stat(s, { x: MX, y: 1.95, w: 3.9, h: 1.4, value: "5 / 6", label: "дефолтний поріг стартера", tone: "acc", size: 34 });
+  D.tile(s, { x: 4.72, y: 1.95, w: 8.0, h: 1.4, title: "Чому не всі шість",
     body: "недетермінізм робить сотку крихкою: один мигаючий кейс — і червоне ігнорують" });
-  D.layers(s, { x: MX, y: 3.75, w: 12.1, h: 0.72, gap: 0.12, items: [
+  // «5 / 6» — це число. Шість квадратів, де п'ять із галочкою і один із хрестиком,
+  // показують те саме як стан набору: прогін зелений, і один кейс має право впасти.
+  {
+    const gy = 3.58, side = 0.46, pitch = 0.58;
+    for (let i = 0; i < 6; i++) {
+      const gx = MX + i * pitch, pass = i < 5;
+      s.addShape("roundRect", { x: gx, y: gy, w: side, h: side, rectRadius: 0.08,
+        fill: { color: pass ? P.goodbg : P.critbg }, line: { type: "none" } });
+      if (pass) D.tick(s, { x: gx + 0.09, y: gy + 0.09, size: side - 0.18, color: P.good });
+      else D.cross(s, { x: gx + 0.07, y: gy + 0.07, size: side - 0.14, color: P.crit });
+    }
+    s.addText([{ text: "прогін зелений  ", options: { bold: true, color: P.good } },
+               { text: "— один кейс має право впасти, і поріг це визнає заздалегідь", options: { color: P.soft } }],
+      { x: MX + 6 * pitch + 0.35, y: gy, w: 12.72 - (MX + 6 * pitch + 0.35), h: side,
+        fontFace: F.body, fontSize: 12.5, valign: "middle", margin: 0 });
+  }
+  D.layers(s, { x: MX, y: 4.38, w: 12.1, h: 0.66, gap: 0.12, items: [
     { label: "Поріг у двох місцях", body: "у команді прогону і в CI — вони мусять збігатися", tone: "warn" },
     { label: "Зміна порогу — реліз", body: "обговорена зміна контракту, а не правка «щоб позеленіло»", tone: "crit" },
   ] });
-  D.band(s, { x: MX, y: 5.35, w: 12.1, h: 1.05, tone: "good",
+  D.band(s, { x: MX, y: 5.95, w: 12.1, h: 0.75, tone: "good",
     text: "Поріг N−1 на малих наборах, далі — відсоток. Safety-кейси не падають ніколи." });
 }
 
