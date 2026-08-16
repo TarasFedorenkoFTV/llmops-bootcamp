@@ -92,12 +92,29 @@ D.titleSlide({
 
 {
   const s = D.slide({ num: "03", title: "Нормалізація — рішення про еквівалентність", pill: "absorb", notes: N() });
-  D.layers(s, { x: MX, y: 1.95, w: 12.1, h: 0.9, gap: 0.16, items: [
+  D.layers(s, { x: MX, y: 1.95, w: 12.1, h: 0.72, gap: 0.16, items: [
     { label: "Зайві пробіли", body: "безпечно: на зміст повідомлення не впливає", tone: "good" },
     { label: "Нижній регістр", body: "майже завжди правда: регістр рідко змінює зміст питання" },
     { label: "Прибрати пунктуацію", body: "вже не завжди: «не працює. оплата пройшла» ≠ «не працює оплата, пройшла»", tone: "crit" },
   ] });
-  D.band(s, { x: MX, y: 5.2, w: 12.1, h: 1.2, tone: "acc", label: "Те саме правило, що з ключем",
+  // Три однакові рядки подають кроки як рівновіддалені. Вони не рівновіддалені:
+  // перші два майже безкоштовні, третій — стрибок у зону, де змінюється зміст.
+  {
+    const ay = 4.86, x0 = MX + 0.9, w = 10.3;
+    s.addShape("line", { x: x0, y: ay, w, h: 0, line: { color: P.line, width: 1.5 } });
+    [[0.08, P.good, "пробіли"], [0.30, P.acc, "регістр"], [0.88, P.crit, "пунктуація"]]
+      .forEach(([f, c, lbl]) => {
+        s.addShape("ellipse", { x: x0 + w * f - 0.07, y: ay - 0.07, w: 0.14, h: 0.14,
+          fill: { color: c }, line: { type: "none" } });
+        s.addText(lbl, { x: x0 + w * f - 1.1, y: ay - 0.36, w: 2.2, h: 0.24, align: "center",
+          fontFace: F.mono, fontSize: 9, bold: true, color: c, margin: 0 });
+      });
+    s.addText("безпечно", { x: x0 - 0.9, y: ay + 0.1, w: 1.8, h: 0.22,
+      fontFace: F.mono, fontSize: 8.5, color: P.faint, margin: 0 });
+    s.addText("змінює зміст", { x: x0 + w - 1.1, y: ay + 0.1, w: 2.0, h: 0.22, align: "right",
+      fontFace: F.mono, fontSize: 8.5, color: P.faint, margin: 0 });
+  }
+  D.band(s, { x: MX, y: 5.42, w: 12.1, h: 1.1, tone: "acc", label: "Те саме правило, що з ключем",
     text: "Нормалізація — частина контракту коректності: найдешевший спосіб підняти hit ratio і саме тому найнебезпечніший. Кожен крок має бути свідомим." });
 }
 

@@ -61,14 +61,32 @@ D.titleSlide({
 
 {
   const s = D.slide({ num: "02", title: "Golden dataset — контракт поведінки", pill: "absorb", notes: N() });
-  D.layers(s, { x: MX, y: 1.95, w: 12.1, h: 0.78, gap: 0.12, items: [
+  D.layers(s, { x: MX, y: 1.95, w: 12.1, h: 0.66, gap: 0.12, items: [
     { label: "expect", body: "що мусить бути у відповіді: ключові слова, факти", tone: "good" },
     { label: "forbid", body: "чого бути не має: «не знаю» на типове питання — провал", tone: "crit" },
     { label: "expect_refusal", body: "очікуємо відмову: red-team кейси з уроку 8", tone: "acc" },
   ] });
-  D.band(s, { x: MX, y: 4.7, w: 12.1, h: 1.4, tone: "good", label: "Принцип",
+  // Три поля виглядають як три незалежні поняття. Насправді це три предикати над
+  // ОДНІЄЮ відповіддю, і кейс проходить лише тоді, коли справдилися всі три.
+  {
+    const cy = 4.71;
+    const box = (x, w, label, tone, y, h) => {
+      const c = D.TONE[tone] || D.TONE.card;
+      s.addShape("roundRect", { x, y, w, h, rectRadius: 0.07,
+        fill: { color: c.bg }, line: tone === "card" ? { color: P.line, width: 1 } : { type: "none" } });
+      s.addText(label, { x, y, w, h, align: "center", valign: "middle",
+        fontFace: F.mono, fontSize: 9.5, bold: true, color: c.fg, margin: 0 });
+    };
+    box(MX, 2.8, "відповідь моделі", "card", cy - 0.24, 0.48);
+    D.arrow(s, { x: 3.52, y: cy, len: 0.38 });
+    [["expect", "good"], ["forbid", "crit"], ["expect_refusal", "acc"]].forEach(([l, t], i) =>
+      box(3.95, 3.6, l, t, 4.35 + i * 0.25, 0.22));
+    D.arrow(s, { x: 7.65, y: cy, len: 0.38 });
+    box(8.1, 4.62, "усі три справдилися — кейс пройшов", "good", cy - 0.24, 0.48);
+  }
+  D.band(s, { x: MX, y: 5.25, w: 12.1, h: 0.9, tone: "good", label: "Принцип",
     text: "Якість — це перелік перевірюваних тверджень, а не відчуття." });
-  D.band(s, { x: MX, y: 6.2, w: 12.1, h: 0.6, tone: "card",
+  D.band(s, { x: MX, y: 6.25, w: 12.1, h: 0.5, tone: "card",
     text: "Репрезентативність важливіша за кількість: 20 правильних > 200 випадкових." });
 }
 

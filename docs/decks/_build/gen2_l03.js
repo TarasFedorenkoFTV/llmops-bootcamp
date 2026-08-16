@@ -233,9 +233,24 @@ D.titleSlide({
   [["FAQ-tier", "типові питання: найдешевша модель або заготовлені відповіді"],
    ["Standard-tier", "звичайний діалог: робоча модель"],
    ["Escalation-tier", "скарги, повернення, юридично чутливе: найсильніша"],
-  ].forEach(([t, b], i) => D.tile(s, { x: MX + i * 4.05, y: 2.0, w: 3.85, h: 1.75, badge: i + 1, title: t, body: b, tone: "acc" }));
-  D.tile(s, { x: MX, y: 4.1, w: 5.85, h: 1.5, title: "Механічно — дешево", body: "ще одна гілка в Route() і ще одне ім'я в конфізі" });
-  D.tile(s, { x: 6.87, y: 4.1, w: 5.85, h: 1.5, title: "Змістовно — вправа на політику", body: "де межі між рівнями і як захистити рішення цифрами з лога", tone: "warn" });
+  ].forEach(([t, b], i) => D.tile(s, { x: MX + i * 4.05, y: 2.0, w: 3.85, h: 1.5, badge: i + 1, title: t, body: b, tone: "acc" }));
+  // Три рівні — не перелік, а сходинка за вартістю. Однакові картки подають їх
+  // як рівноцінні варіанти; сходинка показує, що вибір коштує різних грошей.
+  {
+    const base = 4.4;
+    [[0.26, P.goodbg, P.good, "найдешевша"], [0.44, P.acctint, P.acc, "робоча"],
+     [0.62, P.warnbg, P.warn, "найсильніша"]].forEach(([h, bg, fg, lbl], i) => {
+      const x = MX + i * 4.05;
+      s.addShape("roundRect", { x, y: base - h, w: 3.85, h, rectRadius: 0.06,
+        fill: { color: bg }, line: { color: fg, width: 1 } });
+      s.addText(lbl, { x, y: base - h, w: 3.85, h, align: "center", valign: "middle",
+        fontFace: F.mono, fontSize: 9.5, bold: true, color: fg, margin: 0 });
+    });
+    s.addText("вартість запиту →", { x: MX, y: base + 0.06, w: 5, h: 0.22,
+      fontFace: F.mono, fontSize: 8.5, color: P.faint, charSpacing: 1, margin: 0 });
+  }
+  D.tile(s, { x: MX, y: 4.85, w: 5.85, h: 1.35, title: "Механічно — дешево", body: "ще одна гілка в Route() і ще одне ім'я в конфізі" });
+  D.tile(s, { x: 6.87, y: 4.85, w: 5.85, h: 1.35, title: "Змістовно — вправа на політику", body: "де межі між рівнями і як захистити рішення цифрами з лога", tone: "warn" });
 }
 
 {

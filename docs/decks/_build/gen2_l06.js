@@ -204,13 +204,35 @@ D.titleSlide({
 
 {
   const s = D.slide({ num: "08", title: "Кілька інструментів одразу: паралельно — тільки читання", pill: "absorb", notes: N() });
-  D.tile(s, { x: MX, y: 1.95, w: 5.85, h: 1.8, title: "Паралельно — тільки read-only",
+  D.tile(s, { x: MX, y: 1.95, w: 5.85, h: 1.5, title: "Паралельно — тільки read-only",
     body: "кілька читань можна виконати одночасно: наслідків немає, час економиться", tone: "good" });
-  D.tile(s, { x: 6.87, y: 1.95, w: 5.85, h: 1.8, title: "Side-effecting — послідовно",
-    body: "і стоп на першій помилці: інакше наполовину застосований набір дій, який не відкотити", tone: "crit" });
-  D.band(s, { x: MX, y: 4.0, w: 12.1, h: 1.2, tone: "acc", label: "Контракт стартера",
+  D.tile(s, { x: 6.87, y: 1.95, w: 5.85, h: 1.5, title: "Side-effecting — послідовно",
+    body: "і стоп на першій помилці: інакше наполовину застосований набір дій", tone: "crit" });
+  // Паралельність проти послідовності — суто просторова річ: ліворуч виклики
+  // починаються з однієї вертикалі, праворуч ідуть один за одним у часі.
+  {
+    const bh = 0.24, y0 = 3.66;
+    ["читання 1", "читання 2", "читання 3"].forEach((lbl, i) => {
+      s.addShape("roundRect", { x: 1.35, y: y0 + i * 0.3, w: 2.6, h: bh, rectRadius: 0.05,
+        fill: { color: P.goodbg }, line: { type: "none" } });
+      s.addText(lbl, { x: 1.35, y: y0 + i * 0.3, w: 2.6, h: bh, align: "center", valign: "middle",
+        fontFace: F.mono, fontSize: 8.5, bold: true, color: P.good, margin: 0 });
+    });
+    s.addShape("line", { x: 1.25, y: y0 - 0.06, w: 0, h: 1.0, line: { color: P.good, width: 1.5, dashType: "dash" } });
+    s.addText("одночасно", { x: MX, y: y0 + 0.95, w: 5.85, h: 0.22, align: "center",
+      fontFace: F.mono, fontSize: 8.5, color: P.faint, charSpacing: 1, margin: 0 });
+    ["дія 1", "дія 2", "дія 3"].forEach((lbl, i) => {
+      s.addShape("roundRect", { x: 7.15 + i * 1.85, y: y0 + i * 0.3, w: 1.6, h: bh, rectRadius: 0.05,
+        fill: { color: P.critbg }, line: { type: "none" } });
+      s.addText(lbl, { x: 7.15 + i * 1.85, y: y0 + i * 0.3, w: 1.6, h: bh, align: "center", valign: "middle",
+        fontFace: F.mono, fontSize: 8.5, bold: true, color: P.crit, margin: 0 });
+    });
+    s.addText("одна за одною, стоп на першій помилці", { x: 6.87, y: y0 + 0.95, w: 5.85, h: 0.22,
+      align: "center", fontFace: F.mono, fontSize: 8.5, color: P.faint, charSpacing: 1, margin: 0 });
+  }
+  D.band(s, { x: MX, y: 4.98, w: 12.1, h: 0.82, tone: "acc", label: "Контракт стартера",
     text: "Модель просить один інструмент за раз — але код готовий до кількох." });
-  D.band(s, { x: MX, y: 5.35, w: 12.1, h: 1.05, tone: "crit", label: "Типова помилка",
+  D.band(s, { x: MX, y: 5.92, w: 12.1, h: 0.82, tone: "crit", label: "Типова помилка",
     text: "Ліміт кроків обов'язковий: побачивши результат, модель просить ще виклик." });
 }
 
