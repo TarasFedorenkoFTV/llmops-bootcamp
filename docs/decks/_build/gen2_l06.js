@@ -167,13 +167,31 @@ D.titleSlide({
 
 {
   const s = D.slide({ num: "06", title: "Два рішення, які визначають якість реалізації", pill: "absorb", notes: N() });
-  D.tile(s, { x: MX, y: 1.95, w: 5.85, h: 1.8, title: "Ключ народжує ініціатор",
+  D.tile(s, { x: MX, y: 1.95, w: 5.85, h: 1.5, title: "Ключ народжує ініціатор",
     body: "не виконавець: ключ, народжений на місці виконання, повтор зробить двічі", tone: "acc" });
-  D.tile(s, { x: 6.87, y: 1.95, w: 5.85, h: 1.8, title: "TTL пам'яті про ключі",
+  D.tile(s, { x: 6.87, y: 1.95, w: 5.85, h: 1.5, title: "TTL пам'яті про ключі",
     body: "скільки виконавець пам'ятає оброблені операції — і що станеться після закінчення" });
-  D.band(s, { x: MX, y: 4.0, w: 12.1, h: 1.6, tone: "crit", label: "Типова помилка",
+  // «Хто народжує ключ» — питання позиційне: важливо не що це за ключ, а В ЯКІЙ
+  // точці ланцюга він виник. Схема ставить цю точку на місце, текст — ні.
+  {
+    const cy = 4.02, bh = 0.46;
+    const box = (x, w, label, tone, y, h) => {
+      const c = D.TONE[tone] || D.TONE.card;
+      s.addShape("roundRect", { x, y: y ?? cy - bh / 2, w, h: h ?? bh, rectRadius: 0.08,
+        fill: { color: c.bg }, line: tone === "card" ? { color: P.line, width: 1 } : { type: "none" } });
+      s.addText(label, { x, y: y ?? cy - bh / 2, w, h: h ?? bh, align: "center", valign: "middle",
+        fontFace: F.mono, fontSize: 9.5, bold: true, color: c.fg, margin: 0 });
+    };
+    box(MX, 3.0, "ініціатор створює ключ K", "acc");
+    D.arrow(s, { x: 3.72, y: cy, len: 0.38 });
+    box(4.15, 2.9, "виконавець: бачив K?", "card");
+    D.arrow(s, { x: 7.15, y: cy, len: 0.38 });
+    box(7.6, 5.12, "ні — виконати й запам'ятати K", "good", 3.68, 0.3);
+    box(7.6, 5.12, "так — віддати той самий результат", "warn", 4.06, 0.3);
+  }
+  D.band(s, { x: MX, y: 4.58, w: 12.1, h: 1.15, tone: "crit", label: "Типова помилка",
     text: "Ретрай side-effecting виклику без ключа операції — лотерея з подвійним тікетом." });
-  D.band(s, { x: MX, y: 5.75, w: 12.1, h: 0.65, tone: "good",
+  D.band(s, { x: MX, y: 5.88, w: 12.1, h: 0.6, tone: "good",
     text: "Повторюваним без ключа може бути тільки читання." });
 }
 

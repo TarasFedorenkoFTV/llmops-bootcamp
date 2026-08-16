@@ -102,11 +102,30 @@ D.titleSlide({
     body: "«будь точним», «не вигадуй» — немає нічого, що модель могла б порушити перевірюваним чином", tone: "crit" });
   D.tile(s, { x: 6.87, y: 1.85, w: 5.85, h: 1.8, title: "Перевірювана вимога — дія і межа",
     body: "«немає відповіді — скажи, що не знаєш, і запропонуй заявку»; «не більше трьох речень»", tone: "good" });
-  D.tile(s, { x: MX, y: 3.9, w: 5.85, h: 1.55, title: "Few-shot: 1–5 показових пар",
+  D.tile(s, { x: MX, y: 3.55, w: 5.85, h: 1.3, title: "Few-shot: 1–5 показових пар",
     body: "приклад має демонструвати саме те, що модель робить неправильно" });
-  D.tile(s, { x: 6.87, y: 3.9, w: 5.85, h: 1.55, title: "Ціна прикладів",
+  D.tile(s, { x: 6.87, y: 3.55, w: 5.85, h: 1.3, title: "Ціна прикладів",
     body: "їдуть у кожному запиті — множаться на весь трафік (урок 4)", tone: "warn" });
-  D.band(s, { x: MX, y: 5.7, w: 12.1, h: 0.95, tone: "warn", label: "Лайфхак",
+  // «Множаться на весь трафік» — це множення, і поки воно словами, воно нічого
+  // не важить. Записане як добуток, воно стає рахунком, який видно.
+  {
+    const y = 5.02, h = 0.44;
+    const box = (x, w, label, tone) => {
+      const c = D.TONE[tone] || D.TONE.card;
+      s.addShape("roundRect", { x, y, w, h, rectRadius: 0.07,
+        fill: { color: c.bg }, line: tone === "card" ? { color: P.line, width: 1 } : { type: "none" } });
+      s.addText(label, { x, y, w, h, align: "center", valign: "middle",
+        fontFace: F.mono, fontSize: 9.5, bold: true, color: c.fg, margin: 0 });
+    };
+    const op = (x, sym) => s.addText(sym, { x, y, w: 0.4, h, align: "center", valign: "middle",
+      fontFace: F.mono, fontSize: 13, bold: true, color: P.faint, margin: 0 });
+    box(MX, 3.6, "3 приклади ≈ 400 токенів", "warn");
+    op(4.32, "×");
+    box(4.82, 3.6, "10 000 запитів на тиждень", "card");
+    op(8.52, "=");
+    box(9.02, 3.7, "4 млн токенів щотижня", "crit");
+  }
+  D.band(s, { x: MX, y: 5.68, w: 12.1, h: 0.85, tone: "warn", label: "Лайфхак",
     text: "Стабільне (роль, правила, формат) — на початку, змінне (контекст користувача) — у кінці: провайдери кешують стабільний префікс дешевше." });
 }
 
@@ -259,9 +278,27 @@ D.titleSlide({
 // 10 audit trail — опційно
 {
   const s = D.slide({ num: "10", title: "Audit trail: хто, коли, що активував", pill: "absorb", opt: true, notes: N() });
-  D.tile(s, { x: MX, y: 2.1, w: 5.85, h: 1.9, title: "Журнал активацій", body: "окрема таблиця, куди activate дописує рядок: версія, час, хто", tone: "acc" });
-  D.tile(s, { x: 6.87, y: 2.1, w: 5.85, h: 1.9, title: "Версії з міткою часу", body: "замість ручних v1/v2 — час створення в самій назві версії", tone: "acc" });
-  D.band(s, { x: MX, y: 4.35, w: 12.1, h: 1.2, tone: "card",
+  D.tile(s, { x: MX, y: 2.1, w: 5.85, h: 1.6, title: "Журнал активацій", body: "окрема таблиця, куди activate дописує рядок: версія, час, хто", tone: "acc" });
+  D.tile(s, { x: 6.87, y: 2.1, w: 5.85, h: 1.6, title: "Версії з міткою часу", body: "замість ручних v1/v2 — час створення в самій назві версії", tone: "acc" });
+  // Журнал — це вісь часу, а не таблиця полів. Показаний стрічкою, він одразу
+  // відповідає на питання, заради якого існує: «що було активним о 12:50?».
+  {
+    const ay = 4.16, x0 = MX + 0.7, w = 10.7;
+    s.addShape("line", { x: x0, y: ay, w, h: 0, line: { color: P.line, width: 1.5 } });
+    [[0.04, P.acc, "v1 · 10:02", "Олена"], [0.30, P.acc, "v2 · 12:40", "Тарас"],
+     [0.62, P.crit, "rollback · 12:58", "Тарас"], [0.94, P.good, "v3 · 15:10", "Олена"]]
+      .forEach(([f, c, lbl, who]) => {
+        s.addShape("ellipse", { x: x0 + w * f - 0.07, y: ay - 0.07, w: 0.14, h: 0.14,
+          fill: { color: c }, line: { type: "none" } });
+        s.addText(lbl, { x: x0 + w * f - 1.2, y: ay + 0.1, w: 2.4, h: 0.22, align: "center",
+          fontFace: F.mono, fontSize: 8.5, bold: true, color: c, margin: 0 });
+        s.addText(who, { x: x0 + w * f - 1.2, y: ay + 0.3, w: 2.4, h: 0.2, align: "center",
+          fontFace: F.body, fontSize: 9, color: P.faint, margin: 0 });
+      });
+    s.addText("час →", { x: x0, y: ay - 0.3, w: 2, h: 0.22,
+      fontFace: F.mono, fontSize: 8.5, color: P.faint, charSpacing: 1, margin: 0 });
+  }
+  D.band(s, { x: MX, y: 4.9, w: 12.1, h: 1.1, tone: "card",
     text: "Обидві ідеї — еволюція тієї самої таблиці, а не новий механізм: якщо базовий реєстр зроблений чисто, додаються за вечір. Це опційна частина ДЗ тижня 1." });
 }
 

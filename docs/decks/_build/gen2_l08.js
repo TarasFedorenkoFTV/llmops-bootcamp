@@ -91,8 +91,25 @@ D.titleSlide({
   [["Чи йдуть дані в навчання?", "у бізнес-тарифах, як правило, ні — і це записано в умовах"],
    ["Скільки зберігаються запити?", "типово обмежений час; режими нульового збереження вмикають свідомо"],
    ["У якому регіоні обробка?", "для персональних даних це юридичне питання, не технічне"],
-  ].forEach(([t, b], i) => D.tile(s, { x: MX + i * 4.05, y: 2.0, w: 3.85, h: 1.9, badge: i + 1, title: t, body: b, tone: "acc" }));
-  D.band(s, { x: MX, y: 4.3, w: 12.1, h: 1.35, tone: "good", label: "Мінімізуйте те, що виїжджає",
+  ].forEach(([t, b], i) => D.tile(s, { x: MX + i * 4.05, y: 2.0, w: 3.85, h: 1.6, badge: i + 1, title: t, body: b, tone: "acc" }));
+  // Три питання до провайдера мають сенс лише тоді, коли видно межу, яку дані
+  // перетинають. Дві зони роблять питання «що саме виїжджає» буквальним.
+  {
+    const zy = 3.9, zh = 0.86;
+    const zone = (x, w, title, body, tone) => {
+      const c = D.TONE[tone] || D.TONE.card;
+      s.addShape("roundRect", { x, y: zy, w, h: zh, rectRadius: 0.1,
+        fill: { color: c.bg }, line: tone === "card" ? { color: P.line, width: 1 } : { type: "none" } });
+      s.addText(title, { x: x + 0.2, y: zy + 0.1, w: w - 0.4, h: 0.26,
+        fontFace: F.mono, fontSize: 9, bold: true, color: c.fg, charSpacing: 1, margin: 0 });
+      s.addText(body, { x: x + 0.2, y: zy + 0.38, w: w - 0.4, h: 0.4,
+        fontFace: F.body, fontSize: 11, color: P.soft, valign: "top", margin: 0 });
+    };
+    zone(MX, 5.2, "ВАШ ПЕРИМЕТР", "лог, база, повні персональні дані — звідси не виходять", "good");
+    D.arrow(s, { x: 6.0, y: zy + zh / 2, len: 1.4 });
+    zone(7.5, 5.22, "ПРОВАЙДЕР", "сюди їде промпт і повідомлення — маскованими, без зайвих полів", "warn");
+  }
+  D.band(s, { x: MX, y: 5.0, w: 12.1, h: 1.2, tone: "good", label: "Мінімізуйте те, що виїжджає",
     text: "Не відправляйте поля, без яких відповідь складається; маскуйте ідентифікатори там, де достатньо ролі («клієнт із тарифом X» замість імені)." });
 }
 
@@ -110,13 +127,33 @@ D.titleSlide({
 
 {
   const s = D.slide({ num: "04", title: "Непрямий injection: інструкція в «даних»", pill: "absorb", notes: N() });
-  D.tile(s, { x: MX, y: 1.95, w: 5.85, h: 1.8, title: "Прямий — усе сьогоднішнє",
+  D.tile(s, { x: MX, y: 1.95, w: 5.85, h: 1.5, title: "Прямий — усе сьогоднішнє",
     body: "атака живе в тексті самого користувача: «забудь інструкції і…»", tone: "warn" });
-  D.tile(s, { x: 6.87, y: 1.95, w: 5.85, h: 1.8, title: "Непрямий — через інструменти",
+  D.tile(s, { x: 6.87, y: 1.95, w: 5.85, h: 1.5, title: "Непрямий — через інструменти",
     body: "інструкція сидить у контенті, який система читає сама: сторінка, документ, лист", tone: "crit" });
-  D.band(s, { x: MX, y: 4.0, w: 12.1, h: 1.2, tone: "acc",
+  // Головне в непрямому injection — ШЛЯХ: атака заходить не там, де стоїть
+  // перевірка. Поки це два описи поруч, розрив між входами не видно.
+  {
+    const cy = 4.0, bh = 0.46;
+    const box = (x, w, label, tone) => {
+      const c = D.TONE[tone] || D.TONE.card;
+      s.addShape("roundRect", { x, y: cy - bh / 2, w, h: bh, rectRadius: 0.08,
+        fill: { color: c.bg }, line: tone === "card" ? { color: P.line, width: 1 } : { type: "none" } });
+      s.addText(label, { x, y: cy - bh / 2, w, h: bh, align: "center", valign: "middle",
+        fontFace: F.mono, fontSize: 9.5, bold: true, color: c.fg, margin: 0 });
+    };
+    box(MX, 3.0, "сторінка · лист · документ", "crit");
+    D.arrow(s, { x: 3.72, y: cy, len: 0.38 });
+    box(4.15, 2.6, "інструмент", "warn");
+    D.arrow(s, { x: 6.85, y: cy, len: 0.38 });
+    box(7.3, 2.4, "модель", "acc");
+    box(10.1, 2.62, "guardrail стоїть тут", "good");
+    s.addText("перевірка входу користувача сюди не дивиться", { x: MX, y: cy + 0.32, w: 6.5, h: 0.24,
+      fontFace: F.mono, fontSize: 8.5, bold: true, color: P.crit, margin: 0 });
+  }
+  D.band(s, { x: MX, y: 4.6, w: 12.1, h: 1.0, tone: "acc",
     text: "Наш бот не читає зовнішнього контенту — поверхня закрита архітектурно." });
-  D.band(s, { x: MX, y: 5.35, w: 12.1, h: 1.05, tone: "good", label: "Принцип",
+  D.band(s, { x: MX, y: 5.75, w: 12.1, h: 0.9, tone: "good", label: "Принцип",
     text: "Усе, що приносить інструмент, — такий самий недовірений вхід." });
 }
 
@@ -202,15 +239,32 @@ D.titleSlide({
 // ─── межа навчального контуру: черга в пам'яті (доважок блоку 07) ───
 {
   const s = D.slide({ num: "07", title: "Черга в пам'яті — межа навчального контуру", pill: "absorb", notes: N() });
-  D.tile(s, { x: MX, y: 1.9, w: 5.85, h: 1.75, title: "Перезапуск втрачає заявки",
+  D.tile(s, { x: MX, y: 1.9, w: 5.85, h: 1.5, title: "Перезапуск втрачає заявки",
     body: "незворотна дія, яку хтось збирався підтвердити, просто зникає разом із процесом", tone: "crit" });
-  D.tile(s, { x: 6.87, y: 1.9, w: 5.85, h: 1.75, title: "Два інстанси — половина черги",
+  D.tile(s, { x: 6.87, y: 1.9, w: 5.85, h: 1.5, title: "Два інстанси — половина черги",
     body: "оператор бачить лише ті заявки, що потрапили «на його» процес", tone: "crit" });
-  D.layers(s, { x: MX, y: 3.9, w: 12.1, h: 0.78, gap: 0.12, items: [
+  // «Половина черги» — топологічна проблема: черга не одна, а дві, і оператор
+  // підключений лише до однієї. Текстом це звучить як нюанс, схемою — як діра.
+  {
+    const cy = 3.72, bh = 0.44;
+    const box = (x, w, label, tone) => {
+      const c = D.TONE[tone] || D.TONE.card;
+      s.addShape("roundRect", { x, y: cy - bh / 2, w, h: bh, rectRadius: 0.08,
+        fill: { color: c.bg }, line: tone === "card" ? { color: P.line, width: 1 } : { type: "none" } });
+      s.addText(label, { x, y: cy - bh / 2, w, h: bh, align: "center", valign: "middle",
+        fontFace: F.mono, fontSize: 9.5, bold: true, color: c.fg, margin: 0 });
+    };
+    box(MX, 2.2, "оператор", "acc");
+    D.arrow(s, { x: 2.92, y: cy, len: 0.38 });
+    box(3.35, 4.3, "інстанс A · заявки 1, 3", "good");
+    box(8.0, 4.72, "інстанс B · заявки 2, 4 — не видно", "crit");
+    D.cross(s, { x: 7.4, y: cy - 0.16, size: 0.32, color: P.crit });
+  }
+  D.layers(s, { x: MX, y: 4.22, w: 12.1, h: 0.66, gap: 0.12, items: [
     { label: "Доросла форма", body: "таблиця в тій самій базі, де лог: id, дія, аргументи, стан, автор рішення, час", tone: "good" },
     { label: "Даром з'являється", body: "аудит рішень і відповідь на «що чекало підтвердження під час інциденту»" },
   ] });
-  D.band(s, { x: MX, y: 5.78, w: 12.1, h: 0.95, tone: "warn", label: "Друга кнопка теж логується",
+  D.band(s, { x: MX, y: 5.72, w: 12.1, h: 0.95, tone: "warn", label: "Друга кнопка теж логується",
     text: "Відхилені заявки — найцінніша частина аудиту: список моментів, коли система хотіла зробити те, чого робити не слід." });
 }
 
