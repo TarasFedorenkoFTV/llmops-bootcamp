@@ -96,13 +96,32 @@ D.titleSlide({
 
 {
   const s = D.slide({ num: "03", title: "«Модель» за назвою — не та сама модель", pill: "absorb", notes: N() });
-  D.tile(s, { x: MX, y: 1.9, w: 5.85, h: 1.95, title: "Alias — «остання версія сімейства»",
+  D.tile(s, { x: MX, y: 1.9, w: 5.85, h: 1.62, title: "Alias — «остання версія сімейства»",
     body: "автоматично отримуєте покращення — і небезпечно тихі зміни поведінки", tone: "warn" });
-  D.tile(s, { x: 6.87, y: 1.9, w: 5.85, h: 1.95, title: "Snapshot — зафіксована версія",
+  D.tile(s, { x: 6.87, y: 1.9, w: 5.85, h: 1.62, title: "Snapshot — зафіксована версія",
     body: "не змінюється під вами, але й не оновлюється сама — і колись її виведуть з обігу", tone: "good" });
-  D.band(s, { x: MX, y: 4.1, w: 12.1, h: 1.45, tone: "warn", label: "Лайфхак",
+  // Відмінність тут часова: snapshot прибитий до точки, alias їде за часом.
+  // Двома картками цього не видно — видно на шкалі з кількома випусками.
+  {
+    const ty = 4.12, nh = 0.36, nw = 2.3;
+    s.addShape("line", { x: MX + 0.2, y: ty + nh / 2, w: 11.5, h: 0, line: { color: P.line, width: 1 } });
+    ["…-0301", "…-0613", "…-1106"].forEach((name, i) => {
+      const nx = MX + 0.5 + i * 3.9;
+      s.addShape("roundRect", { x: nx, y: ty, w: nw, h: nh, rectRadius: 0.07,
+        fill: { color: i === 2 ? P.acctint : P.card }, line: { color: P.line, width: 1 } });
+      s.addText(name, { x: nx, y: ty, w: nw, h: nh, align: "center", valign: "middle",
+        fontFace: F.mono, fontSize: 10, color: P.ink, margin: 0 });
+    });
+    s.addText("snapshot — ви прибиті сюди", { x: MX + 0.5, y: ty + nh + 0.06, w: 3.6, h: 0.24,
+      fontFace: F.mono, fontSize: 9, bold: true, color: P.good, margin: 0 });
+    s.addText("alias — ви завжди тут, і воно рухається", { x: MX + 8.3, y: ty + nh + 0.06, w: 4.2, h: 0.24,
+      align: "right", fontFace: F.mono, fontSize: 9, bold: true, color: P.warn, margin: 0 });
+    s.addText("час →", { x: MX + 0.2, y: ty - 0.28, w: 2, h: 0.22,
+      fontFace: F.mono, fontSize: 8.5, color: P.faint, charSpacing: 1, margin: 0 });
+  }
+  D.band(s, { x: MX, y: 4.92, w: 12.1, h: 1.15, tone: "warn", label: "Лайфхак",
     text: "Той самий принцип, що з образами контейнерів: у прод не котять latest. Ми і gateway пінимо за digest'ом, а не за рухомим тегом." });
-  D.band(s, { x: MX, y: 5.75, w: 12.1, h: 0.68, tone: "acc", text: "Правило production: у конфізі — snapshot; оновлення версії — окрема свідома зміна." });
+  D.band(s, { x: MX, y: 6.2, w: 12.1, h: 0.55, tone: "acc", text: "Правило production: у конфізі — snapshot; оновлення версії — окрема свідома зміна." });
 }
 
 {

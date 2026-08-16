@@ -50,9 +50,17 @@ D.titleSlide({
   const s = D.slide({ num: "01", title: "Подвійний податок на повтори", pill: "absorb", notes: N() });
   D.stat(s, { x: MX, y: 1.9, w: 5.85, h: 1.5, value: "Гроші", label: "«Як скинути пароль?» — сотні разів на день майже однаковими словами", tone: "crit", size: 30 });
   D.stat(s, { x: 6.87, y: 1.9, w: 5.85, h: 1.5, value: "Час", label: "однакова відповідь — а користувач щоразу чекає похід у модель", tone: "warn", size: 30 });
-  D.band(s, { x: MX, y: 3.65, w: 12.1, h: 1.15, tone: "crit", label: "Пастка: кеш вмикають — і не міряють",
+  // Сто однакових питань — і різниця між «без кешу» та «з кешем» це не відсотки,
+  // а два стовпчики різної довжини. Саме заради цієї картинки шар і будують.
+  s.addText("сто однакових питань за день", { x: MX, y: 3.56, w: 12.1, h: 0.24,
+    fontFace: F.mono, fontSize: 9, bold: true, color: P.faint, charSpacing: 1.5, margin: 0 });
+  D.bars(s, { x: MX, y: 3.84, w: 12.1, labelW: 2.3, noteW: 4.6, rowH: 0.44, gap: 0.2, rows: [
+    { label: "без кешу", value: 100, note: "100 викликів у модель", tone: "crit" },
+    { label: "з кешем", value: 1, note: "1 виклик + 99 hit", tone: "good" },
+  ] });
+  D.band(s, { x: MX, y: 5.0, w: 12.1, h: 0.8, tone: "crit", label: "Пастка: кеш вмикають — і не міряють",
     text: "«Кеш же є, значить економимо». Скільки? На яких запитах? Без цифр — талісман." });
-  D.band(s, { x: MX, y: 5.0, w: 12.1, h: 1.35, tone: "good", label: "Правило уроку — measure-first",
+  D.band(s, { x: MX, y: 5.95, w: 12.1, h: 0.8, tone: "good", label: "Правило уроку — measure-first",
     text: "Лічильники hit/miss — в один урок і в один діф із кешем. Інакше це віра." });
 }
 

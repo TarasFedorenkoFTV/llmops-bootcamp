@@ -90,13 +90,33 @@ D.titleSlide({
 
 {
   const s = D.slide({ num: "03", title: "Дві копії схеми — і лише одній можна довіряти", pill: "absorb", notes: N() });
-  D.tile(s, { x: MX, y: 1.95, w: 5.85, h: 1.8, title: "Копія 1 — їде в модель",
+  D.tile(s, { x: MX, y: 1.95, w: 5.85, h: 1.5, title: "Копія 1 — їде в модель",
     body: "параметр tools із JSON Schema аргументів: підказка, не гарантія", tone: "warn" });
-  D.tile(s, { x: 6.87, y: 1.95, w: 5.85, h: 1.8, title: "Копія 2 — живе у сервісі",
+  D.tile(s, { x: 6.87, y: 1.95, w: 5.85, h: 1.5, title: "Копія 2 — живе у сервісі",
     body: "валідація перед виконанням: «неправильне прохання ніколи не виконається»", tone: "good" });
-  D.band(s, { x: MX, y: 4.0, w: 12.1, h: 1.55, tone: "acc", label: "Реєстр інструментів стає зовнішнім (MCP)",
+  // Дві копії — це не симетрія, а односторонній гейт: одна підказує, друга рішає.
+  // На схемі видно, де саме прохання може не пройти далі.
+  {
+    const cy = 4.06, bh = 0.46;
+    const box = (x, w, label, tone, y, h) => {
+      const c = D.TONE[tone] || D.TONE.card;
+      s.addShape("roundRect", { x, y: y ?? cy - bh / 2, w, h: h ?? bh, rectRadius: 0.08,
+        fill: { color: c.bg }, line: tone === "card" ? { color: P.line, width: 1 } : { type: "none" } });
+      s.addText(label, { x, y: y ?? cy - bh / 2, w, h: h ?? bh, align: "center", valign: "middle",
+        fontFace: F.mono, fontSize: 9.5, bold: true, color: c.fg, margin: 0 });
+    };
+    box(MX, 2.5, "модель просить", "warn");
+    D.arrow(s, { x: 3.22, y: cy, len: 0.38 });
+    box(3.6, 2.6, "схема у сервісі", "acc");
+    D.arrow(s, { x: 6.3, y: cy, len: 0.38 });
+    box(6.75, 3.0, "валідне — виконуємо", "good", 3.72, 0.3);
+    box(6.75, 3.0, "ні — відхилити й залогувати", "crit", 4.1, 0.3);
+    D.arrow(s, { x: 9.85, y: cy, len: 0.38 });
+    box(10.3, 2.42, "слід у лозі", "acc");
+  }
+  D.band(s, { x: MX, y: 4.62, w: 12.1, h: 1.25, tone: "acc", label: "Реєстр інструментів стає зовнішнім (MCP)",
     text: "Чужі сервіси публікують інструменти за стандартним протоколом — а ви вирішуєте, що дозволено, з якими лімітами і що потребує людини. Обв'язка уроку не змінюється." });
-  D.band(s, { x: MX, y: 5.7, w: 12.1, h: 0.7, tone: "crit",
+  D.band(s, { x: MX, y: 6.02, w: 12.1, h: 0.6, tone: "crit",
     text: "Чужому реєстру не довіряють навіть у «що взагалі існує»." });
 }
 
