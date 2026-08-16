@@ -133,7 +133,7 @@ function createDeck({ lesson, week, fileTitle, notes: reader }) {
 
   // лого внизу зліва (світлі слайди)
   function logo(s) {
-    if (LOGO) s.addImage({ data: LOGO, x: MX, y: 6.70, w: 1.62, h: 0.5 });
+    if (LOGO) s.addImage({ data: LOGO, x: MX, y: H - 0.66, w: 1.62, h: 0.5 });
   }
   // вордмарк на темних слайдах
   function wordmark(s, color = P.coverInk) {
@@ -210,7 +210,7 @@ function createDeck({ lesson, week, fileTitle, notes: reader }) {
     }
     if (opt) marker("ОПЦІЙНО", P.warnbg, P.warn);
     logo(s);
-    s.slideNumber = { x: W - 0.9, y: 6.92, w: 0.4, h: 0.3, fontFace: F.mono, fontSize: 8.5, color: P.faint };
+    s.slideNumber = { x: W - 0.9, y: H - 0.46, w: 0.4, h: 0.3, fontFace: F.mono, fontSize: 8.5, color: P.faint };
     pushNotes(s, notes);
     script.push({ n: idx, title, notes });
     return s;

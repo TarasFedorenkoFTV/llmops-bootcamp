@@ -27,6 +27,10 @@ def boxes(xml):
         txt = " ".join(re.findall(r"<a:t(?:\s[^>]*)?>(.*?)</a:t>", body, re.S)).strip()
         # чи має форма заливку (фон) — тоді текст поверх неї це норма
         filled = bool(re.search(r"<a:solidFill>", body.split("<p:txBody>")[0] if "<p:txBody>" in body else body))
+        # Зображення не мають ні тексту, ні заливки — і через це випадали з
+        # перевірки цілком. Саме так лого прослизнуло під плашку непоміченим.
+        if m.group(1) == "pic":
+            filled = True
         out.append(dict(x=x, y=y, w=w, h=h, txt=txt, filled=filled, kind=m.group(1)))
     return out
 

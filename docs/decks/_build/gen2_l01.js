@@ -304,7 +304,7 @@ D.titleSlide({
     s.addShape("roundRect", { x: 11.95, y: y + 0.09, w: 0.77, h: 0.32, rectRadius: 0.06, fill: { color: P.acctint }, line: { type: "none" } });
     s.addText(w, { x: 11.95, y: y + 0.09, w: 0.77, h: 0.32, align: "center", valign: "middle", fontFace: F.mono, fontSize: 9, bold: true, color: P.acc, margin: 0 });
   });
-  D.band(s, { x: MX, y: 6.4, w: 12.1, h: 0.52, tone: "good", text: "Немає лога — немає операцій." });
+  D.band(s, { x: MX, y: 6.32, w: 12.1, h: 0.44, tone: "good", text: "Немає лога — немає операцій." });
 }
 
 // ─── S16 · 08 mock ───
