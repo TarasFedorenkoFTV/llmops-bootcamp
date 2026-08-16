@@ -291,9 +291,10 @@ D.titleSlide({
   D.code(s, { x: MX, y: 1.8, w: 12.1, h: 1.0, size: 13, lines: [
     [{ t: "request_id · model · ", c: P.darktext }, { t: "prompt_version", c: P.codeNum }, { t: " · latency_ms · prompt_tokens · completion_tokens · ", c: P.darktext }, { t: "cost_usd", c: P.codeNum }, { t: " · status", c: P.darktext }],
   ] });
-  s.addText("помаранчеві поля сьогодні порожні — це ваша робота на два тижні",
+  s.addText("підсвічені поля сьогодні порожні — це ваша робота на два тижні",
     { x: MX, y: 2.9, w: 12, h: 0.3, fontFace: F.body, fontSize: 11.5, italic: true, color: P.faint, margin: 0 });
-  const grow = [["model", "розподіл трафіку, доказ routing", "W2"], ["prompt_version", "«що зламалось учора о 19:40»", "W1"],
+  // впорядковано за тижнем: рядок читається як план курсу, а не врозбій
+  const grow = [["prompt_version", "«що зламалось учора о 19:40»", "W1"], ["model", "розподіл трафіку, доказ routing", "W2"],
                 ["tokens · cost_usd", "вартість, бюджет, алерти", "W2"], ["latency_ms · status", "p95, error rate, сліди інцидентів", "W4–5"],
                 ["весь рядок разом", "метрики консолі, гейти якості", "W5–6"]];
   grow.forEach(([f, v, w], i) => {

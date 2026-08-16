@@ -288,7 +288,7 @@ function createDeck({ lesson, week, fileTitle, notes: reader }) {
     const max = Math.max(...rows.map(r => r.value));
     rows.forEach((r, i) => {
       const yy = y + i * (rowH + gap), c = t(r.tone || "acc");
-      s.addText(r.label, { x, y: yy, w: labelW - 0.18, h: rowH, fontFace: F.body, fontSize: 12.5, color: P.ink, valign: "middle", align: "right", margin: 0 });
+      s.addText(r.label, { x, y: yy, w: labelW - 0.18, h: rowH, fontFace: F.body, fontSize: 12.5, color: P.ink, valign: "middle", align: "left", margin: 0 });
       s.addShape("roundRect", { x: x + labelW, y: yy + rowH * 0.18, w: Math.max(0.15, barMax * r.value / max), h: rowH * 0.64, rectRadius: 0.05, fill: { color: c.fg }, line: { type: "none" } });
       s.addText(r.note, { x: x + labelW + barMax + 0.25, y: yy, w: noteW, h: rowH, fontFace: F.body, fontSize: 11.5, bold: true, color: c.fg, valign: "middle", margin: 0 });
     });
