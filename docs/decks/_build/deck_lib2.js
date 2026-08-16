@@ -25,29 +25,27 @@ const P = {
   codeKey: "C9A6FF", codeStr: "7FD9A6", codeNum: "F0B36B",
   cover: "0E0B14", coverGlow: "3A1189", coverInk: "FFFFFF", coverSub: "C9B8FB",
 };
-const F = { body: "Montserrat", mono: "Courier New" };
+const F = { body: "Montserrat", mono: "Courier New", display: "Unbounded" };
 const W = 13.333, H = 7.5, MX = 0.62;
 
-// ── метрики Montserrat SemiBold/Bold для заголовків ──────────────────────────
+// ── метрики Unbounded для заголовків ───────────────────────────────────────
 // Ширини глифів (1/1000 em) для символів, що трапляються в заголовках. Потрібні,
 // щоб ЗНАТИ на етапі генерації, чи заголовок переноситься на другий рядок:
-// бокс заголовка має фіксовану висоту + valign:middle, тож 2-рядковий заголовок
-// росте ВНИЗ і накриває те, що стоїть під ним на фіксованому y (кікер, маркер).
-// Перевірено: збігається з кернінговим виміром PowerPoint на всіх 264 заголовках.
+// бокс має фіксовану висоту + valign:middle, тож 2-рядковий заголовок росте ВНИЗ
+// і накриває те, що стоїть під ним на фіксованому y (кікер, маркер формату).
+// Unbounded помітно ширший за Montserrat: 2-рядкових стало 134 з 264 замість 91.
 const TITLE_W = (() => {
-  // формат: символ + РІВНО 4 цифри ширини (є глифи ширші за 1000: m, Ш, Щ, —)
-  const src = " 0283%0877'0230(0357)0358+0599,0262-0386.0262/0392006791039230592505958066090637:0262=0599?0589A0766B0765C0733E0671F0639G0771H0808I0328K0740L0604M0955O0844P0732R0735S0638T0618U0788X0714_0500a0617b0690c0591d0692e0631f0387g0700h0691i0301j0307k0660l0301m1049n0691o0655p0690q0690r0431s0531t0435u0687v0598x0595y0598«0568»0568×0599І0335А0799Б0738В0745Г0593Д0831З0656К0735Л0799М0963Н0817О0842П0812Р0724С0726Т0637У0724Ч0749Ш1098Щ1130Я0734а0604б0673в0622г0514д0701е0643ж0913з0563и0710й0710к0642л0666м0815н0694о0654п0685р0694с0592т0535у0614ф0849х0592ц0704ч0634ш0971щ0971ь0605ю0903я0628є0592і0305ї0301—1000≠0599";
+  // формат: символ + РІВНО 4 цифри ширини (в Unbounded є глифи ширші за 1000)
+  const src = " 0265%1211'0229(0331)0331+0620,0261-0351.0258/0421008931047130804507758085490825:0294=0620?0653A0899B0847C0912D0896E0766F0740G0946H0910I0300K0832L0738M1177O0948P0779R0811S0803T0784U0862X0793_0482a0787b0784c0724d0788e0710f0538g0779h0736i0268j0268k0685l0268m1155n0743o0764p0786q0786r0506s0691t0555u0732v0714w1099x0646y0715«0619»0619×0620І0300А0899Б0809В0847Г0625Д1010З0810К0832Л0972М1177Н0910О0948П0906Р0779С0912Т0784У0848Ф1238Ч0842Ш1336Щ1409Я0822а0787б0769в0713г0529д0827е0710ж1100з0667и0782й0782к0683л0794м0947н0748о0764п0744р0786с0724т0626у0715ф1269х0646ц0797ч0693ш1124щ1183ь0662ю1029я0701є0726і0268ї0268—1162≠0620";
   const m = Object.create(null);
   for (let i = 0; i + 4 < src.length + 1; i += 5) m[src[i]] = +src.slice(i + 1, i + 5);
   return m;
 })();
 const TITLE_SIZE = 24;
-// Реальний крок рядка Montserrat у PowerPoint (winAscent+winDescent = 1.379 em),
-// зміряний на рендері: 69 px при 144 ppi = 0.479 in для 24 pt.
-const TITLE_LINE = (1109 + 270) / 1000 * TITLE_SIZE / 72;
-// На скільки зсувати все під заголовком за КОЖЕН додатковий рядок: бокс росте вниз
-// на пів рядка, але 0.045" «повітря» під останнім рядком у ньому вже було —
-// стільки становив зазор між низом літер і плашкою в однорядковому випадку.
+// Крок рядка Unbounded у PowerPoint: winAscent+winDescent = 1548/1000 em.
+const TITLE_LINE = 1548 / 1000 * TITLE_SIZE / 72;
+// Зсув усього під заголовком за КОЖЕН додатковий рядок: бокс росте вниз на пів
+// рядка, мінус 0.045" «повітря», що в ньому вже було.
 const TITLE_DROP = TITLE_LINE / 2 - 0.045;
 
 // Скільки рядків займе заголовок у боксі шириною avail (дюйми).
@@ -155,7 +153,7 @@ function createDeck({ lesson, week, fileTitle, notes: reader }) {
         rectRadius: 0.16, fill: { type: "none" }, line: { color: P.accsoft, width: 1, transparency: i === 0 ? 76 : i === 1 ? 58 : 34 } });
     }
     s.addText(`ТИЖДЕНЬ ${week} · УРОК ${lesson} З 12`, { x: MX, y: 1.7, w: 8, h: 0.3, fontFace: F.mono, fontSize: 12, bold: true, color: P.coverSub, charSpacing: 3, margin: 0 });
-    s.addText(title, { x: MX, y: 2.15, w: 9.0, h: 2.0, fontFace: F.body, fontSize: 40, bold: true, color: P.coverInk, valign: "top", lineSpacingMultiple: 1.02, margin: 0 });
+    s.addText(title, { x: MX, y: 2.15, w: 9.0, h: 2.0, fontFace: F.display, fontSize: 36, color: P.coverInk, valign: "top", lineSpacingMultiple: 1.02, margin: 0 });
     s.addText(lead, { x: MX, y: 4.5, w: 8.4, h: 1.2, fontFace: F.body, fontSize: 15, color: P.coverSub, lineSpacingMultiple: 1.2, margin: 0 });
     let cx = MX;
     WEEKS.forEach((label, i) => {
@@ -182,7 +180,7 @@ function createDeck({ lesson, week, fileTitle, notes: reader }) {
       s.addText(num, { x, y: 0.44, w: 0.7, h: 0.6, align: "left", valign: "middle", fontFace: F.mono, fontSize: 26, bold: true, color: P.acc, margin: 0 });
       x += 0.78;
     }
-    s.addText(title, { x, y: 0.42, w: TITLE_R - x, h: 0.66, fontFace: F.body, fontSize: 24, bold: true, color: P.ink, valign: "middle", margin: 0 });
+    s.addText(title, { x, y: 0.42, w: TITLE_R - x, h: 0.66, fontFace: F.display, fontSize: TITLE_SIZE, color: P.ink, valign: "middle", margin: 0 });
     // Бокс заголовка — фіксовані 0.66" з valign:middle, тож 2-рядковий заголовок
     // росте вниз на пів рядка. Усе, що нижче, зсуваємо на цю саму величину,
     // інакше плашка маркера (малюється ПІСЛЯ тексту) зрізає хвости літер р/у/ф/ц/j.
