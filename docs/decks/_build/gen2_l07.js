@@ -77,12 +77,28 @@ D.titleSlide({
 
 {
   const s = D.slide({ num: "02", title: "Backoff: фіксований, експоненційний, jitter", pill: "absorb", notes: N() });
-  D.layers(s, { x: MX, y: 1.95, w: 12.1, h: 0.85, gap: 0.14, items: [
+  D.layers(s, { x: MX, y: 1.95, w: 12.1, h: 0.70, gap: 0.12, items: [
     { label: "Фіксований", body: "«чекай секунду» — найпростіший; на масовому збої всі клієнти повертаються синхронно", tone: "warn" },
     { label: "Експоненційний", body: "кожна наступна спроба чекає довше — трафік згасає замість наростання" },
     { label: "Jitter", body: "випадковий зсув паузи розсинхронізовує натовп: без нього друга хвиля добиває вижилих", tone: "good" },
   ] });
-  D.band(s, { x: MX, y: 5.1, w: 12.1, h: 1.3, tone: "crit", label: "Типова помилка",
+  // Часова діаграма пауз: словами різницю між трьома стратегіями не показати,
+  // а на шкалі вона видна миттєво — рівні інтервали / зростаючі / розсинхронізовані.
+  {
+    const dy = 4.52, pitch = 0.30, x0 = MX + 1.85, track = 9.4;
+    [["Фіксований", [0.10, 0.28, 0.46, 0.64, 0.82], P.warn],
+     ["Експоненційний", [0.06, 0.14, 0.30, 0.62], P.acc],
+     ["Jitter", [0.09, 0.19, 0.37, 0.55, 0.88], P.good],
+    ].forEach(([label, ticks, color], r) => {
+      const y = dy + r * pitch;
+      s.addText(label, { x: MX, y: y - 0.09, w: 1.7, h: 0.26, align: "right", valign: "middle",
+        fontFace: F.body, fontSize: 10.5, color: P.ink, margin: 0 });
+      s.addShape("line", { x: x0, y: y + 0.04, w: track, h: 0, line: { color: P.line, width: 1 } });
+      ticks.forEach(t => s.addShape("ellipse", { x: x0 + track * t - 0.055, y: y - 0.015,
+        w: 0.11, h: 0.11, fill: { color }, line: { type: "none" } }));
+    });
+  }
+  D.band(s, { x: MX, y: 5.5, w: 12.1, h: 1.15, tone: "crit", label: "Типова помилка",
     text: "Retry без backoff і без бюджету: провайдер повернув 429 «пригальмуйте» — а ви у відповідь потроїли трафік. Ваш власний код став другою половиною інциденту." });
 }
 

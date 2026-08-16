@@ -161,14 +161,33 @@ D.titleSlide({
 
 {
   const s = D.slide({ num: "07", title: "Скільки — це нормально: SLI, SLO, бюджет помилок", pill: "absorb", notes: N() });
-  D.layers(s, { x: MX, y: 1.95, w: 12.1, h: 0.75, gap: 0.12, items: [
+  D.layers(s, { x: MX, y: 1.95, w: 12.1, h: 0.68, gap: 0.12, items: [
     { label: "SLI", body: "показник, який ви міряєте: частка успішних відповідей, p95 latency" },
     { label: "SLO", body: "цільове значення, про яке домовилися: «99% успішних», «p95 ≤ 3 с»", tone: "acc" },
     { label: "Бюджет помилок", body: "1% невдач дозволено: 10 000 звернень = 100 невдач на тиждень", tone: "good" },
   ] });
-  D.band(s, { x: MX, y: 4.72, w: 12.1, h: 1.35, tone: "good", label: "Принцип",
+  // Unit-chart: 100 квадратів = 100% звернень, один червоний = увесь бюджет помилок.
+  // Чесний масштаб без спотворення (Tufte): «1%» словами і «ось цей один квадрат»
+  // сприймаються по-різному, і саме друге змушує ставитися до бюджету серйозно.
+  {
+    const gx = MX, gy = 4.42, cell = 0.13, pitch = 0.175, cols = 20;
+    for (let i = 0; i < 100; i++) {
+      const c = i % cols, r = Math.floor(i / cols);
+      s.addShape("rect", { x: gx + c * pitch, y: gy + r * pitch, w: cell, h: cell,
+        fill: { color: i === 99 ? P.crit : P.goodbg }, line: { type: "none" } });
+    }
+    const gw = cols * pitch - (pitch - cell);
+    s.addText([{ text: "100 звернень", options: { bold: true, color: P.good } },
+               { text: "  ·  один червоний квадрат — увесь ваш тижневий бюджет невдач", options: { color: P.soft } }],
+      { x: gx + gw + 0.45, y: gy + 0.05, w: 12.72 - (gx + gw + 0.45), h: 0.4,
+        fontFace: F.body, fontSize: 12.5, valign: "middle", margin: 0 });
+    s.addText("на 10 000 звернень на тиждень це 100 невдач — і вони закінчуються швидше, ніж здається",
+      { x: gx + gw + 0.45, y: gy + 0.48, w: 12.72 - (gx + gw + 0.45), h: 0.4,
+        fontFace: F.body, fontSize: 11.5, italic: true, color: P.faint, valign: "middle", margin: 0 });
+  }
+  D.band(s, { x: MX, y: 5.45, w: 12.1, h: 0.75, tone: "good", label: "Принцип",
     text: "«Uptime 99.9%» — марна обіцянка. Робочий SLI — частка змістовних відповідей." });
-  D.band(s, { x: MX, y: 6.15, w: 12.1, h: 0.6, tone: "warn",
+  D.band(s, { x: MX, y: 6.28, w: 12.1, h: 0.45, tone: "warn",
     text: "Ваш лог його поки не порахує: заглушка пише той самий 503." });
 }
 
