@@ -81,6 +81,19 @@ const LOGO = (() => {
   catch (e) { return null; }
 })();
 
+// Брендовий градієнтний фон — зібраний із самих ассетів шаблону Neoversity
+// (image2+image3 поверх чорного). Живе в МАЙСТЕР-слайді, а не на кожному слайді:
+// pptxgenjs не дедуплікує зображення (саме тому в колодах лежало 24 копії лого),
+// тож фон на кожному слайді роздув би файл до сотень мегабайтів.
+const BG = (() => {
+  try { return "image/jpeg;base64," + fs.readFileSync(path.join(__dirname, "assets", "neo-bg.jpg")).toString("base64"); }
+  catch (e) { return null; }
+})();
+
+// Біла картка контенту. Геометрію взято з шаблону (лейаут CUSTOM_2:
+// x=0.19 y=0.16 9.61x5.31 на полотні 10x5.625) і перераховано на наші 13.333x7.5.
+const CARD = { x: 0.253, y: 0.213, w: 12.813, h: 7.080, r: 0.22 };
+
 function notesFrom(scriptPath) {
   const raw = fs.readFileSync(scriptPath, "utf8");
   const heads = [...raw.matchAll(/\r?\n## Слайд \d+ · ([^\n]*)\r?\n/g)].map(m => m[1].trim());
@@ -102,6 +115,14 @@ function createDeck({ lesson, week, fileTitle, notes: reader }) {
   pres.layout = "LAYOUT_WIDE";
   pres.author = "LLMOps Bootcamp";
   pres.title = `Урок ${lesson} · ${fileTitle}`;
+  // Один майстер на всю колоду: чорна основа + градієнт як об'єкт майстра.
+  // Так зображення потрапляє у файл рівно один раз.
+  pres.defineSlideMaster({
+    title: "NEO",
+    background: { color: "000000" },
+    objects: BG ? [{ image: { x: 0, y: 0, w: W, h: H, data: BG } }] : [],
+  });
+  const newSlide = () => pres.addSlide({ masterName: "NEO" });
   const script = [];
   let idx = 0;
 
@@ -109,7 +130,7 @@ function createDeck({ lesson, week, fileTitle, notes: reader }) {
 
   // лого внизу зліва (світлі слайди)
   function logo(s) {
-    if (LOGO) s.addImage({ data: LOGO, x: MX, y: H - 0.66, w: 1.62, h: 0.5 });
+    if (LOGO) s.addImage({ data: LOGO, x: MX, y: 6.70, w: 1.62, h: 0.5 });
   }
   // вордмарк на темних слайдах
   function wordmark(s, color = P.coverInk) {
@@ -117,13 +138,12 @@ function createDeck({ lesson, week, fileTitle, notes: reader }) {
   }
   // темний фіолетовий фон для обкладинок; глибину дають контурні рамки титулу
   // (fill:none, без тексту) — тож детектор накладань їх не рахує.
-  function coverBg(s) {
-    s.background = { color: P.cover };
-  }
+  // Обкладинки лишаються на градієнті майстра — окрема заливка більше не потрібна.
+  function coverBg() {}
 
   // ─────────────────────────── каркаси слайдів ───────────────────────────
   function titleSlide({ title, lead, notes }) {
-    const s = pres.addSlide(); idx++;
+    const s = newSlide(); idx++;
     coverBg(s);
     wordmark(s);
     // концентричні рамки — знак «контур керування»
@@ -153,8 +173,10 @@ function createDeck({ lesson, week, fileTitle, notes: reader }) {
   function pushNotes() { /* навмисно порожньо — див. LNN-script.md */ }
 
   function slide({ num, title, kicker, pill, opt, notes }) {
-    const s = pres.addSlide(); idx++;
-    s.background = { color: P.bg };
+    const s = newSlide(); idx++;
+    // біла картка контенту поверх градієнта — усередині все лишається як було
+    s.addShape("roundRect", { x: CARD.x, y: CARD.y, w: CARD.w, h: CARD.h, rectRadius: CARD.r,
+      fill: { color: P.bg }, line: { type: "none" } });
     let x = MX;
     if (num) {
       s.addText(num, { x, y: 0.44, w: 0.7, h: 0.6, align: "left", valign: "middle", fontFace: F.mono, fontSize: 26, bold: true, color: P.acc, margin: 0 });
@@ -188,14 +210,14 @@ function createDeck({ lesson, week, fileTitle, notes: reader }) {
     }
     if (opt) marker("ОПЦІЙНО", P.warnbg, P.warn);
     logo(s);
-    s.slideNumber = { x: W - 0.9, y: H - 0.46, w: 0.4, h: 0.3, fontFace: F.mono, fontSize: 8.5, color: P.faint };
+    s.slideNumber = { x: W - 0.9, y: 6.92, w: 0.4, h: 0.3, fontFace: F.mono, fontSize: 8.5, color: P.faint };
     pushNotes(s, notes);
     script.push({ n: idx, title, notes });
     return s;
   }
 
   function closingSlide({ summary, nextTitle, nextBody, notes }) {
-    const s = pres.addSlide(); idx++;
+    const s = newSlide(); idx++;
     coverBg(s);
     wordmark(s);
     s.addText(`ПІДСУМОК УРОКУ ${lesson}`, { x: MX, y: 0.95, w: 8, h: 0.3, fontFace: F.mono, fontSize: 11, bold: true, color: P.coverSub, charSpacing: 3, margin: 0 });

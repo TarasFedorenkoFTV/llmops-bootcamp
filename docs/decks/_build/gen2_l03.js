@@ -114,7 +114,7 @@ D.titleSlide({
     });
     s.addText("snapshot — ви прибиті сюди", { x: MX + 0.5, y: ty + nh + 0.06, w: 3.6, h: 0.24,
       fontFace: F.mono, fontSize: 9, bold: true, color: P.good, margin: 0 });
-    s.addText("alias — ви завжди тут, і воно рухається", { x: MX + 8.3, y: ty + nh + 0.06, w: 4.2, h: 0.24,
+    s.addText("alias — ви завжди тут, і воно рухається", { x: MX + 7.9, y: ty + nh + 0.06, w: 4.2, h: 0.24,
       align: "right", fontFace: F.mono, fontSize: 9, bold: true, color: P.warn, margin: 0 });
     s.addText("час →", { x: MX + 0.2, y: ty - 0.28, w: 2, h: 0.22,
       fontFace: F.mono, fontSize: 8.5, color: P.faint, charSpacing: 1, margin: 0 });
