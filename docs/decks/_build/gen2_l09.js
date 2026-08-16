@@ -176,10 +176,30 @@ D.titleSlide({
   [["fallback росте щогодини", "основна модель деградує, а ви «не бачите» — відповіді ж ідуть"],
    ["cache-hit падає тиждень", "зламали ключ правкою або змінився профіль трафіку"],
    ["розподіл поїхав на strong", "або ескалацій більше, або роутер зламаний — бюджет горить удвічі"],
-  ].forEach(([t, b], i) => D.tile(s, { x: MX + i * 4.05, y: 1.95, w: 3.85, h: 1.85, badge: i + 1, title: t, body: b, tone: "warn" }));
-  D.band(s, { x: MX, y: 4.2, w: 12.1, h: 1.5, tone: "acc", label: "Анатомія алерту — чотири обов'язкові частини",
+  ].forEach(([t, b], i) => D.tile(s, { x: MX + i * 4.05, y: 1.95, w: 3.85, h: 1.55, badge: i + 1, title: t, body: b, tone: "warn" }));
+  // Слайд про динаміку, показаний статикою. Три спарклайни під картками дають
+  // те, чого текст дати не може: напрямок. Знімок «зараз» цього не містить.
+  {
+    const base = 4.46, maxH = 0.62, bw = 0.28, pitch = 0.42;
+    [[0.15, 0.22, 0.3, 0.42, 0.55, 0.7, 0.86, 1.0],
+     [1.0, 0.92, 0.8, 0.66, 0.5, 0.38, 0.26, 0.16],
+     [0.2, 0.3, 0.28, 0.45, 0.6, 0.72, 0.88, 1.0],
+    ].forEach((series, col) => {
+      const cx = MX + col * 4.05 + 0.2;
+      series.forEach((v, i) => {
+        const hh = maxH * v;
+        s.addShape("rect", { x: cx + i * pitch, y: base - hh, w: bw, h: hh,
+          fill: { color: P.warn }, line: { type: "none" } });
+      });
+      s.addShape("line", { x: cx, y: base + 0.02, w: 8 * pitch - (pitch - bw), h: 0,
+        line: { color: P.line, width: 1 } });
+    });
+    s.addText("той самий знімок «зараз» — три різні історії", { x: MX, y: base + 0.08, w: 12.1, h: 0.22,
+      fontFace: F.mono, fontSize: 8.5, color: P.faint, charSpacing: 1, margin: 0 });
+  }
+  D.band(s, { x: MX, y: 4.86, w: 12.1, h: 1.15, tone: "acc", label: "Анатомія алерту — чотири обов'язкові частини",
     text: "метрика (error rate) + поріг (понад 5%) + тривалість (протягом 15 хвилин) + адресат (хто прокидається). Тривалість пропускають найчастіше — і отримують сирену на кожен чих." });
-  D.band(s, { x: MX, y: 5.85, w: 12.1, h: 0.62, tone: "card", text: "Снапшот каже «зараз погано». Тренд каже «стає гірше» — і дає час." });
+  D.band(s, { x: MX, y: 6.16, w: 12.1, h: 0.55, tone: "card", text: "Снапшот каже «зараз погано». Тренд каже «стає гірше» — і дає час." });
 }
 
 {
@@ -258,8 +278,28 @@ D.titleSlide({
   [["Один час стає трьома", "час до першого токена, повна генерація, час до останнього байта"],
    ["Помилка посеред успіху", "стрім почався з 200 і обірвався: для HTTP гаразд, для користувача — ні"],
    ["Кеш і guardrails складнішають", "кешувати можна лише зібрану відповідь; вихідна перевірка мусить уміти обірвати потік"],
-  ].forEach(([t, b], i) => D.tile(s, { x: MX + i * 4.05, y: 2.1, w: 3.85, h: 2.3, badge: i + 1, title: t, body: b, tone: i === 1 ? "crit" : "card" }));
-  D.band(s, { x: MX, y: 4.7, w: 12.1, h: 1.75, tone: "acc", label: "Практичний висновок на сьогодні",
+  ].forEach(([t, b], i) => D.tile(s, { x: MX + i * 4.05, y: 2.1, w: 3.85, h: 1.95, badge: i + 1, title: t, body: b, tone: i === 1 ? "crit" : "card" }));
+  // «Один час стає трьома» — це про відрізки на шкалі. Поки вони перелічені
+  // словами, вони читаються як три окремі метрики, а не як частини однієї події.
+  {
+    const ty = 4.28, th = 0.34, x0 = MX + 1.0, w1 = 2.6, w2 = 7.5;
+    s.addShape("roundRect", { x: x0, y: ty, w: w1, h: th, rectRadius: 0.06,
+      fill: { color: P.acctint }, line: { type: "none" } });
+    s.addText("час до 1-го токена", { x: x0, y: ty, w: w1, h: th, align: "center", valign: "middle",
+      fontFace: F.mono, fontSize: 9, bold: true, color: P.acc, margin: 0 });
+    s.addShape("roundRect", { x: x0 + w1 + 0.06, y: ty, w: w2, h: th, rectRadius: 0.06,
+      fill: { color: P.goodbg }, line: { type: "none" } });
+    s.addText("генерація — токен за токеном", { x: x0 + w1 + 0.06, y: ty, w: w2, h: th,
+      align: "center", valign: "middle", fontFace: F.mono, fontSize: 9, bold: true, color: P.good, margin: 0 });
+    [[x0, "запит"], [x0 + w1, "перший токен"], [x0 + w1 + w2 + 0.06, "останній байт"]]
+      .forEach(([mx, lbl], i) => {
+        s.addShape("ellipse", { x: mx - 0.05, y: ty + th / 2 - 0.05, w: 0.1, h: 0.1,
+          fill: { color: P.ink }, line: { type: "none" } });
+        s.addText(lbl, { x: mx - 1.1, y: ty + th + 0.06, w: 2.2, h: 0.22, align: "center",
+          fontFace: F.mono, fontSize: 8.5, color: P.faint, margin: 0 });
+      });
+  }
+  D.band(s, { x: MX, y: 5.12, w: 12.1, h: 1.3, tone: "acc", label: "Практичний висновок на сьогодні",
     text: "latency_ms і status — характеристика завершення відповіді, а не код HTTP." });
 }
 

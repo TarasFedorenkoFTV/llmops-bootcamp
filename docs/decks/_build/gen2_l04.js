@@ -214,12 +214,32 @@ D.titleSlide({
 
 {
   const s = D.slide({ num: "09", title: "Budget-політика: що робити при 80%", pill: "absorb", opt: true, notes: N() });
-  D.layers(s, { x: MX, y: 2.0, w: 12.1, h: 0.95, gap: 0.18, items: [
+  D.layers(s, { x: MX, y: 2.0, w: 12.1, h: 0.78, gap: 0.16, items: [
     { label: "Алерт", body: "при 80% бюджету — подія в лог; найм'якше і найчастіше достатнє" },
     { label: "Деградація", body: "вище порогу неескалаційний трафік іде на дешевшу модель", tone: "warn" },
     { label: "Відсікання", body: "не-критичні запити отримують заготовлену відповідь без походу в модель", tone: "crit" },
   ] });
-  D.band(s, { x: MX, y: 5.4, w: 12.1, h: 1.2, tone: "acc", label: "Форма важливіша за механізм",
+  // Три реакції — це не перелік, а драбина на шкалі бюджету. Список подає їх як
+  // рівноцінні варіанти; шкала показує, що вмикається послідовно і коли саме.
+  {
+    const by = 4.88, bh = 0.44, W = 12.1;
+    [[0.80, P.goodbg, P.good], [0.12, P.warnbg, P.warn], [0.08, P.critbg, P.crit]].reduce((cx, [frac, bg, fg]) => {
+      s.addShape("rect", { x: cx, y: by, w: W * frac, h: bh, fill: { color: bg }, line: { color: fg, width: 1 } });
+      return cx + W * frac;
+    }, MX);
+    [[0.80, P.warn], [0.92, P.crit]].forEach(([f, c]) =>
+      s.addShape("line", { x: MX + W * f, y: by - 0.08, w: 0, h: bh + 0.16, line: { color: c, width: 1.5 } }));
+    s.addText([{ text: "витрачений бюджет місяця:  ", options: { color: P.faint } },
+               { text: "до 80% — норма", options: { color: P.good, bold: true } },
+               { text: "   ·   ", options: { color: P.faint } },
+               { text: "80% — алерт", options: { color: P.warn, bold: true } },
+               { text: "   ·   ", options: { color: P.faint } },
+               { text: "92% — деградація", options: { color: P.crit, bold: true } },
+               { text: "   ·   ", options: { color: P.faint } },
+               { text: "100% — відсікання", options: { color: P.crit, bold: true } }],
+      { x: MX, y: by + bh + 0.1, w: 12.1, h: 0.26, fontFace: F.mono, fontSize: 9, margin: 0 });
+  }
+  D.band(s, { x: MX, y: 5.72, w: 12.1, h: 0.95, tone: "acc", label: "Форма важливіша за механізм",
     text: "Умова на цифрі з лога → зміна поведінки control plane. Це шаблон, у який далі ляжуть і fallback (W4), і гейт якості (W6)." });
 }
 
