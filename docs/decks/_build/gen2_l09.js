@@ -92,12 +92,35 @@ D.titleSlide({
 
 {
   const s = D.slide({ num: "03", title: "p95, не середнє", pill: "absorb", notes: N() });
-  D.stat(s, { x: MX, y: 1.9, w: 3.9, h: 1.6, value: "≈ 1.1 с", label: "середнє — «прийнятно»", tone: "good", size: 32 });
-  D.stat(s, { x: 4.72, y: 1.9, w: 3.9, h: 1.6, value: "p95", label: "досвід найневдаліших: у хвості живуть скарги", tone: "crit", size: 32 });
-  D.stat(s, { x: 8.82, y: 1.9, w: 3.9, h: 1.6, value: "p99", label: "те саме для найгіршого відсотка", tone: "warn", size: 32 });
-  D.band(s, { x: MX, y: 3.75, w: 12.1, h: 1.35, tone: "crit", label: "Типова помилка",
+  D.stat(s, { x: MX, y: 1.9, w: 3.9, h: 1.35, value: "≈ 1.1 с", label: "середнє — «прийнятно»", tone: "good", size: 30 });
+  D.stat(s, { x: 4.72, y: 1.9, w: 3.9, h: 1.35, value: "p95", label: "досвід найневдаліших", tone: "crit", size: 30 });
+  D.stat(s, { x: 8.82, y: 1.9, w: 3.9, h: 1.35, value: "p99", label: "найгірший відсоток", tone: "warn", size: 30 });
+  // Розподіл із довгим хвостом. Уся суть перцентилів у формі: середнє сидить біля
+  // піка, а скарги живуть у хвості праворуч. Трьома цифрами цього не показати.
+  {
+    const base = 4.58, maxH = 0.76, x0 = MX + 0.1, pitch = 0.42, bw = 0.34;
+    const hs = [0.14, 0.34, 0.60, 0.84, 1.0, 0.94, 0.80, 0.66, 0.54, 0.43, 0.35, 0.29, 0.24,
+                0.20, 0.17, 0.15, 0.13, 0.11, 0.10, 0.09, 0.08, 0.07, 0.06, 0.05, 0.05, 0.04];
+    hs.forEach((h, i) => {
+      const hh = maxH * h;
+      s.addShape("rect", { x: x0 + i * pitch, y: base - hh, w: bw, h: hh,
+        fill: { color: P.accsoft }, line: { type: "none" } });
+    });
+    const mark = (i, color, label) => {
+      const mx = x0 + i * pitch + bw / 2;
+      s.addShape("line", { x: mx, y: base - maxH - 0.16, w: 0, h: maxH + 0.16,
+        line: { color, width: 1.5, dashType: "dash" } });
+      s.addText(label, { x: mx - 0.8, y: base - maxH - 0.42, w: 1.6, h: 0.24, align: "center",
+        fontFace: F.mono, fontSize: 9, bold: true, color, margin: 0 });
+    };
+    mark(4, P.good, "середнє");
+    mark(19, P.crit, "p95");
+    s.addText("час відповіді →", { x: x0, y: base + 0.06, w: 4, h: 0.22,
+      fontFace: F.mono, fontSize: 8.5, color: P.faint, charSpacing: 1, margin: 0 });
+  }
+  D.band(s, { x: MX, y: 4.98, w: 12.1, h: 0.78, tone: "crit", label: "Типова помилка",
     text: "Середня latency згладить і сплеск, і деградацію. Алерти — на перцентилі." });
-  D.band(s, { x: MX, y: 5.25, w: 12.1, h: 1.15, tone: "acc",
+  D.band(s, { x: MX, y: 5.9, w: 12.1, h: 0.78, tone: "acc",
     text: "Перцентилі не усереднюються: середнє від двох p95 — не p95 за дві години." });
 }
 

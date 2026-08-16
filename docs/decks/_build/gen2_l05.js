@@ -180,13 +180,33 @@ D.titleSlide({
 
 {
   const s = D.slide({ num: "07", title: "Свіжість: віддати старе — і оновити у фоні", pill: "absorb", notes: N() });
-  D.tile(s, { x: MX, y: 1.95, w: 5.85, h: 1.7, title: "Жорсткий TTL — вибір із двох зол",
+  D.tile(s, { x: MX, y: 1.95, w: 5.85, h: 1.45, title: "Жорсткий TTL — вибір із двох зол",
     body: "короткий — кеш майже не влучає; довгий — роздаєте застаріле", tone: "warn" });
-  D.tile(s, { x: 6.87, y: 1.95, w: 5.85, h: 1.7, title: "Третій варіант: два строки",
-    body: "«свіжий до» — віддаємо як є; далі віддаємо старе + фоновий виклик оновлює запис", tone: "good" });
-  D.band(s, { x: MX, y: 3.9, w: 12.1, h: 1.1, tone: "acc", label: "Чому для LLM це вигідніше, ніж для звичайного API",
+  D.tile(s, { x: 6.87, y: 1.95, w: 5.85, h: 1.45, title: "Третій варіант: два строки",
+    body: "«свіжий до» — віддаємо як є; далі старе + фоновий виклик оновлює запис", tone: "good" });
+  // Життя запису на шкалі: два строки перетворюють вибір «або-або» на три зони.
+  // Словами це звучить як нюанс; на шкалі видно, що середня зона — і є виграш.
+  {
+    const ty = 3.62, th = 0.52, x0 = MX, W = 12.1;
+    [[0.34, P.goodbg, P.good, "свіжий", "віддаємо як є"],
+     [0.40, P.warnbg, P.warn, "застарілий", "віддаємо старе + фоновий рефреш"],
+     [0.26, P.critbg, P.crit, "прострочений", "miss — ідемо в модель"],
+    ].reduce((cx, [frac, bg, fg, name, note]) => {
+      const w = W * frac;
+      s.addShape("roundRect", { x: cx, y: ty, w: w - 0.06, h: th, rectRadius: 0.07,
+        fill: { color: bg }, line: { type: "none" } });
+      s.addText([{ text: name + "  ", options: { bold: true, color: fg } },
+                 { text: note, options: { color: P.soft } }],
+        { x: cx + 0.16, y: ty, w: w - 0.38, h: th, fontFace: F.body, fontSize: 11,
+          valign: "middle", margin: 0 });
+      return cx + w;
+    }, x0);
+    s.addText("час життя запису →", { x: x0, y: ty + th + 0.04, w: 4, h: 0.22,
+      fontFace: F.mono, fontSize: 8.5, color: P.faint, charSpacing: 1, margin: 0 });
+  }
+  D.band(s, { x: MX, y: 4.58, w: 12.1, h: 0.9, tone: "acc", label: "Чому для LLM це вигідніше, ніж для звичайного API",
     text: "Miss коштує секунди й гроші, а «застаріла» інструкція не псується за годину." });
-  D.band(s, { x: MX, y: 5.15, w: 12.1, h: 1.25, tone: "crit", label: "Типова помилка: один TTL на все",
+  D.band(s, { x: MX, y: 5.65, w: 12.1, h: 1.0, tone: "crit", label: "Типова помилка: один TTL на все",
     text: "TTL — властивість класу запиту: пароль може жити добу, статус замовлення — ні." });
 }
 
