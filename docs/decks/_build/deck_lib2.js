@@ -1,22 +1,29 @@
-// deck_lib2.js — візуальний каркас колод LLMOps Bootcamp · брендинг Neoversity (White)
-// Джерело стилю: офіційний шаблон «Neoversity (White)».
-//   • контент-слайди: білий фон, чорний текст, шрифт Montserrat, код — Courier New;
-//   • обкладинки/секції/фінал: темний фіолетовий градієнт-фон, білий текст;
-//   • акцент — фіолетовий #5A05F4 (плашки-виноски, бейджі, стрілки);
-//   • лого Neoversity — унизу зліва на світлих слайдах, вордмарк — на темних;
-//   • верхній правий кут лишаємо під відео експерта (video-safe zone).
+// deck_lib2.js — візуальний каркас колод LLMOps Bootcamp · шаблон Neoversity
+// Джерело стилю: офіційний шаблон «Neoversity (White)», майстер 2 (брендований).
+//   • фон — брендовий градієнт із ассетів шаблону, у МАЙСТЕР-слайді (один раз);
+//   • контент лежить прямо на градієнті, білим по темному — як на 32 з 42
+//     слайдів шаблону; біла картка там використовується лише на 7, тож від неї
+//     відмовились: із нею слайд читався як білий із рамкою, а не як шаблон;
+//   • акцент — фіолетовий #5A05F4 (суцільні панелі) і #C9A6FF (текст на темному);
+//   • кожна пара «текст на тлі» перевірена на контраст >= 4.5:1;
+//   • лого Neoversity — біла версія, унизу зліва; вордмарк — на обкладинках.
 // Начитка НЕ вбудовується в pptx — збирається в окремий сценарій LNN-script.md.
 const pptxgen = require("pptxgenjs");
 const fs = require("fs");
 const path = require("path");
 
-// Палітра Neoversity White
+// Палітра Neoversity — ТЕМНА тема, як у шаблоні: контент лежить прямо на
+// градієнті, білим по темному. Кольори виведені з брендового фіолета
+// #5A05F4; кожна пара «текст на тлі» перевірена на контраст >= 4.5:1.
 const P = {
-  bg: "FFFFFF", card: "FFFFFF", ink: "111318", soft: "555B66", faint: "9AA1AD", line: "E6E7EC",
-  acc: "5A05F4", acctint: "EFEAFE", accsoft: "C9B8FB",
-  good: "1B8A5A", goodbg: "E9F4EF", warn: "9A5B12", warnbg: "F8F0E2", crit: "C62A2A", critbg: "FBE9E9",
-  codebg: "F5F4FA", darktext: "23262F", dim: "8A7FA6",
-  cover: "1B0942", coverGlow: "3A1189", coverInk: "FFFFFF", coverSub: "C9B8FB",
+  bg: "0E0B14", card: "17141F", ink: "FFFFFF", soft: "AFA9BE", faint: "8A82A0", line: "2E2A3A",
+  acc: "C9A6FF", accsolid: "5A05F4", acctint: "1C1140", accsoft: "9B7BE8",
+  good: "5FD6A0", goodbg: "102A20", warn: "E8A857", warnbg: "2A2010", crit: "FF7B7B", critbg: "2E1418",
+  codebg: "12101A", darktext: "D8D4E4", dim: "8A82A0",
+  // підсвітка коду — окремі ключі, бо раніше ці кольори були захардкоджені
+  // в кожному gen-файлі й не пережили б жодної зміни теми
+  codeKey: "C9A6FF", codeStr: "7FD9A6", codeNum: "F0B36B",
+  cover: "0E0B14", coverGlow: "3A1189", coverInk: "FFFFFF", coverSub: "C9B8FB",
 };
 const F = { body: "Montserrat", mono: "Courier New" };
 const W = 13.333, H = 7.5, MX = 0.62;
@@ -77,7 +84,7 @@ const TONE = {
 
 // Лого Neoversity як data-URI (незалежно від cwd)
 const LOGO = (() => {
-  try { return "data:image/png;base64," + fs.readFileSync(path.join(__dirname, "assets", "neoversity-logo.png")).toString("base64"); }
+  try { return "data:image/png;base64," + fs.readFileSync(path.join(__dirname, "assets", "neoversity-logo-white.png")).toString("base64"); }
   catch (e) { return null; }
 })();
 
@@ -89,10 +96,6 @@ const BG = (() => {
   try { return "image/jpeg;base64," + fs.readFileSync(path.join(__dirname, "assets", "neo-bg.jpg")).toString("base64"); }
   catch (e) { return null; }
 })();
-
-// Біла картка контенту. Геометрію взято з шаблону (лейаут CUSTOM_2:
-// x=0.19 y=0.16 9.61x5.31 на полотні 10x5.625) і перераховано на наші 13.333x7.5.
-const CARD = { x: 0.253, y: 0.213, w: 12.813, h: 7.080, r: 0.22 };
 
 function notesFrom(scriptPath) {
   const raw = fs.readFileSync(scriptPath, "utf8");
@@ -157,7 +160,7 @@ function createDeck({ lesson, week, fileTitle, notes: reader }) {
     let cx = MX;
     WEEKS.forEach((label, i) => {
       const on = i === week - 1, cw = 0.3 + label.length * 0.079;
-      s.addShape("roundRect", { x: cx, y: 6.35, w: cw, h: 0.34, rectRadius: 0.17, fill: on ? { color: P.acc } : { type: "none" }, line: on ? { type: "none" } : { color: P.accsoft, width: 1, transparency: 40 } });
+      s.addShape("roundRect", { x: cx, y: 6.35, w: cw, h: 0.34, rectRadius: 0.17, fill: on ? { color: P.accsolid } : { type: "none" }, line: on ? { type: "none" } : { color: P.accsoft, width: 1, transparency: 40 } });
       s.addText(label, { x: cx, y: 6.35, w: cw, h: 0.34, align: "center", valign: "middle", fontFace: F.mono, fontSize: 9, bold: on, color: on ? "FFFFFF" : P.coverSub, margin: 0 });
       cx += cw + 0.12;
     });
@@ -174,9 +177,6 @@ function createDeck({ lesson, week, fileTitle, notes: reader }) {
 
   function slide({ num, title, kicker, pill, opt, notes }) {
     const s = newSlide(); idx++;
-    // біла картка контенту поверх градієнта — усередині все лишається як було
-    s.addShape("roundRect", { x: CARD.x, y: CARD.y, w: CARD.w, h: CARD.h, rectRadius: CARD.r,
-      fill: { color: P.bg }, line: { type: "none" } });
     let x = MX;
     if (num) {
       s.addText(num, { x, y: 0.44, w: 0.7, h: 0.6, align: "left", valign: "middle", fontFace: F.mono, fontSize: 26, bold: true, color: P.acc, margin: 0 });
@@ -205,7 +205,7 @@ function createDeck({ lesson, week, fileTitle, notes: reader }) {
       mx += pw + 0.12;
     };
     if (pill) {
-      const map = { absorb: ["ТЕОРІЯ", P.acc, "FFFFFF"], do: ["ПРАКТИКА", P.good, "FFFFFF"], connect: ["РЕФЛЕКСІЯ", P.warn, "FFFFFF"] };
+      const map = { absorb: ["ТЕОРІЯ", P.acc, P.acctint], do: ["ПРАКТИКА", P.good, P.goodbg], connect: ["РЕФЛЕКСІЯ", P.warn, P.warnbg] };
       const m = map[pill]; if (m) marker(m[0], m[1], m[2]);
     }
     if (opt) marker("ОПЦІЙНО", P.warnbg, P.warn);
@@ -223,11 +223,11 @@ function createDeck({ lesson, week, fileTitle, notes: reader }) {
     s.addText(`ПІДСУМОК УРОКУ ${lesson}`, { x: MX, y: 0.95, w: 8, h: 0.3, fontFace: F.mono, fontSize: 11, bold: true, color: P.coverSub, charSpacing: 3, margin: 0 });
     summary.forEach((txt, i) => {
       const y = 1.5 + i * 0.72;
-      s.addShape("ellipse", { x: MX, y: y + 0.1, w: 0.16, h: 0.16, fill: { color: P.acc }, line: { type: "none" } });
+      s.addShape("ellipse", { x: MX, y: y + 0.1, w: 0.16, h: 0.16, fill: { color: P.accsolid }, line: { type: "none" } });
       s.addText(txt, { x: MX + 0.34, y, w: 11.4, h: 0.6, fontFace: F.body, fontSize: 15, color: P.coverInk, valign: "top", lineSpacingMultiple: 1.1, margin: 0 });
     });
     const y0 = 1.5 + summary.length * 0.72 + 0.35;
-    s.addShape("roundRect", { x: MX, y: y0, w: 12.1, h: H - y0 - 0.7, rectRadius: 0.14, fill: { color: "FFFFFF" }, line: { type: "none" } });
+    s.addShape("roundRect", { x: MX, y: y0, w: 12.1, h: H - y0 - 0.7, rectRadius: 0.14, fill: { color: P.card }, line: { color: P.line, width: 1 } });
     s.addText(nextTitle, { x: MX + 0.28, y: y0 + 0.22, w: 11.5, h: 0.35, fontFace: F.body, fontSize: 15, bold: true, color: P.acc, margin: 0 });
     s.addText(nextBody, { x: MX + 0.28, y: y0 + 0.62, w: 11.5, h: H - y0 - 1.55, fontFace: F.body, fontSize: 12.5, color: P.ink, valign: "top", lineSpacingMultiple: 1.15, margin: 0 });
     pushNotes(s, notes);
@@ -249,7 +249,7 @@ function createDeck({ lesson, week, fileTitle, notes: reader }) {
     s.addShape("roundRect", { x, y, w, h, rectRadius: 0.12, fill: { color: c.bg }, line: tone === "card" ? { color: P.line, width: 1 } : { type: "none" } });
     let ty = y + 0.2;
     if (badge !== undefined) {
-      s.addShape("ellipse", { x: x + 0.22, y: ty, w: 0.42, h: 0.42, fill: { color: tone === "card" ? P.acc : c.fg }, line: { type: "none" } });
+      s.addShape("ellipse", { x: x + 0.22, y: ty, w: 0.42, h: 0.42, fill: { color: tone === "card" ? P.accsolid : c.fg }, line: { type: "none" } });
       s.addText(String(badge), { x: x + 0.22, y: ty, w: 0.42, h: 0.42, align: "center", valign: "middle", fontFace: F.mono, fontSize: 12, bold: true, color: tone === "card" ? "FFFFFF" : c.bg, margin: 0 });
     }
     const tx = badge !== undefined ? x + 0.78 : x + 0.22;
@@ -336,7 +336,7 @@ function createDeck({ lesson, week, fileTitle, notes: reader }) {
   function band(s, { x, y, w, h = 1.05, label, text, tone = "acc" }) {
     const solid = tone === "acc";
     const c = t(tone);
-    const bg = solid ? P.acc : c.bg;
+    const bg = solid ? P.accsolid : c.bg;   // суцільний брендовий фіолет, не світлий текстовий
     const bodyColor = solid ? "FFFFFF" : P.ink;
     const labelColor = solid ? "FFFFFF" : c.fg;
     s.addShape("roundRect", { x, y, w, h, rectRadius: 0.12, fill: { color: bg }, line: tone === "card" ? { color: P.line, width: 1 } : { type: "none" } });
@@ -364,7 +364,7 @@ function createDeck({ lesson, week, fileTitle, notes: reader }) {
   }
 
   function table(s, { x, y, w, head, rows, colW, rowH, size = 11.5 }) {
-    const data = [head.map(h => ({ text: h, options: { fontFace: F.mono, fontSize: 9, bold: true, color: P.faint, fill: { color: "F6F5FB" }, charSpacing: 1 } }))];
+    const data = [head.map(h => ({ text: h, options: { fontFace: F.mono, fontSize: 9, bold: true, color: P.soft, fill: { color: "1F1B2A" }, charSpacing: 1 } }))];
     rows.forEach(r => data.push(r.cells.map((cText, i) => {
       const ct = (r.cellTones && r.cellTones[i]) ? t(r.cellTones[i]) : null;
       const c = ct || (r.tone ? t(r.tone) : null);

@@ -59,7 +59,7 @@ D.titleSlide({
 
 {
   const s = D.slide({ num: "02", title: "Сервіс вирішує. Адаптер виконує.", pill: "absorb", notes: N() });
-  s.addShape("roundRect", { x: MX, y: 1.8, w: 5.85, h: 1.9, rectRadius: 0.12, fill: { color: P.acc }, line: { type: "none" } });
+  s.addShape("roundRect", { x: MX, y: 1.8, w: 5.85, h: 1.9, rectRadius: 0.12, fill: { color: P.accsolid }, line: { type: "none" } });
   s.addText("ВИРІШУЄ", { x: MX + 0.3, y: 1.98, w: 5.2, h: 0.3, fontFace: F.mono, fontSize: 10.5, bold: true, color: "C9C5F2", charSpacing: 2, margin: 0 });
   s.addText("Сервіс", { x: MX + 0.3, y: 2.3, w: 5.2, h: 0.5, fontFace: F.body, fontSize: 24, bold: true, color: "FFFFFF", margin: 0 });
   s.addText("яку модель викликати — код, який можна прочитати, протестувати й залогувати", { x: MX + 0.3, y: 2.85, w: 5.2, h: 0.7, fontFace: F.body, fontSize: 12, color: "DEDAF8", valign: "top", margin: 0 });
@@ -76,15 +76,15 @@ D.titleSlide({
 {
   const s = D.slide({ num: "03", title: "Розтин конфіга: дві «моделі» на одному mock", pill: "absorb", notes: N() });
   D.code(s, { x: MX, y: 1.85, w: 7.0, h: 3.5, size: 11, lines: [
-    [{ t: "model_list:", c: "5A05F4" }],
-    [{ t: "  - model_name: ", c: P.darktext }, { t: "mock-mini", c: "177245" }],
-    [{ t: "    litellm_params:", c: "5A05F4" }],
+    [{ t: "model_list:", c: P.codeKey }],
+    [{ t: "  - model_name: ", c: P.darktext }, { t: "mock-mini", c: P.codeStr }],
+    [{ t: "    litellm_params:", c: P.codeKey }],
     [{ t: "      model: openai/mock", c: P.darktext }],
     [{ t: "      api_base: http://mock-provider:9000/v1", c: P.darktext }],
-    [{ t: "  - model_name: ", c: P.darktext }, { t: "mock-strong", c: "177245" }],
-    [{ t: "    litellm_params:   ", c: "5A05F4" }, { t: "# той самий mock", c: P.dim }],
+    [{ t: "  - model_name: ", c: P.darktext }, { t: "mock-strong", c: P.codeStr }],
+    [{ t: "    litellm_params:   ", c: P.codeKey }, { t: "# той самий mock", c: P.dim }],
     [{ t: "      model: openai/mock", c: P.darktext }],
-    [{ t: "litellm_settings:", c: "5A05F4" }],
+    [{ t: "litellm_settings:", c: P.codeKey }],
     [{ t: "  drop_params: true", c: P.darktext }],
     [{ t: "  num_retries: 0    ", c: P.darktext }, { t: "# збої йдуть у сервіс", c: P.dim }],
   ] });
@@ -128,13 +128,13 @@ D.titleSlide({
   const s = D.slide({ num: "04", title: "Route(): роутер на десять рядків", pill: "absorb", notes: N() });
   D.code(s, { x: MX, y: 1.85, w: 12.1, h: 2.35, size: 11.5, lines: [
     [{ t: "// [W2] routing: ескалація → сильна, решта → дешева", c: P.dim }],
-    [{ t: "static string Route(string message, string def) {", c: "5A05F4" }],
+    [{ t: "static string Route(string message, string def) {", c: P.codeKey }],
     [{ t: '  if (def != "mock") return def;   ', c: P.darktext }, { t: "// реальний ключ", c: P.dim }],
     [{ t: "  var u = message.ToLowerInvariant();", c: P.darktext }],
     [{ t: '  bool escalation = u.Contains("поверн") || u.Contains("терміново")', c: P.darktext }],
     [{ t: '                 || u.Contains("refund")  || u.Contains("скарг");', c: P.darktext }],
-    [{ t: '  return escalation ? "mock-strong" : "mock-mini";', c: "177245" }],
-    [{ t: "}", c: "5A05F4" }],
+    [{ t: '  return escalation ? "mock-strong" : "mock-mini";', c: P.codeStr }],
+    [{ t: "}", c: P.codeKey }],
   ] });
   D.flow(s, { x: MX, y: 4.55, w: 12.1, h: 0.8, size: 11.5, items: [
     { label: "повідомлення" }, { label: "маркери ескалації", tone: "acc" }, { label: "mock-strong", tone: "crit" }] });
@@ -216,8 +216,8 @@ D.titleSlide({
 {
   const s = D.slide({ num: "08", title: "Додати провайдера — без зміни коду", pill: "absorb", notes: N() });
   D.code(s, { x: MX, y: 1.9, w: 12.1, h: 1.9, size: 12, lines: [
-    [{ t: "  - model_name: ", c: P.darktext }, { t: "azure-gpt-4o", c: "177245" }],
-    [{ t: "    litellm_params:", c: "5A05F4" }],
+    [{ t: "  - model_name: ", c: P.darktext }, { t: "azure-gpt-4o", c: P.codeStr }],
+    [{ t: "    litellm_params:", c: P.codeKey }],
     [{ t: "      model: azure/gpt-4o", c: P.darktext }],
     [{ t: "      api_base: os.environ/AZURE_API_BASE", c: P.darktext }],
     [{ t: "      api_key:  os.environ/AZURE_API_KEY", c: P.darktext }],
@@ -274,7 +274,7 @@ D.titleSlide({
   ].forEach(([t, b, opt], i) => {
     const y = 2.0 + i * 0.92;
     s.addShape("ellipse", { x: MX, y, w: 0.5, h: 0.5, fill: { color: opt ? P.warn : P.acc }, line: { type: "none" } });
-    s.addText(String(i + 1), { x: MX, y, w: 0.5, h: 0.5, align: "center", valign: "middle", fontFace: F.mono, fontSize: 13, bold: true, color: "FFFFFF", margin: 0 });
+    s.addText(String(i + 1), { x: MX, y, w: 0.5, h: 0.5, align: "center", valign: "middle", fontFace: F.mono, fontSize: 13, bold: true, color: opt ? P.warnbg : P.acctint, margin: 0 });
     s.addText([{ text: t + "  ", options: { bold: true, fontSize: 14, color: opt ? P.warn : P.ink } },
                { text: b, options: { fontSize: 12, color: P.soft } }],
       { x: MX + 0.68, y, w: 11.4, h: 0.5, fontFace: F.body, valign: "middle", margin: 0 });

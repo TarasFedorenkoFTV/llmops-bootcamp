@@ -64,7 +64,7 @@ D.titleSlide({
 {
   const s = D.slide({ num: "02", title: "Один лог-рядок — джерело всього", pill: "absorb", notes: N() });
   D.code(s, { x: MX, y: 1.9, w: 12.1, h: 0.85, size: 12.5, lines: [
-    [{ t: "requests: request_id · model · prompt_version · latency_ms · tokens · cost_usd · status", c: "5A05F4" }],
+    [{ t: "requests: request_id · model · prompt_version · latency_ms · tokens · cost_usd · status", c: P.codeKey }],
   ] });
   [["Трейс", "за request_id відновлюється шлях: яка модель, яка версія, скільки тривало"],
    ["Метрика", "p95 по latency_ms, error rate як частка не-200, сума cost_usd"],
@@ -127,10 +127,10 @@ D.titleSlide({
 {
   const s = D.slide({ num: "04", title: "Розтин: GET /observability", pill: "absorb", notes: N() });
   D.code(s, { x: MX, y: 1.9, w: 12.1, h: 2.15, size: 11.5, lines: [
-    [{ t: "SELECT count(*),", c: "5A05F4" }],
+    [{ t: "SELECT count(*),", c: P.codeKey }],
     [{ t: "  COALESCE(percentile_cont(0.95) WITHIN GROUP (ORDER BY latency_ms), 0),", c: P.darktext }],
     [{ t: "  COALESCE(AVG(CASE WHEN status <> '200' THEN 1.0 ELSE 0 END) * 100, 0)", c: P.darktext }],
-    [{ t: "FROM requests WHERE created_at::date = CURRENT_DATE;", c: "5A05F4" }],
+    [{ t: "FROM requests WHERE created_at::date = CURRENT_DATE;", c: P.codeKey }],
   ] });
   D.tile(s, { x: MX, y: 4.3, w: 5.85, h: 1.75, title: "З бази: requests · p95 · error rate",
     body: "переживають рестарт, історичні — по них видно тренд", tone: "good" });
@@ -348,7 +348,7 @@ D.titleSlide({
   ].forEach(([t, b, opt], i) => {
     const y = 2.0 + i * 0.92;
     s.addShape("ellipse", { x: MX, y, w: 0.5, h: 0.5, fill: { color: opt ? P.warn : P.acc }, line: { type: "none" } });
-    s.addText(String(i + 1), { x: MX, y, w: 0.5, h: 0.5, align: "center", valign: "middle", fontFace: F.mono, fontSize: 13, bold: true, color: "FFFFFF", margin: 0 });
+    s.addText(String(i + 1), { x: MX, y, w: 0.5, h: 0.5, align: "center", valign: "middle", fontFace: F.mono, fontSize: 13, bold: true, color: opt ? P.warnbg : P.acctint, margin: 0 });
     s.addText([{ text: t + "  ", options: { bold: true, fontSize: 14, color: opt ? P.warn : P.ink } },
                { text: b, options: { fontSize: 12, color: P.soft } }],
       { x: MX + 0.68, y, w: 11.4, h: 0.5, fontFace: F.body, valign: "middle", margin: 0 });

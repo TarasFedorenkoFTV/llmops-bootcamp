@@ -113,10 +113,10 @@ D.titleSlide({
     notes: N() });
   D.code(s, { x: MX, y: 1.75, w: 6.1, h: 2.75, size: 11.5, lines: [
     [{ t: "{", c: P.darktext }],
-    [{ t: '  "model"', c: "5A05F4" }, { t: ': "mock",', c: "177245" }],
-    [{ t: '  "messages"', c: "5A05F4" }, { t: ": [", c: P.darktext }],
-    [{ t: '    {"role":"system", "content":"…"},', c: "177245" }],
-    [{ t: '    {"role":"user",   "content":"…"}', c: "177245" }],
+    [{ t: '  "model"', c: P.codeKey }, { t: ': "mock",', c: P.codeStr }],
+    [{ t: '  "messages"', c: P.codeKey }, { t: ": [", c: P.darktext }],
+    [{ t: '    {"role":"system", "content":"…"},', c: P.codeStr }],
+    [{ t: '    {"role":"user",   "content":"…"}', c: P.codeStr }],
     [{ t: "  ]", c: P.darktext }],
     [{ t: "}", c: P.darktext }],
     [{ t: "// саме це шле service/Program.cs", c: P.dim }],
@@ -191,13 +191,13 @@ D.titleSlide({
   s.addText("КОРОТКА ВІДПОВІДЬ", { x: MX, y: 1.75, w: 3, h: 0.28, fontFace: F.mono, fontSize: 9.5, bold: true, color: P.faint, charSpacing: 1, margin: 0 });
   s.addShape("roundRect", { x: MX, y: 2.1, w: 2.2, h: 0.6, rectRadius: 0.08, fill: { color: P.acctint }, line: { type: "none" } });
   s.addText("час до 1-го токена", { x: MX, y: 2.1, w: 2.2, h: 0.6, align: "center", valign: "middle", fontFace: F.body, fontSize: 10.5, color: P.acc, margin: 0 });
-  s.addShape("roundRect", { x: MX + 2.25, y: 2.1, w: 1.5, h: 0.6, rectRadius: 0.08, fill: { color: P.acc }, line: { type: "none" } });
+  s.addShape("roundRect", { x: MX + 2.25, y: 2.1, w: 1.5, h: 0.6, rectRadius: 0.08, fill: { color: P.accsolid }, line: { type: "none" } });
   s.addText("генерація", { x: MX + 2.25, y: 2.1, w: 1.5, h: 0.6, align: "center", valign: "middle", fontFace: F.body, fontSize: 10.5, bold: true, color: "FFFFFF", margin: 0 });
 
   s.addText("ТРИ АБЗАЦИ — ТА САМА МОДЕЛЬ, ТОЙ САМИЙ ПРОВАЙДЕР", { x: MX, y: 3.1, w: 7, h: 0.28, fontFace: F.mono, fontSize: 9.5, bold: true, color: P.faint, charSpacing: 1, margin: 0 });
   s.addShape("roundRect", { x: MX, y: 3.45, w: 2.2, h: 0.6, rectRadius: 0.08, fill: { color: P.acctint }, line: { type: "none" } });
   s.addText("час до 1-го токена", { x: MX, y: 3.45, w: 2.2, h: 0.6, align: "center", valign: "middle", fontFace: F.body, fontSize: 10.5, color: P.acc, margin: 0 });
-  s.addShape("roundRect", { x: MX + 2.25, y: 3.45, w: 6.6, h: 0.6, rectRadius: 0.08, fill: { color: P.acc }, line: { type: "none" } });
+  s.addShape("roundRect", { x: MX + 2.25, y: 3.45, w: 6.6, h: 0.6, rectRadius: 0.08, fill: { color: P.accsolid }, line: { type: "none" } });
   s.addText("генерація: послідовно, токен за токеном", { x: MX + 2.25, y: 3.45, w: 6.6, h: 0.6, align: "center", valign: "middle", fontFace: F.body, fontSize: 11, bold: true, color: "FFFFFF", margin: 0 });
   s.addText("схематично: співвідношення часток, не виміряні значення",
     { x: MX, y: 4.12, w: 12.1, h: 0.3, fontFace: F.body, fontSize: 10.5, italic: true, color: P.faint, margin: 0 });
@@ -217,7 +217,7 @@ D.titleSlide({
   s.addText("МОНІТОРИНГ БАЧИТЬ", { x: MX + 0.25, y: 1.95, w: 5.35, h: 0.3, fontFace: F.mono, fontSize: 10, bold: true, color: P.good, charSpacing: 1.5, margin: 0 });
   [["429", "вичерпана квота"], ["5xx", "інцидент провайдера"], ["таймаут", "відповідь після того, як пішов користувач"]].forEach(([k, v], i) => {
     const y = 2.45 + i * 0.88;
-    s.addShape("roundRect", { x: MX + 0.25, y, w: 1.35, h: 0.5, rectRadius: 0.08, fill: { color: "FFFFFF" }, line: { type: "none" } });
+    s.addShape("roundRect", { x: MX + 0.25, y, w: 1.35, h: 0.5, rectRadius: 0.08, fill: { color: P.card }, line: { type: "none" } });
     s.addText(k, { x: MX + 0.25, y, w: 1.35, h: 0.5, align: "center", valign: "middle", fontFace: F.mono, fontSize: 11.5, bold: true, color: P.good, margin: 0 });
     s.addText(v, { x: MX + 1.75, y, w: 3.85, h: 0.5, fontFace: F.body, fontSize: 12, color: P.ink, valign: "middle", margin: 0 });
   });
@@ -225,7 +225,7 @@ D.titleSlide({
   s.addText("НЕ БАЧИТЬ У ПРИНЦИПІ", { x: 7.12, y: 1.95, w: 5.35, h: 0.3, fontFace: F.mono, fontSize: 10, bold: true, color: P.crit, charSpacing: 1.5, margin: 0 });
   [["200 + сміття", "обрізана, порожня або не-JSON відповідь"], ["200 + тихо гірше", "новий снапшот моделі або правка промпта"]].forEach(([k, v], i) => {
     const y = 2.45 + i * 1.35;
-    s.addShape("roundRect", { x: 7.12, y, w: 5.35, h: 1.15, rectRadius: 0.1, fill: { color: "FFFFFF" }, line: { type: "none" } });
+    s.addShape("roundRect", { x: 7.12, y, w: 5.35, h: 1.15, rectRadius: 0.1, fill: { color: P.card }, line: { type: "none" } });
     s.addText(k, { x: 7.34, y: y + 0.14, w: 5, h: 0.4, fontFace: F.body, fontSize: 15, bold: true, color: P.crit, margin: 0 });
     s.addText(v, { x: 7.34, y: y + 0.58, w: 5, h: 0.5, fontFace: F.body, fontSize: 12, color: P.soft, margin: 0 });
   });
@@ -244,7 +244,7 @@ D.titleSlide({
   D.arrow(s, { x: 6.3, y: 3.35, len: 0.9, dir: "down", color: P.good, dashed: true });
   s.addShape("roundRect", { x: 5.25, y: 4.3, w: 2.1, h: 0.62, rectRadius: 0.1, fill: { color: P.goodbg }, line: { type: "none" } });
   s.addText("Лог у БД", { x: 5.25, y: 4.3, w: 2.1, h: 0.62, align: "center", valign: "middle", fontFace: F.mono, fontSize: 12, bold: true, color: P.good, margin: 0 });
-  D.code(s, { x: MX, y: 5.35, w: 5.6, h: 0.72, size: 13, lines: [[{ t: "docker compose up", c: "177245" }, { t: "  # п'ять компонентів", c: P.dim }]] });
+  D.code(s, { x: MX, y: 5.35, w: 5.6, h: 0.72, size: 13, lines: [[{ t: "docker compose up", c: P.codeStr }, { t: "  # п'ять компонентів", c: P.dim }]] });
   D.band(s, { x: 6.6, y: 5.35, w: 6.12, h: 0.72, tone: "card",
     text: "Ті самі ролі ви зустрінете в будь-якому проді — незалежно від інструментів." });
 }
@@ -268,7 +268,7 @@ D.titleSlide({
 {
   const s = D.slide({ num: "06", title: "Сервіс вирішує. Адаптер виконує.", pill: "absorb",
     notes: N() });
-  s.addShape("roundRect", { x: MX, y: 1.8, w: 5.85, h: 2.15, rectRadius: 0.12, fill: { color: P.acc }, line: { type: "none" } });
+  s.addShape("roundRect", { x: MX, y: 1.8, w: 5.85, h: 2.15, rectRadius: 0.12, fill: { color: P.accsolid }, line: { type: "none" } });
   s.addText("ВИРІШУЄ", { x: MX + 0.3, y: 2.0, w: 5.2, h: 0.35, fontFace: F.mono, fontSize: 11, bold: true, color: "C9C5F2", charSpacing: 2, margin: 0 });
   s.addText("Сервіс", { x: MX + 0.3, y: 2.35, w: 5.2, h: 0.55, fontFace: F.body, fontSize: 26, bold: true, color: "FFFFFF", margin: 0 });
   s.addText("яку модель · чи кеш · чи fallback · скільки коштувало", { x: MX + 0.3, y: 2.95, w: 5.2, h: 0.8, fontFace: F.body, fontSize: 12.5, color: "DEDAF8", valign: "top", margin: 0 });
@@ -289,7 +289,7 @@ D.titleSlide({
   const s = D.slide({ num: "07", title: "Unified log: рядок, з якого виростає весь курс", pill: "absorb",
     notes: N() });
   D.code(s, { x: MX, y: 1.8, w: 12.1, h: 1.0, size: 13, lines: [
-    [{ t: "request_id · model · ", c: P.darktext }, { t: "prompt_version", c: "B45309" }, { t: " · latency_ms · prompt_tokens · completion_tokens · ", c: P.darktext }, { t: "cost_usd", c: "B45309" }, { t: " · status", c: P.darktext }],
+    [{ t: "request_id · model · ", c: P.darktext }, { t: "prompt_version", c: P.codeNum }, { t: " · latency_ms · prompt_tokens · completion_tokens · ", c: P.darktext }, { t: "cost_usd", c: P.codeNum }, { t: " · status", c: P.darktext }],
   ] });
   s.addText("помаранчеві поля сьогодні порожні — це ваша робота на два тижні",
     { x: MX, y: 2.9, w: 12, h: 0.3, fontFace: F.body, fontSize: 11.5, italic: true, color: P.faint, margin: 0 });
@@ -338,9 +338,9 @@ D.titleSlide({
   const s = D.slide({ num: "09", title: "Реальний ключ і розширений стек", pill: "absorb", opt: true,
     notes: N() });
   D.code(s, { x: MX, y: 1.8, w: 12.1, h: 1.65, size: 12.5, lines: [
-    [{ t: "cp gateway/.env.example gateway/.env", c: "177245" }, { t: "   # вписати ключ", c: P.dim }],
-    [{ t: "MODEL=назва-моделі docker compose up", c: "177245" }, { t: "   # реальний провайдер", c: P.dim }],
-    [{ t: "docker compose --profile advanced up", c: "177245" }, { t: "   # + Redis (W3)", c: P.dim }],
+    [{ t: "cp gateway/.env.example gateway/.env", c: P.codeStr }, { t: "   # вписати ключ", c: P.dim }],
+    [{ t: "MODEL=назва-моделі docker compose up", c: P.codeStr }, { t: "   # реальний провайдер", c: P.dim }],
+    [{ t: "docker compose --profile advanced up", c: P.codeStr }, { t: "   # + Redis (W3)", c: P.dim }],
   ] });
   D.tile(s, { x: MX, y: 3.75, w: 3.9, h: 1.9, title: "Зміниться", body: "якість відповідей, багатоходовий діалог, цифри вартості", tone: "card" });
   D.tile(s, { x: 4.72, y: 3.75, w: 3.9, h: 1.9, title: "Не зміниться", body: "жоден механізм контуру: routing, лог, кеш, fallback, гейти", tone: "acc" });
@@ -375,7 +375,7 @@ D.titleSlide({
               ["Зламати", "__fail_503 → «сервіс недоступний», плану Б немає"]];
   st.forEach(([tt, bb], i) => {
     const y = 1.8 + i * 0.86;
-    s.addShape("ellipse", { x: MX, y, w: 0.5, h: 0.5, fill: { color: P.acc }, line: { type: "none" } });
+    s.addShape("ellipse", { x: MX, y, w: 0.5, h: 0.5, fill: { color: P.accsolid }, line: { type: "none" } });
     s.addText(String(i + 1), { x: MX, y, w: 0.5, h: 0.5, align: "center", valign: "middle", fontFace: F.mono, fontSize: 13, bold: true, color: "FFFFFF", margin: 0 });
     s.addText([{ text: tt + "  ", options: { bold: true, fontSize: 14, color: P.ink } },
                { text: bb, options: { fontSize: 12, color: P.soft } }],
@@ -383,7 +383,7 @@ D.titleSlide({
   });
   const yo = 1.8 + 5 * 0.86;
   s.addShape("ellipse", { x: MX, y: yo, w: 0.5, h: 0.5, fill: { color: P.warn }, line: { type: "none" } });
-  s.addText("6", { x: MX, y: yo, w: 0.5, h: 0.5, align: "center", valign: "middle", fontFace: F.mono, fontSize: 13, bold: true, color: "FFFFFF", margin: 0 });
+  s.addText("6", { x: MX, y: yo, w: 0.5, h: 0.5, align: "center", valign: "middle", fontFace: F.mono, fontSize: 13, bold: true, color: P.warnbg, margin: 0 });
   s.addText([{ text: "Розширений стек · опційно  ", options: { bold: true, fontSize: 14, color: P.warn } },
              { text: "--profile advanced → +Redis → погасити", options: { fontSize: 12, color: P.soft } }],
     { x: MX + 0.68, y: yo, w: 11.4, h: 0.5, fontFace: F.body, valign: "middle", margin: 0 });

@@ -64,11 +64,11 @@ D.titleSlide({
 {
   const s = D.slide({ num: "02", title: "tool_calls — прохання, не подія", pill: "absorb", notes: N() });
   D.code(s, { x: MX, y: 1.9, w: 12.1, h: 2.05, size: 11.5, lines: [
-    [{ t: '"message": {', c: "5A05F4" }],
+    [{ t: '"message": {', c: P.codeKey }],
     [{ t: '  "role": "assistant",', c: P.darktext }],
-    [{ t: '  "content": "Перевіряю статус вашого замовлення…",', c: "177245" }],
-    [{ t: '  "tool_calls": [ { "function": { "name": "lookup_order", … } } ]', c: "B45309" }],
-    [{ t: '}, "finish_reason": "tool_calls"', c: "5A05F4" }],
+    [{ t: '  "content": "Перевіряю статус вашого замовлення…",', c: P.codeStr }],
+    [{ t: '  "tool_calls": [ { "function": { "name": "lookup_order", … } } ]', c: P.codeNum }],
+    [{ t: '}, "finish_reason": "tool_calls"', c: P.codeKey }],
   ] });
   D.flow(s, { x: MX, y: 4.3, w: 12.1, h: 0.8, size: 11.5, items: [
     { label: "модель попросила", tone: "acc" }, { label: "сервіс вирішує" }, { label: "сервіс виконує", tone: "good" }] });
@@ -124,11 +124,11 @@ D.titleSlide({
   const s = D.slide({ num: "04", title: "Виконання: реєстр як одна функція", pill: "absorb", notes: N() });
   D.code(s, { x: MX, y: 1.9, w: 12.1, h: 2.5, size: 11.5, lines: [
     [{ t: "// [W3] мінімальний реєстр інструментів", c: P.dim }],
-    [{ t: "static string? RunTool(string name) => name switch {", c: "5A05F4" }],
-    [{ t: '    "lookup_order"  => "статус: оплачено, доставку призначено",', c: "177245" }],
-    [{ t: '    "create_ticket" => "тікет #T-" + Guid.NewGuid()…,', c: "177245" }],
-    [{ t: "    _ => null,", c: "B45309" }],
-    [{ t: "};", c: "5A05F4" }],
+    [{ t: "static string? RunTool(string name) => name switch {", c: P.codeKey }],
+    [{ t: '    "lookup_order"  => "статус: оплачено, доставку призначено",', c: P.codeStr }],
+    [{ t: '    "create_ticket" => "тікет #T-" + Guid.NewGuid()…,', c: P.codeStr }],
+    [{ t: "    _ => null,", c: P.codeNum }],
+    [{ t: "};", c: P.codeKey }],
     [{ t: "var result = RunTool(toolCall);", c: P.darktext }],
     [{ t: 'if (result != null) answer += $" ({result})";', c: P.darktext }],
   ] });
@@ -301,7 +301,7 @@ D.titleSlide({
   ].forEach(([t, b, opt], i) => {
     const y = 2.0 + i * 0.92;
     s.addShape("ellipse", { x: MX, y, w: 0.5, h: 0.5, fill: { color: opt ? P.warn : P.acc }, line: { type: "none" } });
-    s.addText(String(i + 1), { x: MX, y, w: 0.5, h: 0.5, align: "center", valign: "middle", fontFace: F.mono, fontSize: 13, bold: true, color: "FFFFFF", margin: 0 });
+    s.addText(String(i + 1), { x: MX, y, w: 0.5, h: 0.5, align: "center", valign: "middle", fontFace: F.mono, fontSize: 13, bold: true, color: opt ? P.warnbg : P.acctint, margin: 0 });
     s.addText([{ text: t + "  ", options: { bold: true, fontSize: 14, color: opt ? P.warn : P.ink } },
                { text: b, options: { fontSize: 12, color: P.soft } }],
       { x: MX + 0.68, y, w: 11.4, h: 0.5, fontFace: F.body, valign: "middle", margin: 0 });

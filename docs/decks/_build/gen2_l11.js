@@ -97,19 +97,19 @@ D.titleSlide({
 {
   const s = D.slide({ num: "03", title: "Розтин eval-gate.yml: кожен крок — граблі", pill: "absorb", notes: N() });
   D.code(s, { x: MX, y: 1.9, w: 7.5, h: 3.55, size: 10.5, lines: [
-    [{ t: "- name: Up stack        ", c: "5A05F4" }, { t: "# без UI — для evals не потрібен", c: P.dim }],
+    [{ t: "- name: Up stack        ", c: P.codeKey }, { t: "# без UI — для evals не потрібен", c: P.dim }],
     [{ t: "  run: docker compose up -d --build service", c: P.darktext }],
-    [{ t: "- name: Wait for service", c: "5A05F4" }],
+    [{ t: "- name: Wait for service", c: P.codeKey }],
     [{ t: "  run: for i in $(seq 1 40); do", c: P.darktext }],
     [{ t: "         if curl -sf localhost:8080/health; then exit 0; fi", c: P.darktext }],
     [{ t: "         sleep 5", c: P.darktext }],
     [{ t: "       done; docker compose logs; exit 1", c: P.darktext }],
-    [{ t: "- name: Wait for gateway   ", c: "5A05F4" }, { t: "# холодний LiteLLM: 500", c: P.dim }],
-    [{ t: "- name: Evals", c: "5A05F4" }],
+    [{ t: "- name: Wait for gateway   ", c: P.codeKey }, { t: "# холодний LiteLLM: 500", c: P.dim }],
+    [{ t: "- name: Evals", c: P.codeKey }],
     [{ t: "  run: python evals/run.py --dataset evals/golden.jsonl \\", c: P.darktext }],
     [{ t: "         --threshold 5", c: P.darktext }],
-    [{ t: "- name: Logs on failure   ", c: "5A05F4" }, { t: "# if: failure()", c: P.dim }],
-    [{ t: "- name: Down              ", c: "5A05F4" }, { t: "# if: always()", c: P.dim }],
+    [{ t: "- name: Logs on failure   ", c: P.codeKey }, { t: "# if: failure()", c: P.dim }],
+    [{ t: "- name: Down              ", c: P.codeKey }, { t: "# if: always()", c: P.dim }],
   ] });
   [["без UI", "збірка фронтенду в CI — марні хвилини"],
    ["if curl; then", "а не curl && — bash -e вб'є крок на першій невдачі"],
@@ -208,12 +208,12 @@ D.titleSlide({
 {
   const s = D.slide({ num: "09", title: "Rollback-критерії пишуться до пожежі", pill: "absorb", notes: N() });
   D.code(s, { x: MX, y: 1.9, w: 12.1, h: 2.25, size: 12, lines: [
-    [{ t: "Відкочуємо, якщо:", c: "5A05F4" }],
-    [{ t: "  eval pass rate < 5/6         ", c: "B45309" }, { t: "(прогін після деплою)", c: P.dim }],
-    [{ t: "  або fallback_events зростає  ", c: "B45309" }, { t: "протягом 15 хв", c: P.dim }],
-    [{ t: "  або error rate > 5%          ", c: "B45309" }, { t: "протягом 15 хв", c: P.dim }],
-    [{ t: "Хто смикає: черговий, без погоджень.", c: "177245" }],
-    [{ t: "Як: activate попередньої версії — одна команда.", c: "177245" }],
+    [{ t: "Відкочуємо, якщо:", c: P.codeKey }],
+    [{ t: "  eval pass rate < 5/6         ", c: P.codeNum }, { t: "(прогін після деплою)", c: P.dim }],
+    [{ t: "  або fallback_events зростає  ", c: P.codeNum }, { t: "протягом 15 хв", c: P.dim }],
+    [{ t: "  або error rate > 5%          ", c: P.codeNum }, { t: "протягом 15 хв", c: P.dim }],
+    [{ t: "Хто смикає: черговий, без погоджень.", c: P.codeStr }],
+    [{ t: "Як: activate попередньої версії — одна команда.", c: P.codeStr }],
   ] });
   [["Умова", "конкретна метрика і поріг, а не «якщо стане погано»"],
    ["Хто", "названа роль, яка має право смикнути, не питаючи дозволу"],
@@ -244,7 +244,7 @@ D.titleSlide({
   ].forEach(([t, b, opt], i) => {
     const y = 2.0 + i * 0.92;
     s.addShape("ellipse", { x: MX, y, w: 0.5, h: 0.5, fill: { color: opt ? P.warn : P.acc }, line: { type: "none" } });
-    s.addText(String(i + 1), { x: MX, y, w: 0.5, h: 0.5, align: "center", valign: "middle", fontFace: F.mono, fontSize: 13, bold: true, color: "FFFFFF", margin: 0 });
+    s.addText(String(i + 1), { x: MX, y, w: 0.5, h: 0.5, align: "center", valign: "middle", fontFace: F.mono, fontSize: 13, bold: true, color: opt ? P.warnbg : P.acctint, margin: 0 });
     s.addText([{ text: t + "  ", options: { bold: true, fontSize: 14, color: opt ? P.warn : P.ink } },
                { text: b, options: { fontSize: 12, color: P.soft } }],
       { x: MX + 0.68, y, w: 11.4, h: 0.5, fontFace: F.body, valign: "middle", margin: 0 });

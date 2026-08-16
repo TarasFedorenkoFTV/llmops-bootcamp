@@ -80,7 +80,7 @@ D.titleSlide({
 {
   const s = D.slide({ num: "03", title: "Ключ кешу — це контракт коректності", pill: "absorb", notes: N() });
   D.code(s, { x: MX, y: 1.9, w: 12.1, h: 0.85, size: 13, lines: [
-    [{ t: "var cacheKey = ", c: P.darktext }, { t: '$"{model}|{systemPrompt}|{body.Message}"', c: "177245" }, { t: ";", c: P.darktext }],
+    [{ t: "var cacheKey = ", c: P.darktext }, { t: '$"{model}|{systemPrompt}|{body.Message}"', c: P.codeStr }, { t: ";", c: P.darktext }],
   ] });
   D.flow(s, { x: MX, y: 3.05, w: 12.1, h: 0.78, size: 11.5, items: [
     { label: "модель", tone: "acc" }, { label: "текст промпта", tone: "acc" }, { label: "повідомлення", tone: "acc" }] });
@@ -122,14 +122,14 @@ D.titleSlide({
   const s = D.slide({ num: "04", title: "Розтин коду: виклик моделі стає гілкою miss", pill: "absorb", notes: N() });
   D.code(s, { x: MX, y: 1.9, w: 12.1, h: 2.65, size: 11.5, lines: [
     [{ t: "// [W3] простий in-memory кеш + лічильники", c: P.dim }],
-    [{ t: "if (cache.TryGetValue(cacheKey, out var cached)) {", c: "5A05F4" }],
+    [{ t: "if (cache.TryGetValue(cacheKey, out var cached)) {", c: P.codeKey }],
     [{ t: "    answer = cached;", c: P.darktext }],
-    [{ t: "    Interlocked.Increment(ref stats.CacheHits);", c: "177245" }],
-    [{ t: "} else {", c: "5A05F4" }],
-    [{ t: "    Interlocked.Increment(ref stats.CacheMisses);", c: "B45309" }],
+    [{ t: "    Interlocked.Increment(ref stats.CacheHits);", c: P.codeStr }],
+    [{ t: "} else {", c: P.codeKey }],
+    [{ t: "    Interlocked.Increment(ref stats.CacheMisses);", c: P.codeNum }],
     [{ t: "    // ... виклик моделі, парсинг, як раніше ...", c: P.dim }],
     [{ t: "    if (status == 200 && toolCall == null) cache[cacheKey] = answer;", c: P.darktext }],
-    [{ t: "}", c: "5A05F4" }],
+    [{ t: "}", c: P.codeKey }],
   ] });
   [["Тільки 200 у кеш", "заглушки й помилки не консервуємо"],
    ["toolCall == null", "результати інструментів не кешуються ніколи"],
@@ -278,7 +278,7 @@ D.titleSlide({
   ].forEach(([t, b, opt], i) => {
     const y = 2.0 + i * 0.92;
     s.addShape("ellipse", { x: MX, y, w: 0.5, h: 0.5, fill: { color: opt ? P.warn : P.acc }, line: { type: "none" } });
-    s.addText(String(i + 1), { x: MX, y, w: 0.5, h: 0.5, align: "center", valign: "middle", fontFace: F.mono, fontSize: 13, bold: true, color: "FFFFFF", margin: 0 });
+    s.addText(String(i + 1), { x: MX, y, w: 0.5, h: 0.5, align: "center", valign: "middle", fontFace: F.mono, fontSize: 13, bold: true, color: opt ? P.warnbg : P.acctint, margin: 0 });
     s.addText([{ text: t + "  ", options: { bold: true, fontSize: 14, color: opt ? P.warn : P.ink } },
                { text: b, options: { fontSize: 12, color: P.soft } }],
       { x: MX + 0.68, y, w: 11.4, h: 0.5, fontFace: F.body, valign: "middle", margin: 0 });

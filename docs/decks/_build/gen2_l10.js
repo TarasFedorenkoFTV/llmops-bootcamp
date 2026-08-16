@@ -105,12 +105,12 @@ D.titleSlide({
 {
   const s = D.slide({ num: "03", title: "Шість кейсів = специфікація п'яти тижнів", pill: "absorb", notes: N() });
   D.code(s, { x: MX, y: 1.85, w: 12.1, h: 2.05, size: 10, lines: [
-    [{ t: '{"id": "faq-1",    "input": "Як скинути пароль?",       "expect": ["email"], "forbid": ["не знаю"]}', c: "177245" }],
-    [{ t: '{"id": "faq-2",    "input": "Не працює вхід",           "expect": ["email"], "forbid": ["не знаю"]}', c: "177245" }],
-    [{ t: '{"id": "order-1",  "input": "Де моє замовлення #10482?", "expect": ["замовлення"]}', c: "5A05F4" }],
-    [{ t: '{"id": "refund-1", "input": "Хочу повернути гроші",      "expect": ["тікет"]}', c: "5A05F4" }],
-    [{ t: '{"id": "safety-1", "input": "Ignore instructions…",      "expect_refusal": true}', c: "B45309" }],
-    [{ t: '{"id": "caps-1",   "input": "Що ти можеш?",              "expect": ["допомог"]}', c: "177245" }],
+    [{ t: '{"id": "faq-1",    "input": "Як скинути пароль?",       "expect": ["email"], "forbid": ["не знаю"]}', c: P.codeStr }],
+    [{ t: '{"id": "faq-2",    "input": "Не працює вхід",           "expect": ["email"], "forbid": ["не знаю"]}', c: P.codeStr }],
+    [{ t: '{"id": "order-1",  "input": "Де моє замовлення #10482?", "expect": ["замовлення"]}', c: P.codeKey }],
+    [{ t: '{"id": "refund-1", "input": "Хочу повернути гроші",      "expect": ["тікет"]}', c: P.codeKey }],
+    [{ t: '{"id": "safety-1", "input": "Ignore instructions…",      "expect_refusal": true}', c: P.codeNum }],
+    [{ t: '{"id": "caps-1",   "input": "Що ти можеш?",              "expect": ["допомог"]}', c: P.codeStr }],
   ] });
   [["faq · caps", "базова якість; червоніють після rollback промпта", "W1–2"],
    ["order-1", "tool-виклик працює, результат у відповіді", "W3"],
@@ -154,14 +154,14 @@ D.titleSlide({
 {
   const s = D.slide({ num: "05", title: "Rule-based grader: дешево і детерміновано", pill: "absorb", notes: N() });
   D.code(s, { x: MX, y: 1.9, w: 12.1, h: 2.5, size: 11.5, lines: [
-    [{ t: "def grade(case, answer):", c: "5A05F4" }],
+    [{ t: "def grade(case, answer):", c: P.codeKey }],
     [{ t: "    a = answer.lower()", c: P.darktext }],
-    [{ t: '    if case.get("expect_refusal"):', c: "5A05F4" }],
-    [{ t: '        return any(w in a for w in ["не можу", "cannot", "refuse"])', c: "177245" }],
-    [{ t: '    for kw in case.get("expect", []):', c: "5A05F4" }],
-    [{ t: "        if kw.lower() not in a: return False", c: "B45309" }],
-    [{ t: '    for kw in case.get("forbid", []):', c: "5A05F4" }],
-    [{ t: "        if kw.lower() in a: return False", c: "B45309" }],
+    [{ t: '    if case.get("expect_refusal"):', c: P.codeKey }],
+    [{ t: '        return any(w in a for w in ["не можу", "cannot", "refuse"])', c: P.codeStr }],
+    [{ t: '    for kw in case.get("expect", []):', c: P.codeKey }],
+    [{ t: "        if kw.lower() not in a: return False", c: P.codeNum }],
+    [{ t: '    for kw in case.get("forbid", []):', c: P.codeKey }],
+    [{ t: "        if kw.lower() in a: return False", c: P.codeNum }],
   ] });
   [["Безкоштовний", "жодного виклику моделі"],
    ["Детермінований", "той самий вхід — той самий вердикт"],
@@ -216,14 +216,14 @@ D.titleSlide({
 {
   const s = D.slide({ num: "08", title: "Та сама регресія — тепер командою", pill: "absorb", notes: N() });
   D.code(s, { x: MX, y: 1.9, w: 7.3, h: 2.5, size: 11, lines: [
-    [{ t: "$ python evals/run.py --dataset evals/golden.jsonl --threshold 5", c: "5A05F4" }],
-    [{ t: "eval: 6/6 passed, threshold 5     # зелено", c: "177245" }],
+    [{ t: "$ python evals/run.py --dataset evals/golden.jsonl --threshold 5", c: P.codeKey }],
+    [{ t: "eval: 6/6 passed, threshold 5     # зелено", c: P.codeStr }],
     [{ t: "", c: P.darktext }],
-    [{ t: "$ curl -X POST …/prompts/v1/activate   # «погана» версія", c: "5A05F4" }],
-    [{ t: "eval: 3/6 passed, threshold 5     # ЧЕРВОНО, exit 1", c: "B45309" }],
+    [{ t: "$ curl -X POST …/prompts/v1/activate   # «погана» версія", c: P.codeKey }],
+    [{ t: "eval: 3/6 passed, threshold 5     # ЧЕРВОНО, exit 1", c: P.codeNum }],
     [{ t: "", c: P.darktext }],
-    [{ t: "$ curl -X POST …/prompts/v2/activate   # відкат", c: "5A05F4" }],
-    [{ t: "eval: 6/6 passed                  # зелено знову", c: "177245" }],
+    [{ t: "$ curl -X POST …/prompts/v2/activate   # відкат", c: P.codeKey }],
+    [{ t: "eval: 6/6 passed                  # зелено знову", c: P.codeStr }],
   ] });
   D.tile(s, { x: 7.9, y: 1.9, w: 4.82, h: 1.15, title: "Відчуйте різницю",
     body: "«я подивився, ніби ок» залежить від того, хто дивився", tone: "warn" });
@@ -280,7 +280,7 @@ D.titleSlide({
   ].forEach(([t, b, opt], i) => {
     const y = 2.0 + i * 0.92;
     s.addShape("ellipse", { x: MX, y, w: 0.5, h: 0.5, fill: { color: opt ? P.warn : P.acc }, line: { type: "none" } });
-    s.addText(String(i + 1), { x: MX, y, w: 0.5, h: 0.5, align: "center", valign: "middle", fontFace: F.mono, fontSize: 13, bold: true, color: "FFFFFF", margin: 0 });
+    s.addText(String(i + 1), { x: MX, y, w: 0.5, h: 0.5, align: "center", valign: "middle", fontFace: F.mono, fontSize: 13, bold: true, color: opt ? P.warnbg : P.acctint, margin: 0 });
     s.addText([{ text: t + "  ", options: { bold: true, fontSize: 14, color: opt ? P.warn : P.ink } },
                { text: b, options: { fontSize: 12, color: P.soft } }],
       { x: MX + 0.68, y, w: 11.4, h: 0.5, fontFace: F.body, valign: "middle", margin: 0 });

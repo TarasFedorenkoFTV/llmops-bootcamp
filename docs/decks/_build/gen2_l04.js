@@ -63,8 +63,8 @@ D.titleSlide({
 {
   const s = D.slide({ num: "02", title: "Usage — єдине джерело правди", pill: "absorb", notes: N() });
   D.code(s, { x: MX, y: 1.9, w: 6.3, h: 1.35, size: 13, lines: [
-    [{ t: '"usage"', c: "5A05F4" }, { t: ": { ", c: P.darktext }, { t: '"prompt_tokens"', c: "5A05F4" }, { t: ": 184,", c: P.darktext }],
-    [{ t: "          ", c: P.darktext }, { t: '"completion_tokens"', c: "5A05F4" }, { t: ": 46 }", c: P.darktext }],
+    [{ t: '"usage"', c: P.codeKey }, { t: ": { ", c: P.darktext }, { t: '"prompt_tokens"', c: P.codeKey }, { t: ": 184,", c: P.darktext }],
+    [{ t: "          ", c: P.darktext }, { t: '"completion_tokens"', c: P.codeKey }, { t: ": 46 }", c: P.darktext }],
   ] });
   D.band(s, { x: MX, y: 3.45, w: 6.3, h: 1.1, tone: "acc", text: "вартість = токени × ціна моделі, окремо вхідні й вихідні" });
   D.tile(s, { x: 7.25, y: 1.9, w: 5.47, h: 1.35, title: "Вихідні дорожчі", body: "провайдери тарифікують їх у кілька разів вище", tone: "warn" });
@@ -96,10 +96,10 @@ D.titleSlide({
   const s = D.slide({ num: "03", title: "Прайс живе в control plane", pill: "absorb", notes: N() });
   D.code(s, { x: MX, y: 1.9, w: 7.4, h: 2.0, size: 11.5, lines: [
     [{ t: "// [W2] прайс за 1k токенів (in, out) — навчальні числа", c: P.dim }],
-    [{ t: "var prices = new Dictionary<string, (decimal In, decimal Out)>", c: "5A05F4" }],
+    [{ t: "var prices = new Dictionary<string, (decimal In, decimal Out)>", c: P.codeKey }],
     [{ t: "{", c: P.darktext }],
-    [{ t: '  ["mock-mini"]   = (0.00015m, 0.0006m),', c: "177245" }],
-    [{ t: '  ["mock-strong"] = (0.0025m,  0.01m),', c: "177245" }],
+    [{ t: '  ["mock-mini"]   = (0.00015m, 0.0006m),', c: P.codeStr }],
+    [{ t: '  ["mock-strong"] = (0.0025m,  0.01m),', c: P.codeStr }],
     [{ t: "};", c: P.darktext }],
   ] });
   D.stat(s, { x: 8.35, y: 1.9, w: 2.1, h: 2.0, value: "×16", label: "strong дорожча за mini", tone: "crit", size: 34 });
@@ -129,10 +129,10 @@ D.titleSlide({
   const s = D.slide({ num: "04", title: "Розрахунок: три рядки після відповіді", pill: "absorb", notes: N() });
   D.code(s, { x: MX, y: 1.9, w: 12.1, h: 1.9, size: 12, lines: [
     [{ t: "// [W2] cost: tokens * ціна моделі", c: P.dim }],
-    [{ t: "decimal? costUsd = prices.TryGetValue(model, out var pr)", c: "5A05F4" }],
+    [{ t: "decimal? costUsd = prices.TryGetValue(model, out var pr)", c: P.codeKey }],
     [{ t: "    ? Math.Round(promptTokens / 1000m * pr.In", c: P.darktext }],
     [{ t: "                + completionTokens / 1000m * pr.Out, 6)", c: P.darktext }],
-    [{ t: "    : null;", c: "B45309" }],
+    [{ t: "    : null;", c: P.codeNum }],
   ] });
   D.tile(s, { x: MX, y: 4.05, w: 5.85, h: 1.75, title: "null, а не нуль",
     body: "нуль — брехня «запит був безкоштовний»; null — чесне «не знаємо», яке легко знайти запитом", tone: "crit" });
@@ -182,10 +182,10 @@ D.titleSlide({
   D.stat(s, { x: 3.82, y: 1.9, w: 8.9, h: 1.5, value: "$310 — ескалації на strong", label: "третина могла піти на mini: рішення з порахованим ефектом", tone: "good", size: 28 });
   D.code(s, { x: MX, y: 3.6, w: 6.9, h: 1.75, size: 11, lines: [
     [{ t: "-- за моделлю: чи дороге дістається складному?", c: P.dim }],
-    [{ t: "SELECT model, count(*), SUM(cost_usd)", c: "5A05F4" }],
+    [{ t: "SELECT model, count(*), SUM(cost_usd)", c: P.codeKey }],
     [{ t: "  FROM requests GROUP BY model;", c: P.darktext }],
     [{ t: "-- за днем: тренд і сплески", c: P.dim }],
-    [{ t: "SELECT created_at::date, SUM(cost_usd) …", c: "5A05F4" }],
+    [{ t: "SELECT created_at::date, SUM(cost_usd) …", c: P.codeKey }],
   ] });
   D.band(s, { x: 7.85, y: 3.6, w: 4.87, h: 1.75, tone: "acc",
     text: "Записали в момент запиту — зріз коштує один GROUP BY. Ні — вже ніколи." });
@@ -198,7 +198,7 @@ D.titleSlide({
   D.code(s, { x: MX, y: 1.9, w: 7.2, h: 2.2, size: 11.5, lines: [
     [{ t: "// SELECT COALESCE(SUM(cost_usd), 0) FROM requests", c: P.dim }],
     [{ t: "//  WHERE created_at::date = CURRENT_DATE", c: P.dim }],
-    [{ t: "return Results.Json(new {", c: "5A05F4" }],
+    [{ t: "return Results.Json(new {", c: P.codeKey }],
     [{ t: "    today_usd  = Math.Round(today, 4),", c: P.darktext }],
     [{ t: "    budget_usd = 5.0 });", c: P.darktext }],
   ] });
@@ -215,7 +215,7 @@ D.titleSlide({
 {
   const s = D.slide({ num: "08", title: "Routing × cost: важіль стає видимим", pill: "absorb", notes: N() });
   D.code(s, { x: MX, y: 1.9, w: 12.1, h: 0.8, size: 12.5, lines: [
-    [{ t: "SELECT model, cost_usd FROM requests ORDER BY created_at DESC LIMIT 2;", c: "5A05F4" }],
+    [{ t: "SELECT model, cost_usd FROM requests ORDER BY created_at DESC LIMIT 2;", c: P.codeKey }],
   ] });
   D.bars(s, { x: MX + 0.4, y: 3.0, w: 11.3, labelW: 2.6, noteW: 3.2, rowH: 0.55, gap: 0.3, rows: [
     { label: "FAQ → mock-mini", value: 1, note: "дешевий маршрут", tone: "good" },
@@ -279,7 +279,7 @@ D.titleSlide({
   ].forEach(([t, b, opt], i) => {
     const y = 2.0 + i * 0.92;
     s.addShape("ellipse", { x: MX, y, w: 0.5, h: 0.5, fill: { color: opt ? P.warn : P.acc }, line: { type: "none" } });
-    s.addText(String(i + 1), { x: MX, y, w: 0.5, h: 0.5, align: "center", valign: "middle", fontFace: F.mono, fontSize: 13, bold: true, color: "FFFFFF", margin: 0 });
+    s.addText(String(i + 1), { x: MX, y, w: 0.5, h: 0.5, align: "center", valign: "middle", fontFace: F.mono, fontSize: 13, bold: true, color: opt ? P.warnbg : P.acctint, margin: 0 });
     s.addText([{ text: t + "  ", options: { bold: true, fontSize: 14, color: opt ? P.warn : P.ink } },
                { text: b, options: { fontSize: 12, color: P.soft } }],
       { x: MX + 0.68, y, w: 11.4, h: 0.5, fontFace: F.body, valign: "middle", margin: 0 });
