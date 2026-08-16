@@ -146,15 +146,11 @@ function createDeck({ lesson, week, fileTitle, notes: reader }) {
     return s;
   }
 
-  // Начитка з LNN-script.md → панель нотаток PowerPoint. Без цього виклику текст
-  // ходив по колу (md → script[] → md) і в .pptx не потрапляв: усі 288 нотаток були
-  // порожні. Нотатки — місце для повного тексту виступу (Redundancy Principle),
-  // слайд лишається візуальною опорою.
-  function pushNotes(s, notes) {
-    const t = String(notes || "").trim();
-    if (!t) return;
-    s.addNotes(t.replace(/\*\*(.+?)\*\*/g, "$1").replace(/[ \t]+\n/g, "\n"));
-  }
+  // Начитку СВІДОМО не кладемо в панель нотаток PowerPoint: вона живе окремим
+  // текстовим файлом LNN-script.md поруч із LNN.pptx (пише save() нижче).
+  // Так .pptx лишається чистим файлом для показу, а текст виступу редагується
+  // й читається окремо, без відкривання презентації.
+  function pushNotes() { /* навмисно порожньо — див. LNN-script.md */ }
 
   function slide({ num, title, kicker, pill, opt, notes }) {
     const s = pres.addSlide(); idx++;
