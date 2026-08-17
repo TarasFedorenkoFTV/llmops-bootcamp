@@ -133,6 +133,9 @@ const logoAsset = (name) => {
 };
 const LOGO = logoAsset("neoversity-logo-white.png");
 const LOGO_DARK = logoAsset("neoversity-logo.png");
+// Фото автора. Немає файлу — слайд усе одно збереться, з боксом «фото», рівно
+// як заготовка в шаблоні. Підтримуються jpg і png.
+const AUTHOR = logoAsset("author.jpg") || logoAsset("author.png");
 
 // Брендові фони — зібрані з ассетів самого шаблону Neoversity, по одному на тип
 // слайда, як у шаблоні (там під кожен тип свій готовий фон):
@@ -268,6 +271,55 @@ function createDeck({ lesson, week, fileTitle, notes: reader }) {
     }
     pushNotes(s, notes);
     script.push({ n: idx, title: big, notes });
+    return s;
+  }
+
+  // ── АВТОР ТА ВИКЛАДАЧ ──────────────────────────────────────────────────────
+  // Архетип шаблону, сл. 11: біла картка на ~54% ліворуч (ім'я великим, роль,
+  // лінійка, булети біографії) і темний закруглений бокс під фото праворуч, на
+  // градієнті. Якщо файлу фото немає — бокс лишається з підписом «фото», рівно
+  // як заготовка в самому шаблоні.
+  function authorSlide({ name, role, bullets, notes }) {
+    const s = newSlide(); idx++;
+    const CW = 7.18;                                    // 54% ширини, як у шаблоні
+    s.addShape("roundRect", { x: CARD.x, y: CARD.y, w: CW, h: CARD.h,
+      rectRadius: CARD.r, fill: { color: P.cardbg }, line: { type: "none" } });
+    s.addText(name, { x: 0.85, y: 0.70, w: CW - 1.1, h: 1.10, fontFace: F.display,
+      fontSize: 34, color: P.ink, valign: "middle", lineSpacingMultiple: 1.0, margin: 0 });
+    s.addText(role, { x: 0.85, y: 1.90, w: CW - 1.1, h: 0.60, fontFace: F.body,
+      fontSize: 14.5, color: P.soft, valign: "top", lineSpacingMultiple: 1.15, margin: 0 });
+    s.addShape("line", { x: 0.85, y: 2.62, w: CW - 1.7, h: 0, line: { color: P.line, width: 1 } });
+    const top = 2.90, gap = (CARD.y + CARD.h - 0.55 - top) / bullets.length;
+    bullets.forEach((b, i) => {
+      const yy = top + i * gap;
+      s.addShape("ellipse", { x: 0.88, y: yy + 0.16, w: 0.11, h: 0.11, fill: { color: P.acc }, line: { type: "none" } });
+      s.addText(b, { x: 1.18, y: yy, w: CW - 1.45, h: gap - 0.10, fontFace: F.body,
+        fontSize: 11.5, color: P.ink, valign: "top", lineSpacingMultiple: 1.12, margin: 0 });
+    });
+    // Фото праворуч — портретний бокс на градієнті
+    const px = 7.85, py = 0.95, pw = 4.62, ph = 5.60;
+    if (AUTHOR) {
+      s.addImage({ data: AUTHOR, x: px, y: py, w: pw, h: ph, rounding: false });
+    } else {
+      s.addShape("roundRect", { x: px, y: py, w: pw, h: ph, rectRadius: 0.24,
+        fill: { color: DK.panel }, line: { color: DK.line, width: 1 } });
+      s.addText("фото", { x: px, y: py, w: pw, h: ph, align: "center", valign: "middle",
+        fontFace: F.body, fontSize: 15, color: DK.sub, margin: 0 });
+    }
+    pushNotes(s, notes);
+    script.push({ n: idx, title: "Автор та викладач", notes });
+    return s;
+  }
+
+  // ── ДЯКУЮ ──────────────────────────────────────────────────────────────────
+  // Шаблон, сл. 42: одне слово на темному градієнті, Unbounded 73 pt.
+  function thanksSlide({ notes }) {
+    const s = newDarkSlide(); idx++;
+    wordmark(s);
+    s.addText("ДЯКУЮ", { x: MX, y: 3.10, w: 12.10, h: 1.60, fontFace: F.display,
+      fontSize: 73, color: DK.ink, valign: "middle", margin: 0 });
+    pushNotes(s, notes);
+    script.push({ n: idx, title: "ДЯКУЮ", notes });
     return s;
   }
 
@@ -576,7 +628,7 @@ function createDeck({ lesson, week, fileTitle, notes: reader }) {
     return pres.writeFile({ fileName: deckPath }).then(() => console.log("OK: " + deckPath + "  +  " + scriptPath));
   }
 
-  return { pres, P, F, W, H, MX, TONE, titleSlide, slide, divider, closingSlide,
+  return { pres, P, F, W, H, MX, TONE, titleSlide, slide, divider, authorSlide, thanksSlide, closingSlide,
            stat, tile, arrow, flow, bars, states, layers, timeline, band, code, table, checklist, terms,
            tick, cross, save };
 }

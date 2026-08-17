@@ -332,5 +332,8 @@ D.closingSlide({
   notes: N(),
 });
 
+// ─── ДЯКУЮ (шаблон, сл. 42) ───
+D.thanksSlide({ notes: N() });
+
 const OUT = process.env.DECKS_OUT || SRC;
 D.save(path.join(OUT, "L11.pptx"), path.join(OUT, "L11-script.md"));

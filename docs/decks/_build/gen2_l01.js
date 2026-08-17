@@ -14,6 +14,20 @@ D.titleSlide({
 });
 
 // ─── S2 learning outcomes ───
+// ─── АВТОР ТА ВИКЛАДАЧ (шаблон, сл. 11) ───
+D.authorSlide({
+  name: "Тарас\nФедоренко",
+  role: "Senior Backend / AI Engineer у Creatio · автор курсу LLMOps у Neoversity",
+  bullets: [
+    "8+ років в IT — від QA Automation до Backend та AI Engineering у production",
+    "Стояв біля витоків Creatio.ai — флагманського AI-напряму українського єдинорога Creatio: впроваджував LLM-фічі ще до мейнстріму GenAI",
+    "Наскрізно побудував RAG/Q&A систему: від .NET API до Python ML на LangChain, з OpenAI / Azure OpenAI та Elasticsearch як vector store",
+    "Основна експертиза — LLMOps: надійність, масштабування, моніторинг і security AI-сервісів у production",
+    "Досвід у класичному ML (рекомендації, sequence prediction, scikit-learn / xgboost) і у full-stack розробці",
+  ],
+  notes: N(),
+});
+
 {
   const s = D.slide({ title: "Що ви зможете після уроку", pill: "absorb", kicker: "Шість дій, які перевірите руками вже сьогодні",
     notes: N() });
@@ -50,6 +64,31 @@ D.titleSlide({
   });
   D.band(s, { x: MX, y: 6.32, w: 12.1, h: 0.44, tone: "card",
     text: "Перші п'ять блоків — об'єкт керування. Наступні — каркас, який ви будуватимете шість тижнів." });
+}
+
+// ─── КАРТА КУРСУ ПО ТИЖНЯХ (шаблон, сл. 13) ───
+{
+  const s = D.slide({ title: "Курс складається з шести тижнів", pill: "absorb",
+    kicker: "Кожен тиждень — два уроки; кожен наступний шар лягає на той самий контур керування",
+    notes: N() });
+  [["Тиждень 1", "Основа + промпти", "архітектура production LLM-системи · промпт як артефакт"],
+   ["Тиждень 2", "Routing + cost", "мультипровайдерний gateway · токеноміка і cost attribution"],
+   ["Тиждень 3", "Кеш + tools", "точний і semantic cache · tool calls, коли модель діє"],
+   ["Тиждень 4", "Надійність + безпека", "fallback і circuit breaker · guardrails і human-in-the-loop"],
+   ["Тиждень 5", "Observability + evals", "метрики LLM-систем · golden dataset і eval suite"],
+   ["Тиждень 6", "CI + фінал", "quality gates, canary і rollback · operating model"],
+  ].forEach(([wk, name, body], i) => {
+    const y = 2.30 + i * 0.76;
+    s.addShape("roundRect", { x: MX, y, w: 1.62, h: 0.56, rectRadius: 0.28,
+      fill: { color: P.accsolid }, line: { type: "none" } });
+    s.addText(wk, { x: MX, y, w: 1.62, h: 0.56, align: "center", valign: "middle",
+      fontFace: F.mono, fontSize: 9.5, bold: true, color: P.onink, margin: 0 });
+    s.addShape("roundRect", { x: 2.44, y, w: 10.28, h: 0.56, rectRadius: 0.1,
+      fill: { color: P.cardbg }, line: { color: P.line, width: 1 } });
+    s.addText([{ text: name + "   ", options: { bold: true, color: P.ink } },
+               { text: body, options: { color: P.soft } }],
+      { x: 2.68, y, w: 9.8, h: 0.56, fontFace: F.body, fontSize: 11.5, valign: "middle", margin: 0 });
+  });
 }
 
 // ─── S4 глосарій (pre-training) ───
@@ -484,6 +523,9 @@ D.closingSlide({
   nextBody: "Ваш системний промпт захардкоджений у коді — і це остання доба, коли це прийнятно. Далі: версії, promote, rollback і відкат за секунди.",
   notes: N(),
 });
+
+// ─── ДЯКУЮ (шаблон, сл. 42) ───
+D.thanksSlide({ notes: N() });
 
 const OUT = process.env.DECKS_OUT || SRC;
 D.save(path.join(OUT, "L01.pptx"), path.join(OUT, "L01-script.md"));
