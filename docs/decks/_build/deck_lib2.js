@@ -296,8 +296,11 @@ function createDeck({ lesson, week, fileTitle, notes: reader }) {
       s.addText(b, { x: 1.18, y: yy, w: CW - 1.45, h: gap - 0.10, fontFace: F.body,
         fontSize: 11.5, color: P.ink, valign: "top", lineSpacingMultiple: 1.12, margin: 0 });
     });
-    // Фото праворуч — портретний бокс на градієнті
-    const px = 7.85, py = 0.95, pw = 4.62, ph = 5.60;
+    // Фото праворуч. Бокс КВАДРАТНИЙ — це теж геометрія шаблону (сл. 21 і 22:
+    // 4.96×4.96" у позиції y 1.27), і саме вона дозволяє поставити квадратний
+    // портрет без кадрування. У шаблоні є чотири пропорції боксів під фото
+    // (0.84, 1.00, 2.12, 3.77) — беремо ту, що пасує до наявного фото.
+    const px = 7.79, py = 1.27, pw = 4.96, ph = 4.96;
     if (AUTHOR) {
       s.addImage({ data: AUTHOR, x: px, y: py, w: pw, h: ph, rounding: false });
     } else {
