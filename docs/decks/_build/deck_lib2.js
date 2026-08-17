@@ -241,6 +241,36 @@ function createDeck({ lesson, week, fileTitle, notes: reader }) {
     return s;
   }
 
+  // ── РОЗДІЛЮВАЧ ─────────────────────────────────────────────────────────────
+  // Архетип шаблону, найчастіший серед його прикладів: 16 із 34 — темний
+  // градієнт з ОДНИМ великим заголовком (сл. 14, 25, 28, 32, 36–39, 42).
+  // Типографіка виміряна зі шаблону: Unbounded, великими, 65 pt (рівно як
+  // «ПРАКТИКА» на сл. 28), ліворуч від MX, у середній смузі слайда; знизу —
+  // короткий підпис 15 pt і за потреби фіолетовий чип «що далі» (сл. 38).
+  // Ні номера слайда, ні лого — у шаблонних розділювачах їх немає.
+  // 65 pt тримає всі три наші слова: найдовше «РЕФЛЕКСІЯ» = 6.67" із 12.10".
+  function divider({ big, sub, pill, notes }) {
+    const s = newDarkSlide(); idx++;
+    wordmark(s);
+    s.addText(big, { x: MX, y: 2.72, w: 12.10, h: 1.50, fontFace: F.display,
+      fontSize: 65, color: DK.ink, valign: "middle", margin: 0 });
+    if (sub) {
+      s.addText(sub, { x: MX, y: 4.40, w: 9.60, h: 0.52, fontFace: F.body,
+        fontSize: 15, color: DK.sub, valign: "top", margin: 0 });
+    }
+    if (pill) {
+      const label = "→  " + pill;
+      const pw = Math.min(9.4, 0.70 + label.length * 0.098);
+      s.addShape("roundRect", { x: MX, y: 5.22, w: pw, h: 0.52, rectRadius: 0.26,
+        fill: { color: DK.solid }, line: { type: "none" } });
+      s.addText(label, { x: MX, y: 5.22, w: pw, h: 0.52, align: "center", valign: "middle",
+        fontFace: F.body, fontSize: 13, bold: true, color: DK.ink, margin: 0 });
+    }
+    pushNotes(s, notes);
+    script.push({ n: idx, title: big, notes });
+    return s;
+  }
+
   // Начитку СВІДОМО не кладемо в панель нотаток PowerPoint: вона живе окремим
   // текстовим файлом LNN-script.md поруч із LNN.pptx (пише save() нижче).
   // Так .pptx лишається чистим файлом для показу, а текст виступу редагується
@@ -538,7 +568,7 @@ function createDeck({ lesson, week, fileTitle, notes: reader }) {
     return pres.writeFile({ fileName: deckPath }).then(() => console.log("OK: " + deckPath + "  +  " + scriptPath));
   }
 
-  return { pres, P, F, W, H, MX, TONE, titleSlide, slide, closingSlide,
+  return { pres, P, F, W, H, MX, TONE, titleSlide, slide, divider, closingSlide,
            stat, tile, arrow, flow, bars, states, layers, timeline, band, code, table, checklist, terms,
            tick, cross, save };
 }

@@ -69,6 +69,11 @@ D.titleSlide({
     text: "Кожне розберемо на місці — тут лише щоб не спотикатися." });
 }
 
+// ─── РОЗДІЛЮВАЧ · теорія ───
+{
+  D.divider({ big: "ТЕОРІЯ", sub: "9 блоків — дивимось і розбираємось, руками поки не робимо", notes: N() });
+}
+
 // ─── S5 · 01 проблема ───
 {
   const s = D.slide({ num: "01", title: "Чому демо за день — а прод ніколи?", pill: "absorb",
@@ -351,6 +356,12 @@ D.titleSlide({
     { x: MX, y: 5.9, w: 12, h: 0.35, fontFace: F.body, fontSize: 12, italic: true, color: P.soft, margin: 0 });
 }
 
+// ─── РОЗДІЛЮВАЧ · практика ───
+{
+  D.divider({ big: "ПРАКТИКА", sub: "стенд наживо — і чесна межа того, що він доводить",
+    pill: "Лабораторна: п'ять кроків + один опційний", notes: N() });
+}
+
 // ─── S18 місток до демо ───
 {
   const s = D.slide({ title: "Зараз ви побачите — і навіщо", pill: "do",
@@ -388,6 +399,11 @@ D.titleSlide({
   s.addText([{ text: "Розширений стек · опційно  ", options: { bold: true, fontSize: 14, color: P.warn } },
              { text: "--profile advanced → +Redis → погасити", options: { fontSize: 12, color: P.soft } }],
     { x: MX + 0.68, y: yo, w: 11.4, h: 0.5, fontFace: F.body, valign: "middle", margin: 0 });
+}
+
+// ─── РОЗДІЛЮВАЧ · рефлексія ───
+{
+  D.divider({ big: "РЕФЛЕКСІЯ", sub: "що це довело · перевір себе · антипатерни тижня", notes: N() });
 }
 
 // ─── S20 що це довело ───
