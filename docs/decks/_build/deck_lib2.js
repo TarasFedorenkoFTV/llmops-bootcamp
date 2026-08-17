@@ -1,10 +1,13 @@
 // deck_lib2.js — візуальний каркас колод LLMOps Bootcamp · шаблон Neoversity
 // Джерело стилю: офіційний шаблон «Neoversity (White)», майстер 2 (брендований).
-//   • фон — брендовий градієнт із ассетів шаблону, у МАЙСТЕР-слайді (один раз);
-//   • контент лежить прямо на градієнті, білим по темному — як на 32 з 42
-//     слайдів шаблону; біла картка там використовується лише на 7, тож від неї
+//   • фон — два готові фони під різні типи слайдів, зібрані з ассетів шаблону
+//     (контентний і обкладинковий), кожен у своєму МАЙСТРІ, тобто один раз;
+//   • контент лежить прямо на фоні, білим по темному — як на 32 з 42 слайдів
+//     шаблону; біла картка там використовується лише на 7, тож від неї
 //     відмовились: із нею слайд читався як білий із рамкою, а не як шаблон;
-//   • акцент — фіолетовий #5A05F4 (суцільні панелі) і #C9A6FF (текст на темному);
+//   • палітра рівно шаблонна: плашки чорні, акцент — синьо-фіолетовий #5A05F4,
+//     текст білий; синій — третя брендова барва; зелений і червоний лишаються
+//     ТОЧКОВО, тільки на «правильно / помилка», і лише рамкою та підписом;
 //   • кожна пара «текст на тлі» перевірена на контраст >= 4.5:1;
 //   • лого Neoversity — біла версія, унизу зліва; вордмарк — на обкладинках.
 // Начитка НЕ вбудовується в pptx — збирається в окремий сценарій LNN-script.md.
@@ -12,18 +15,28 @@ const pptxgen = require("pptxgenjs");
 const fs = require("fs");
 const path = require("path");
 
-// Палітра Neoversity — ТЕМНА тема, як у шаблоні: контент лежить прямо на
-// градієнті, білим по темному. Кольори виведені з брендового фіолета
-// #5A05F4; кожна пара «текст на тлі» перевірена на контраст >= 4.5:1.
+// Палітра Neoversity — рівно та, що в шаблоні, і не ширша. Виміряна із заливок
+// 42 слайдів шаблону: #000000 (204 in², найбільша площа) — плашки, #5A05F4
+// (41 in², 29 фігур) — акцент, білий — текст (88 ранів проти 16 чорних).
+// Зеленого, коричневого й лавандового в шаблоні НЕМАЄ: попередня палітра
+// вигадувала їх «із семантики» і розходилася з брендом. Синій — третя
+// брендова барва (є у фоновому градієнті), тож ним позначаємо «увага/опційно».
+// Зелений і червоний лишаються ТОЧКОВО — тільки «правильно / помилка», і лише
+// як тонка рамка й колір підпису, а не як заливка плашки.
 const P = {
-  bg: "0E0B14", card: "17141F", ink: "FFFFFF", soft: "AFA9BE", faint: "8A82A0", line: "2E2A3A",
-  acc: "C9A6FF", accsolid: "5A05F4", acctint: "1C1140", accsoft: "9B7BE8",
-  good: "5FD6A0", goodbg: "102A20", warn: "E8A857", warnbg: "2A2010", crit: "FF7B7B", critbg: "2E1418",
-  codebg: "12101A", darktext: "D8D4E4", dim: "8A82A0",
-  // підсвітка коду — окремі ключі, бо раніше ці кольори були захардкоджені
-  // в кожному gen-файлі й не пережили б жодної зміни теми
-  codeKey: "C9A6FF", codeStr: "7FD9A6", codeNum: "F0B36B",
-  cover: "0E0B14", coverGlow: "3A1189", coverInk: "FFFFFF", coverSub: "C9B8FB",
+  bg: "000000", card: "000000", ink: "FFFFFF", soft: "C9C4D6", faint: "9A94AA", line: "5E4F85",
+  acc: "A98BFF", accsolid: "5A05F4", acctint: "1A0B3D", accsoft: "8F72E6",
+  blue: "6BA0F8", bluetint: "0B1A38",
+  good: "3FCF8E", crit: "FF6B6B",
+  // «Фонові» варіанти семантичних барв — майже чорні, лише з відтінком: плашка
+  // читається як чорна, а сигнал «правильно/помилка» дає рамка й колір підпису.
+  // warn більше не коричневий, а синій: коричневого в шаблоні немає.
+  goodbg: "06180F", warnbg: "0B1A38", critbg: "1A0808", warn: "6BA0F8",
+  codebg: "07060C", darktext: "D8D4E4", dim: "9A94AA",
+  // підсвітка коду — тільки брендові барви: фіолет / синій / світло-сірий.
+  // Зелень і оранж звідси прибрані, бо в шаблоні таких кольорів немає.
+  codeKey: "A98BFF", codeStr: "6BA0F8", codeNum: "C9C4D6",
+  cover: "000000", coverInk: "FFFFFF", coverSub: "C4B3F5",
 };
 const F = { body: "Montserrat", mono: "Courier New", display: "Unbounded" };
 const W = 13.333, H = 7.5, MX = 0.62;
@@ -72,12 +85,16 @@ function titleLines(text, avail) {
 // у колодах немає, тож зона скасована, а значення лишилося як типографське.)
 const TITLE_R = 8.10;
 const WEEKS = ["W1 Основа + промпти", "W2 Routing + cost", "W3 Кеш + tools", "W4 Надійність + безпека", "W5 Observability + evals", "W6 CI + фінал"];
+// Тони: заливка в усіх майже чорна (правило шаблону «плашки чорні»), а
+// відрізняє їх РАМКА і колір підпису. Раніше кожен тон заливався своїм
+// кольором — звідси й бралися зелені, коричневі та лавандові плашки.
+// `edge` додано саме тому: без рамки п'ять тонів на чорному злилися б в один.
 const TONE = {
-  acc:  { bg: P.acctint, fg: P.acc },
-  good: { bg: P.goodbg, fg: P.good },
-  warn: { bg: P.warnbg, fg: P.warn },
-  crit: { bg: P.critbg, fg: P.crit },
-  card: { bg: P.card,   fg: P.ink },
+  acc:  { bg: P.acctint, fg: P.acc,  edge: P.accsolid },
+  good: { bg: P.goodbg,  fg: P.good, edge: P.good },
+  warn: { bg: P.warnbg,  fg: P.warn, edge: P.warn },
+  crit: { bg: P.critbg,  fg: P.crit, edge: P.crit },
+  card: { bg: P.card,    fg: P.ink,  edge: P.line },
 };
 
 // Лого Neoversity як data-URI (незалежно від cwd)
@@ -86,14 +103,21 @@ const LOGO = (() => {
   catch (e) { return null; }
 })();
 
-// Брендовий градієнтний фон — зібраний із самих ассетів шаблону Neoversity
-// (image2+image3 поверх чорного). Живе в МАЙСТЕР-слайді, а не на кожному слайді:
-// pptxgenjs не дедуплікує зображення (саме тому в колодах лежало 24 копії лого),
-// тож фон на кожному слайді роздув би файл до сотень мегабайтів.
-const BG = (() => {
-  try { return "image/jpeg;base64," + fs.readFileSync(path.join(__dirname, "assets", "neo-bg.jpg")).toString("base64"); }
+// Брендові фони — зібрані з ассетів самого шаблону Neoversity, по одному на тип
+// слайда, як у шаблоні (там під кожен тип свій готовий фон):
+//   • content — лейаут CUSTOM_3: вордмарк NEOVERSITY + бордове й фіолетове світіння;
+//   • cover   — лейаут CUSTOM_1: те саме плюс бордовий акцент праворуч.
+// ВАЖЛИВО про складання: <a:srcRect> обрізає ДЖЕРЕЛО, потім результат вписується
+// в рамку, і лише тоді <a:xfrm rot> крутить розміщену фігуру. Якщо крутити до
+// обрізки, видно інший фрагмент image3 — саме там лежать зелений, бірюзовий і
+// жовтий, яких у шаблоні на екрані немає. Живуть у МАЙСТЕР-слайдах, а не на
+// кожному слайді: pptxgenjs не дедуплікує зображення.
+const bgAsset = (name) => {
+  try { return "image/jpeg;base64," + fs.readFileSync(path.join(__dirname, "assets", name)).toString("base64"); }
   catch (e) { return null; }
-})();
+};
+const BG = bgAsset("neo-bg-content.jpg");
+const BG_COVER = bgAsset("neo-bg-cover.jpg");
 
 function notesFrom(scriptPath) {
   const raw = fs.readFileSync(scriptPath, "utf8");
@@ -116,14 +140,20 @@ function createDeck({ lesson, week, fileTitle, notes: reader }) {
   pres.layout = "LAYOUT_WIDE";
   pres.author = "LLMOps Bootcamp";
   pres.title = `Урок ${lesson} · ${fileTitle}`;
-  // Один майстер на всю колоду: чорна основа + градієнт як об'єкт майстра.
-  // Так зображення потрапляє у файл рівно один раз.
+  // Два майстри — по одному на тип фону, як у шаблоні. Фон лежить у майстрі,
+  // тож кожне зображення потрапляє у файл рівно один раз (на майстер).
   pres.defineSlideMaster({
     title: "NEO",
     background: { color: "000000" },
     objects: BG ? [{ image: { x: 0, y: 0, w: W, h: H, data: BG } }] : [],
   });
+  pres.defineSlideMaster({
+    title: "NEO_COVER",
+    background: { color: "000000" },
+    objects: BG_COVER ? [{ image: { x: 0, y: 0, w: W, h: H, data: BG_COVER } }] : [],
+  });
   const newSlide = () => pres.addSlide({ masterName: "NEO" });
+  const newCoverSlide = () => pres.addSlide({ masterName: "NEO_COVER" });
   const script = [];
   let idx = 0;
 
@@ -144,7 +174,7 @@ function createDeck({ lesson, week, fileTitle, notes: reader }) {
 
   // ─────────────────────────── каркаси слайдів ───────────────────────────
   function titleSlide({ title, lead, notes }) {
-    const s = newSlide(); idx++;
+    const s = newCoverSlide(); idx++;
     coverBg(s);
     wordmark(s);
     // концентричні рамки — знак «контур керування»
@@ -196,17 +226,25 @@ function createDeck({ lesson, week, fileTitle, notes: reader }) {
     }
     // маркер формату — маленька фіолетова плашка під заголовком (ліворуч, поза відео-зоною)
     let mx = x;
-    const marker = (label, bg, fg) => {
+    const marker = (label, fg, bg, edge) => {
       const pw = 0.28 + label.length * 0.095;
-      s.addShape("roundRect", { x: mx, y: ty, w: pw, h: 0.28, rectRadius: 0.14, fill: { color: bg }, line: { type: "none" } });
+      s.addShape("roundRect", { x: mx, y: ty, w: pw, h: 0.28, rectRadius: 0.14, fill: { color: bg },
+        line: edge ? { color: edge, width: 1 } : { type: "none" } });
       s.addText(label, { x: mx, y: ty, w: pw, h: 0.28, align: "center", valign: "middle", fontFace: F.mono, fontSize: 9, bold: true, color: fg, charSpacing: 1, margin: 0 });
       mx += pw + 0.12;
     };
     if (pill) {
-      const map = { absorb: ["ТЕОРІЯ", P.acc, P.acctint], do: ["ПРАКТИКА", P.good, P.goodbg], connect: ["РЕФЛЕКСІЯ", P.warn, P.warnbg] };
-      const m = map[pill]; if (m) marker(m[0], m[1], m[2]);
+      // Три маркери формату відрізняються НЕ трьома чужими барвами (було
+      // фіолет/зелений/коричневий), а трьома способами подачі всередині
+      // брендової палітри: темний фіолет → суцільний фіолет → темний синій.
+      const map = {
+        absorb:  ["ТЕОРІЯ",    P.acc,     P.acctint,  P.accsolid],
+        do:      ["ПРАКТИКА",  "FFFFFF",  P.accsolid, null],
+        connect: ["РЕФЛЕКСІЯ", P.blue,    P.bluetint, P.blue],
+      };
+      const m = map[pill]; if (m) marker(m[0], m[1], m[2], m[3]);
     }
-    if (opt) marker("ОПЦІЙНО", P.warnbg, P.warn);
+    if (opt) marker("ОПЦІЙНО", P.soft, P.card, P.line);
     logo(s);
     s.slideNumber = { x: W - 0.9, y: H - 0.46, w: 0.4, h: 0.3, fontFace: F.mono, fontSize: 8.5, color: P.faint };
     pushNotes(s, notes);
@@ -215,7 +253,7 @@ function createDeck({ lesson, week, fileTitle, notes: reader }) {
   }
 
   function closingSlide({ summary, nextTitle, nextBody, notes }) {
-    const s = newSlide(); idx++;
+    const s = newCoverSlide(); idx++;
     coverBg(s);
     wordmark(s);
     s.addText(`ПІДСУМОК УРОКУ ${lesson}`, { x: MX, y: 0.95, w: 8, h: 0.3, fontFace: F.mono, fontSize: 11, bold: true, color: P.coverSub, charSpacing: 3, margin: 0 });
@@ -237,22 +275,25 @@ function createDeck({ lesson, week, fileTitle, notes: reader }) {
 
   function stat(s, { x, y, w, h = 1.5, value, label, tone = "card", size = 40 }) {
     const c = t(tone);
-    s.addShape("roundRect", { x, y, w, h, rectRadius: 0.12, fill: { color: c.bg }, line: tone === "card" ? { color: P.line, width: 1 } : { type: "none" } });
+    s.addShape("roundRect", { x, y, w, h, rectRadius: 0.12, fill: { color: c.bg }, line: { color: c.edge, width: 1 } });
     s.addText(value, { x: x + 0.16, y: y + 0.12, w: w - 0.32, h: h * 0.52, fontFace: F.body, fontSize: size, bold: true, color: c.fg, valign: "middle", margin: 0 });
-    s.addText(label, { x: x + 0.16, y: y + h * 0.58, w: w - 0.32, h: h * 0.36, fontFace: F.body, fontSize: 11.5, color: tone === "card" ? P.soft : c.fg, valign: "top", margin: 0 });
+    s.addText(label, { x: x + 0.16, y: y + h * 0.58, w: w - 0.32, h: h * 0.36, fontFace: F.body, fontSize: 11.5, color: P.soft, valign: "top", margin: 0 });
   }
 
   function tile(s, { x, y, w, h, badge, title, body, tone = "card" }) {
     const c = t(tone);
-    s.addShape("roundRect", { x, y, w, h, rectRadius: 0.12, fill: { color: c.bg }, line: tone === "card" ? { color: P.line, width: 1 } : { type: "none" } });
+    s.addShape("roundRect", { x, y, w, h, rectRadius: 0.12, fill: { color: c.bg }, line: { color: c.edge, width: 1 } });
     let ty = y + 0.2;
     if (badge !== undefined) {
-      s.addShape("ellipse", { x: x + 0.22, y: ty, w: 0.42, h: 0.42, fill: { color: tone === "card" ? P.accsolid : c.fg }, line: { type: "none" } });
-      s.addText(String(badge), { x: x + 0.22, y: ty, w: 0.42, h: 0.42, align: "center", valign: "middle", fontFace: F.mono, fontSize: 12, bold: true, color: tone === "card" ? "FFFFFF" : c.bg, margin: 0 });
+      // Кружок номера — завжди суцільний брендовий фіолет: це нумерація, а не
+      // семантика. Раніше він фарбувався в колір тону, і на зеленому тоні
+      // виходив зелений кружок із майже нечитним темним номером.
+      s.addShape("ellipse", { x: x + 0.22, y: ty, w: 0.42, h: 0.42, fill: { color: P.accsolid }, line: { type: "none" } });
+      s.addText(String(badge), { x: x + 0.22, y: ty, w: 0.42, h: 0.42, align: "center", valign: "middle", fontFace: F.mono, fontSize: 12, bold: true, color: "FFFFFF", margin: 0 });
     }
     const tx = badge !== undefined ? x + 0.78 : x + 0.22;
     s.addText(title, { x: tx, y: ty - 0.03, w: w - (tx - x) - 0.22, h: 0.48, fontFace: F.body, fontSize: 14.5, bold: true, color: c.fg, valign: "middle", margin: 0 });
-    if (body) s.addText(body, { x: x + 0.22, y: ty + 0.55, w: w - 0.44, h: h - (ty - y) - 0.72, fontFace: F.body, fontSize: 12, color: tone === "card" ? P.soft : P.ink, valign: "top", lineSpacingMultiple: 1.08, margin: 0 });
+    if (body) s.addText(body, { x: x + 0.22, y: ty + 0.55, w: w - 0.44, h: h - (ty - y) - 0.72, fontFace: F.body, fontSize: 12, color: P.soft, valign: "top", lineSpacingMultiple: 1.08, margin: 0 });
   }
 
   function arrow(s, { x, y, len, color = P.accsoft, dir = "right", dashed = false }) {
@@ -273,7 +314,7 @@ function createDeck({ lesson, week, fileTitle, notes: reader }) {
     items.forEach((it, i) => {
       const bw = it.w || auto;
       const c = t(it.tone || "card");
-      s.addShape("roundRect", { x: cx, y, w: bw, h, rectRadius: 0.1, fill: { color: c.bg }, line: it.tone ? { type: "none" } : { color: P.line, width: 1 } });
+      s.addShape("roundRect", { x: cx, y, w: bw, h, rectRadius: 0.1, fill: { color: c.bg }, line: { color: c.edge, width: 1 } });
       s.addText(it.label, { x: cx + 0.06, y, w: bw - 0.12, h, align: "center", valign: "middle", fontFace: F.mono, fontSize: size, bold: !!it.tone, color: c.fg, margin: 0 });
       if (it.sub) s.addText(it.sub, { x: cx, y: y + h + 0.04, w: bw, h: 0.3, align: "center", fontFace: F.body, fontSize: 10, color: P.faint, margin: 0 });
       cx += bw;
@@ -313,9 +354,9 @@ function createDeck({ lesson, week, fileTitle, notes: reader }) {
   function layers(s, { x, y, w, items, h = 0.66, gap = 0.12 }) {
     items.forEach((it, i) => {
       const yy = y + i * (h + gap), c = t(it.tone || "card");
-      s.addShape("roundRect", { x, y: yy, w, h, rectRadius: 0.1, fill: { color: c.bg }, line: it.tone ? { type: "none" } : { color: P.line, width: 1 } });
+      s.addShape("roundRect", { x, y: yy, w, h, rectRadius: 0.1, fill: { color: c.bg }, line: { color: c.edge, width: 1 } });
       s.addText(it.label, { x: x + 0.24, y: yy, w: w * 0.34, h, fontFace: F.body, fontSize: 13.5, bold: true, color: c.fg, valign: "middle", margin: 0 });
-      s.addText(it.body, { x: x + 0.24 + w * 0.34, y: yy, w: w * 0.62 - 0.24, h, fontFace: F.body, fontSize: 11.5, color: it.tone ? P.ink : P.soft, valign: "middle", margin: 0 });
+      s.addText(it.body, { x: x + 0.24 + w * 0.34, y: yy, w: w * 0.62 - 0.24, h, fontFace: F.body, fontSize: 11.5, color: P.soft, valign: "middle", margin: 0 });
     });
   }
 
@@ -337,7 +378,7 @@ function createDeck({ lesson, week, fileTitle, notes: reader }) {
     const bg = solid ? P.accsolid : c.bg;   // суцільний брендовий фіолет, не світлий текстовий
     const bodyColor = solid ? "FFFFFF" : P.ink;
     const labelColor = solid ? "FFFFFF" : c.fg;
-    s.addShape("roundRect", { x, y, w, h, rectRadius: 0.12, fill: { color: bg }, line: tone === "card" ? { color: P.line, width: 1 } : { type: "none" } });
+    s.addShape("roundRect", { x, y, w, h, rectRadius: 0.12, fill: { color: bg }, line: solid ? { type: "none" } : { color: c.edge, width: 1 } });
     if (label) s.addText(label.toUpperCase(), { x: x + 0.24, y: y + 0.14, w: w - 0.48, h: 0.24, fontFace: F.mono, fontSize: 9.5, bold: true, color: labelColor, charSpacing: 1.5, margin: 0 });
     s.addText(text, { x: x + 0.24, y: y + (label ? 0.42 : 0.16), w: w - 0.48, h: h - (label ? 0.56 : 0.32), fontFace: F.body, fontSize: 13, color: bodyColor, valign: "middle", lineSpacingMultiple: 1.12, margin: 0 });
   }
@@ -362,7 +403,7 @@ function createDeck({ lesson, week, fileTitle, notes: reader }) {
   }
 
   function table(s, { x, y, w, head, rows, colW, rowH, size = 11.5 }) {
-    const data = [head.map(h => ({ text: h, options: { fontFace: F.mono, fontSize: 9, bold: true, color: P.soft, fill: { color: "1F1B2A" }, charSpacing: 1 } }))];
+    const data = [head.map(h => ({ text: h, options: { fontFace: F.mono, fontSize: 9, bold: true, color: P.soft, fill: { color: P.acctint }, charSpacing: 1 } }))];
     rows.forEach(r => data.push(r.cells.map((cText, i) => {
       const ct = (r.cellTones && r.cellTones[i]) ? t(r.cellTones[i]) : null;
       const c = ct || (r.tone ? t(r.tone) : null);
