@@ -166,12 +166,12 @@ D.titleSlide({
   // грошей. Поки це текст, дешева модель виглядає вигідною; на смузі — ні.
   {
     const by = 3.86, bh = 0.5, W = 12.1;
-    [[0.72, P.goodbg, P.good, "72 вирішено ботом  ·  $0.90"],
-     [0.28, P.critbg, P.crit, "28 на оператора  ·  $46"],
-    ].reduce((cx, [f, bg, fg, lbl]) => {
-      s.addShape("rect", { x: cx, y: by, w: W * f, h: bh, fill: { color: bg }, line: { color: fg, width: 1 } });
+    [[0.72, P.good, "72 вирішено ботом  ·  $0.90"],
+     [0.28, P.crit, "28 на оператора  ·  $46"],
+    ].reduce((cx, [f, bg, lbl]) => {
+      s.addShape("rect", { x: cx, y: by, w: W * f, h: bh, fill: { color: bg }, line: { type: "none" } });
       s.addText(lbl, { x: cx, y: by, w: W * f, h: bh, align: "center", valign: "middle",
-        fontFace: F.mono, fontSize: 9.5, bold: true, color: fg, margin: 0 });
+        fontFace: F.mono, fontSize: 9.5, bold: true, color: P.onink, margin: 0 });
       return cx + W * f;
     }, MX);
     s.addText("сто звернень за день", { x: MX, y: by - 0.28, w: 5, h: 0.22,
@@ -243,12 +243,14 @@ D.titleSlide({
   // рівноцінні варіанти; шкала показує, що вмикається послідовно і коли саме.
   {
     const by = 4.88, bh = 0.44, W = 12.1;
-    [[0.80, P.goodbg, P.good], [0.12, P.warnbg, P.warn], [0.08, P.critbg, P.crit]].reduce((cx, [frac, bg, fg]) => {
-      s.addShape("rect", { x: cx, y: by, w: W * frac, h: bh, fill: { color: bg }, line: { color: fg, width: 1 } });
+    [[0.80, P.good], [0.12, P.warn], [0.08, P.crit]].reduce((cx, [frac, bg]) => {
+      s.addShape("rect", { x: cx, y: by, w: W * frac, h: bh, fill: { color: bg }, line: { type: "none" } });
       return cx + W * frac;
     }, MX);
-    [[0.80, P.warn], [0.92, P.crit]].forEach(([f, c]) =>
-      s.addShape("line", { x: MX + W * f, y: by - 0.08, w: 0, h: bh + 0.16, line: { color: c, width: 1.5 } }));
+    // Порогові риски — білим по смузі: на власній заливці сегмента вони видні,
+    // а семантичним кольором зливалися б із ним.
+    [[0.80], [0.92]].forEach(([f]) =>
+      s.addShape("line", { x: MX + W * f, y: by - 0.08, w: 0, h: bh + 0.16, line: { color: P.onink, width: 1.5 } }));
     s.addText([{ text: "витрачений бюджет місяця:  ", options: { color: P.faint } },
                { text: "до 80% — норма", options: { color: P.good, bold: true } },
                { text: "   ·   ", options: { color: P.faint } },

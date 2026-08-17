@@ -218,15 +218,17 @@ D.titleSlide({
   // Словами це звучить як нюанс; на шкалі видно, що середня зона — і є виграш.
   {
     const ty = 3.62, th = 0.52, x0 = MX, W = 12.1;
-    [[0.34, P.goodbg, P.good, "свіжий", "віддаємо як є"],
-     [0.40, P.warnbg, P.warn, "застарілий", "віддаємо старе + фоновий рефреш"],
-     [0.26, P.critbg, P.crit, "прострочений", "miss — ідемо в модель"],
-    ].reduce((cx, [frac, bg, fg, name, note]) => {
+    // Три зони свіжості — це шкала, а не три плашки: заливка мусить різнити їх
+    // сама. Зі світлою нейтральною поверхнею і без рамок вони злилися в одну.
+    [[0.34, P.good, "свіжий", "віддаємо як є"],
+     [0.40, P.warn, "застарілий", "віддаємо старе + фоновий рефреш"],
+     [0.26, P.crit, "прострочений", "miss — ідемо в модель"],
+    ].reduce((cx, [frac, bg, name, note]) => {
       const w = W * frac;
       s.addShape("roundRect", { x: cx, y: ty, w: w - 0.06, h: th, rectRadius: 0.07,
         fill: { color: bg }, line: { type: "none" } });
-      s.addText([{ text: name + "  ", options: { bold: true, color: fg } },
-                 { text: note, options: { color: P.soft } }],
+      s.addText([{ text: name + "  ", options: { bold: true, color: P.onink } },
+                 { text: note, options: { color: P.onsoft } }],
         { x: cx + 0.16, y: ty, w: w - 0.38, h: th, fontFace: F.body, fontSize: 11,
           valign: "middle", margin: 0 });
       return cx + w;

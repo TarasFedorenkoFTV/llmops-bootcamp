@@ -243,13 +243,17 @@ D.titleSlide({
   // як рівноцінні варіанти; сходинка показує, що вибір коштує різних грошей.
   {
     const base = 4.4;
-    [[0.26, P.goodbg, P.good, "найдешевша"], [0.44, P.acctint, P.acc, "робоча"],
-     [0.62, P.warnbg, P.warn, "найсильніша"]].forEach(([h, bg, fg, lbl], i) => {
+    // Смуга — дані, тож заливається семантичним кольором (світла нейтральна
+    // поверхня виносок тут зробила б три однакові чипи). Підпис — УНИЗУ смуги,
+    // на спільній лінії: різною лишається тільки висота, яка й означає вартість.
+    // По центру смуги він стрибав за висотою і читався як збите вирівнювання.
+    [[0.26, P.good, "найдешевша"], [0.44, P.acc, "робоча"],
+     [0.62, P.blue, "найсильніша"]].forEach(([h, bg, lbl], i) => {
       const x = MX + i * 4.05;
       s.addShape("roundRect", { x, y: base - h, w: 3.85, h, rectRadius: 0.06,
-        fill: { color: bg }, line: { color: fg, width: 1 } });
-      s.addText(lbl, { x, y: base - h, w: 3.85, h, align: "center", valign: "middle",
-        fontFace: F.mono, fontSize: 9.5, bold: true, color: fg, margin: 0 });
+        fill: { color: bg }, line: { type: "none" } });
+      s.addText(lbl, { x, y: base - 0.26, w: 3.85, h: 0.26, align: "center", valign: "middle",
+        fontFace: F.mono, fontSize: 9.5, bold: true, color: P.onink, margin: 0 });
     });
     s.addText("вартість запиту →", { x: MX, y: base + 0.06, w: 5, h: 0.22,
       fontFace: F.mono, fontSize: 8.5, color: P.faint, charSpacing: 1, margin: 0 });
