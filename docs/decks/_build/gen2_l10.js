@@ -19,7 +19,7 @@ D.titleSlide({
    ["Додати власні кейси", "позитивний і негативний, перерахувати поріг"],
    ["Перевірити на фальш-позитиви", "прогін із __fail_503 має дати 0 пройдених"],
    ["Пояснити LLM-as-judge", "коли потрібен і чому не безкоштовний"],
-  ].forEach(([t, b], i) => D.tile(s, { x: MX + (i % 3) * 4.05, y: 1.95 + Math.floor(i / 3) * 1.9, w: 3.85, h: 1.6, badge: i + 1, title: t, body: b }));
+  ].forEach(([t, b], i) => D.tile(s, { x: MX + (i % 3) * 4.05, y: 1.95 + Math.floor(i / 3) * 2.30, w: 3.85, h: 2.05, badge: i + 1, title: t, body: b }));
 }
 
 {
@@ -36,7 +36,7 @@ D.titleSlide({
 {
   const s = D.slide({ title: "Терміни, якими користуватимемось", pill: "absorb", kicker: "Шість слів сьогоднішнього уроку",
     notes: N() });
-  D.terms(s, { x: MX, y: 1.95, w: 12.1, cols: 3, rowH: 1.3, items: [
+  D.terms(s, { x: MX, y: 1.95, w: 12.1, cols: 3, rowH: 1.62, items: [
     { term: "golden dataset", def: "набір кейсів: вхід + очікування щодо відповіді" },
     { term: "expect / forbid", def: "що мусить бути — і чого бути не має" },
     { term: "expect_refusal", def: "очікуємо відмову: red-team кейси з уроку 8" },
@@ -44,7 +44,7 @@ D.titleSlide({
     { term: "поріг", def: "скільки кейсів має пройти, щоб прогін був зелений" },
     { term: "exit code", def: "0 або 1 — мова прогону з машинами (CI, тиждень 6)" },
   ] });
-  D.band(s, { x: MX, y: 4.95, w: 12.1, h: 0.85, tone: "card", text: "Кожне побачимо в коді — тут вони лише щоб не спотикатися." });
+  D.band(s, { x: MX, y: 5.62, w: 12.1, h: 0.85, tone: "card", text: "Кожне побачимо в коді — тут вони лише щоб не спотикатися." });
 }
 
 // ─── РОЗДІЛЮВАЧ · теорія ───
@@ -305,17 +305,17 @@ D.titleSlide({
 
 {
   const s = D.slide({ title: "Що це довело", pill: "connect", notes: N() });
-  D.tile(s, { x: MX, y: 1.9, w: 3.9, h: 2.0, title: "Якість стала числом", body: "«6/6, поріг 5» однакове для всіх, хто дивиться", tone: "good" });
-  D.tile(s, { x: 4.72, y: 1.9, w: 3.9, h: 2.0, title: "Регресія ловиться командою", body: "не очима і не настроєм — відтворюваним прогоном", tone: "acc" });
-  D.tile(s, { x: 8.82, y: 1.9, w: 3.9, h: 2.0, title: "Exit code готовий до CI", body: "усе, чого бракує гейту, — місце, де це запускати" });
-  D.band(s, { x: MX, y: 4.35, w: 12.1, h: 1.35, tone: "card",
+  D.tile(s, { x: MX, y: 1.9, w: 3.9, h: 2.35, title: "Якість стала числом", body: "«6/6, поріг 5» однакове для всіх, хто дивиться", tone: "good" });
+  D.tile(s, { x: 4.72, y: 1.9, w: 3.9, h: 2.35, title: "Регресія ловиться командою", body: "не очима і не настроєм — відтворюваним прогоном", tone: "acc" });
+  D.tile(s, { x: 8.82, y: 1.9, w: 3.9, h: 2.35, title: "Exit code готовий до CI", body: "усе, чого бракує гейту, — місце, де це запускати" });
+  D.band(s, { x: MX, y: 4.70, w: 12.1, h: 1.75, tone: "card",
     text: "Тиждень 5 закрито: систему видно і якість виміряна. Лишилося зробити так, щоб перевірка запускалася без вас — це наступний тиждень." });
 }
 
 {
   const s = D.slide({ title: "Перевір себе", pill: "connect", notes: N() });
-  s.addShape("roundRect", { x: MX, y: 1.95, w: 12.1, h: 2.55, rectRadius: 0.12, fill: { color: P.card }, line: { color: P.line, width: 1 } });
-  D.checklist(s, { x: MX + 0.45, y: 2.3, w: 11.3, cols: 2, items: [
+  s.addShape("roundRect", { x: MX, y: 1.95, w: 12.1, h: 4.00, rectRadius: 0.12, fill: { color: P.card }, line: { color: P.line, width: 1 } });
+  D.checklist(s, { x: MX + 0.45, y: 2.3, w: 11.3, cols: 2, h: 3.20, size: 14, items: [
     "прогін дає число і правильний exit code",
     "rollback промпта робить прогін червоним",
     "у датасеті є мої власні кейси",
@@ -323,7 +323,7 @@ D.titleSlide({
     "поясню, чому поріг не 100%",
   ] });
   s.addText("Де завагалися — туди і повертайтеся. Питання — у канал потоку або на Q&A.",
-    { x: MX, y: 4.75, w: 12, h: 0.35, fontFace: F.body, fontSize: 12, italic: true, color: P.faint, margin: 0 });
+    { x: MX, y: 6.20, w: 12, h: 0.35, fontFace: F.body, fontSize: 12, italic: true, color: P.faint, margin: 0 });
 }
 
 {

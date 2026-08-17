@@ -19,7 +19,7 @@ D.titleSlide({
    ["Віддати ввічливу заглушку", "замість 500-ки, з чесним 503 у лозі"],
    ["Влаштувати інцидент", "__fail_503 і довести: збій коштує мілісекунди"],
    ["Зібрати circuit breaker", "із half-open · опційно"],
-  ].forEach(([t, b], i) => D.tile(s, { x: MX + (i % 3) * 4.05, y: 1.95 + Math.floor(i / 3) * 1.9, w: 3.85, h: 1.6, badge: i + 1, title: t, body: b, tone: i === 4 ? "warn" : "card" }));
+  ].forEach(([t, b], i) => D.tile(s, { x: MX + (i % 3) * 4.05, y: 1.95 + Math.floor(i / 3) * 2.30, w: 3.85, h: 2.05, badge: i + 1, title: t, body: b, tone: i === 4 ? "warn" : "card" }));
 }
 
 {
@@ -36,7 +36,7 @@ D.titleSlide({
 {
   const s = D.slide({ title: "Терміни, якими користуватимемось", pill: "absorb", kicker: "Шість слів сьогоднішнього уроку",
     notes: N() });
-  D.terms(s, { x: MX, y: 1.95, w: 12.1, cols: 3, rowH: 1.3, items: [
+  D.terms(s, { x: MX, y: 1.95, w: 12.1, cols: 3, rowH: 1.62, items: [
     { term: "retry", def: "ще раз туди само — на минущих збоях, обов'язково з паузою" },
     { term: "fallback", def: "в інше місце: інша модель за оголошеним порядком" },
     { term: "backoff", def: "пауза перед повтором; jitter розсинхронізує натовп" },
@@ -44,7 +44,7 @@ D.titleSlide({
     { term: "circuit breaker", def: "після кількох збоїв перестає стукати в мертвий сервіс" },
     { term: "half-open", def: "пробний запит: чи ожив провайдер" },
   ] });
-  D.band(s, { x: MX, y: 4.95, w: 12.1, h: 0.85, tone: "card", text: "Кожне побачимо в коді — тут вони лише щоб не спотикатися." });
+  D.band(s, { x: MX, y: 5.62, w: 12.1, h: 0.85, tone: "card", text: "Кожне побачимо в коді — тут вони лише щоб не спотикатися." });
 }
 
 // ─── РОЗДІЛЮВАЧ · теорія ───
@@ -299,7 +299,7 @@ D.titleSlide({
    ["Перевірити слід", "статуси і лічильник fallback ростуть правильно", false],
    ["Circuit breaker · опційно", "3 збої → open на 30 с, обов'язково з half-open", true],
   ].forEach(([t, b, opt], i) => {
-    const y = 2.1 + i * 1.0;
+    const y = 2.15 + i * 1.25;   // 4 кроки на всю картку, а не купкою вгорі
     s.addShape("ellipse", { x: MX, y, w: 0.5, h: 0.5, fill: { color: opt ? P.warn : P.acc }, line: { type: "none" } });
     s.addText(String(i + 1), { x: MX, y, w: 0.5, h: 0.5, align: "center", valign: "middle", fontFace: F.mono, fontSize: 13, bold: true, color: opt ? P.warnbg : P.acctint, margin: 0 });
     s.addText([{ text: t + "  ", options: { bold: true, fontSize: 14, color: opt ? P.warn : P.ink } },
@@ -315,24 +315,24 @@ D.titleSlide({
 
 {
   const s = D.slide({ title: "Що це довело", pill: "connect", notes: N() });
-  D.tile(s, { x: MX, y: 1.9, w: 3.9, h: 2.0, title: "Збій швидкий", body: "мілісекунди замість восьми секунд прихованих ретраїв", tone: "good" });
-  D.tile(s, { x: 4.72, y: 1.9, w: 3.9, h: 2.0, title: "Користувач бачить ввічливість", body: "заглушка замість 500-ки — чат живий", tone: "acc" });
-  D.tile(s, { x: 8.82, y: 1.9, w: 3.9, h: 2.0, title: "Система бачить правду", body: "503 у лозі й лічильник переходів, а не «все добре»" });
-  D.band(s, { x: MX, y: 4.35, w: 12.1, h: 1.35, tone: "warn", label: "Межа стенда — чесна",
+  D.tile(s, { x: MX, y: 1.9, w: 3.9, h: 2.35, title: "Збій швидкий", body: "мілісекунди замість восьми секунд прихованих ретраїв", tone: "good" });
+  D.tile(s, { x: 4.72, y: 1.9, w: 3.9, h: 2.35, title: "Користувач бачить ввічливість", body: "заглушка замість 500-ки — чат живий", tone: "acc" });
+  D.tile(s, { x: 8.82, y: 1.9, w: 3.9, h: 2.35, title: "Система бачить правду", body: "503 у лозі й лічильник переходів, а не «все добре»" });
+  D.band(s, { x: MX, y: 4.70, w: 12.1, h: 1.75, tone: "warn", label: "Межа стенда — чесна",
     text: "Успішний fallback «основна впала — резерв відповів» на mock показати неможливо: обидва елементи ланцюга — той самий mock. Перехід дивимось у діфі коду." });
 }
 
 {
   const s = D.slide({ title: "Перевір себе", pill: "connect", notes: N() });
-  s.addShape("roundRect", { x: MX, y: 1.95, w: 12.1, h: 2.05, rectRadius: 0.12, fill: { color: P.card }, line: { color: P.line, width: 1 } });
-  D.checklist(s, { x: MX + 0.45, y: 2.3, w: 11.3, cols: 2, items: [
+  s.addShape("roundRect", { x: MX, y: 1.95, w: 12.1, h: 4.00, rectRadius: 0.12, fill: { color: P.card }, line: { color: P.line, width: 1 } });
+  D.checklist(s, { x: MX + 0.45, y: 2.3, w: 11.3, cols: 2, h: 3.20, size: 14, items: [
     "__fail_503 дає ввічливу заглушку, не 500",
     "збій швидкий — мілісекунди, а не секунди",
     "у лозі чесний 503 і лічильник переходів",
     "поясню retry, fallback і breaker одним реченням",
   ] });
   s.addText("Де завагалися — туди і повертайтеся. Питання — у канал потоку або на Q&A.",
-    { x: MX, y: 4.25, w: 12, h: 0.35, fontFace: F.body, fontSize: 12, italic: true, color: P.faint, margin: 0 });
+    { x: MX, y: 6.20, w: 12, h: 0.35, fontFace: F.body, fontSize: 12, italic: true, color: P.faint, margin: 0 });
 }
 
 {

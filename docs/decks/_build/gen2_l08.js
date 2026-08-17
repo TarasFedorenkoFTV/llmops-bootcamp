@@ -19,7 +19,7 @@ D.titleSlide({
    ["Пояснити повторний approve", "і зазор check-then-act"],
    ["Атакувати власного бота", "injection-ом — і назвати, чия це відмова"],
    ["Додати red-team кейс", "у golden dataset, назавжди"],
-  ].forEach(([t, b], i) => D.tile(s, { x: MX + (i % 3) * 4.05, y: 1.95 + Math.floor(i / 3) * 1.9, w: 3.85, h: 1.6, badge: i + 1, title: t, body: b }));
+  ].forEach(([t, b], i) => D.tile(s, { x: MX + (i % 3) * 4.05, y: 1.95 + Math.floor(i / 3) * 2.30, w: 3.85, h: 2.05, badge: i + 1, title: t, body: b }));
 }
 
 {
@@ -36,7 +36,7 @@ D.titleSlide({
 {
   const s = D.slide({ title: "Терміни, якими користуватимемось", pill: "absorb", kicker: "Шість слів сьогоднішнього уроку",
     notes: N() });
-  D.terms(s, { x: MX, y: 1.95, w: 12.1, cols: 3, rowH: 1.3, items: [
+  D.terms(s, { x: MX, y: 1.95, w: 12.1, cols: 3, rowH: 1.62, items: [
     { term: "guardrail", def: "код на межі: перевірка входу й виходу, а не прохання в промпті" },
     { term: "prompt injection", def: "спроба переписати ваші правила зовнішнім текстом" },
     { term: "jailbreak", def: "обхід політик провайдера — не ваших" },
@@ -44,7 +44,7 @@ D.titleSlide({
     { term: "HITL", def: "незворотне стає заявкою і чекає людського «так»" },
     { term: "policy log", def: "слід спрацювань guardrail-ів: скільки відмов і чому" },
   ] });
-  D.band(s, { x: MX, y: 4.95, w: 12.1, h: 0.85, tone: "card", text: "Кожне побачимо в коді — тут вони лише щоб не спотикатися." });
+  D.band(s, { x: MX, y: 5.62, w: 12.1, h: 0.85, tone: "card", text: "Кожне побачимо в коді — тут вони лише щоб не спотикатися." });
 }
 
 // ─── РОЗДІЛЮВАЧ · теорія ───
@@ -369,24 +369,24 @@ D.titleSlide({
 
 {
   const s = D.slide({ title: "Що це довело", pill: "connect", notes: N() });
-  D.tile(s, { x: MX, y: 1.9, w: 3.9, h: 2.0, title: "Відмова — це механізм", body: "не добра воля моделі: патерн детектиться незалежно від промпта", tone: "good" });
-  D.tile(s, { x: 4.72, y: 1.9, w: 3.9, h: 2.0, title: "Дірку закрито", body: "незворотна дія більше не виконується автономно", tone: "acc" });
-  D.tile(s, { x: 8.82, y: 1.9, w: 3.9, h: 2.0, title: "Повтор безпечний", body: "другий approve нічого не створює — зазор check-then-act закритий" });
-  D.band(s, { x: MX, y: 4.35, w: 12.1, h: 1.35, tone: "card",
+  D.tile(s, { x: MX, y: 1.9, w: 3.9, h: 2.35, title: "Відмова — це механізм", body: "не добра воля моделі: патерн детектиться незалежно від промпта", tone: "good" });
+  D.tile(s, { x: 4.72, y: 1.9, w: 3.9, h: 2.35, title: "Дірку закрито", body: "незворотна дія більше не виконується автономно", tone: "acc" });
+  D.tile(s, { x: 8.82, y: 1.9, w: 3.9, h: 2.35, title: "Повтор безпечний", body: "другий approve нічого не створює — зазор check-then-act закритий" });
+  D.band(s, { x: MX, y: 4.70, w: 12.1, h: 1.75, tone: "card",
     text: "Радіус ураження в дії: навіть успішна атака впирається в чергу і людину. Це і є різниця між «модель переконали» і «система зробила»." });
 }
 
 {
   const s = D.slide({ title: "Перевір себе", pill: "connect", notes: N() });
-  s.addShape("roundRect", { x: MX, y: 1.95, w: 12.1, h: 2.05, rectRadius: 0.12, fill: { color: P.card }, line: { color: P.line, width: 1 } });
-  D.checklist(s, { x: MX + 0.45, y: 2.3, w: 11.3, cols: 2, items: [
+  s.addShape("roundRect", { x: MX, y: 1.95, w: 12.1, h: 4.00, rectRadius: 0.12, fill: { color: P.card }, line: { color: P.line, width: 1 } });
+  D.checklist(s, { x: MX + 0.45, y: 2.3, w: 11.3, cols: 2, h: 3.20, size: 14, items: [
     "injection отримує відмову",
     "«поверніть гроші» породжує заявку, не тікет",
     "тікет з'являється лише після approve",
     "повторний approve не створює другого тікета",
   ] });
   s.addText("Де завагалися — туди і повертайтеся. Питання — у канал потоку або на Q&A.",
-    { x: MX, y: 4.25, w: 12, h: 0.35, fontFace: F.body, fontSize: 12, italic: true, color: P.faint, margin: 0 });
+    { x: MX, y: 6.20, w: 12, h: 0.35, fontFace: F.body, fontSize: 12, italic: true, color: P.faint, margin: 0 });
 }
 
 {

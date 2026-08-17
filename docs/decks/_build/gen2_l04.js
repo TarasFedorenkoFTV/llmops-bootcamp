@@ -19,7 +19,7 @@ D.titleSlide({
    ["Показати різницю SELECT'ом", "ескалація дорожча за FAQ"],
    ["Оживити плитку вартості", "GET /cost із бюджетом поруч"],
    ["Розкласти витрати", "за моделлю, днем і версією промпта"],
-  ].forEach(([t, b], i) => D.tile(s, { x: MX + (i % 3) * 4.05, y: 1.95 + Math.floor(i / 3) * 1.9, w: 3.85, h: 1.6, badge: i + 1, title: t, body: b }));
+  ].forEach(([t, b], i) => D.tile(s, { x: MX + (i % 3) * 4.05, y: 1.95 + Math.floor(i / 3) * 2.30, w: 3.85, h: 2.05, badge: i + 1, title: t, body: b }));
 }
 
 {
@@ -36,7 +36,7 @@ D.titleSlide({
 {
   const s = D.slide({ title: "Терміни, якими користуватимемось", pill: "absorb", kicker: "Шість слів сьогоднішнього уроку",
     notes: N() });
-  D.terms(s, { x: MX, y: 1.95, w: 12.1, cols: 3, rowH: 1.3, items: [
+  D.terms(s, { x: MX, y: 1.95, w: 12.1, cols: 3, rowH: 1.62, items: [
     { term: "usage", def: "prompt_tokens (вхід) і completion_tokens (вихід) у відповіді" },
     { term: "прайс", def: "ціни за 1k токенів, окремо вхідних і вихідних" },
     { term: "cost_usd", def: "поле лога з порахованою вартістю запиту" },
@@ -44,7 +44,7 @@ D.titleSlide({
     { term: "звернення ≠ виклик", def: "одне питання — до чотирьох походів у модель" },
     { term: "бюджет", def: "цифра, з якою порівнюється сьогоднішня витрата" },
   ] });
-  D.band(s, { x: MX, y: 4.95, w: 12.1, h: 0.85, tone: "card", text: "Кожне побачимо в коді — тут вони лише щоб не спотикатися." });
+  D.band(s, { x: MX, y: 5.62, w: 12.1, h: 0.85, tone: "card", text: "Кожне побачимо в коді — тут вони лише щоб не спотикатися." });
 }
 
 // ─── РОЗДІЛЮВАЧ · теорія ───
@@ -306,24 +306,24 @@ D.titleSlide({
 
 {
   const s = D.slide({ title: "Що це довело", pill: "connect", notes: N() });
-  D.tile(s, { x: MX, y: 1.9, w: 3.9, h: 2.0, title: "Гроші видно одразу", body: "cost_usd з'являється разом із відповіддю, а не в рахунку", tone: "good" });
-  D.tile(s, { x: 4.72, y: 1.9, w: 3.9, h: 2.0, title: "Важіль порахований", body: "різниця маршрутів — у доларах, а не у відчуттях", tone: "acc" });
-  D.tile(s, { x: 8.82, y: 1.9, w: 3.9, h: 2.0, title: "Бюджет — сигнал", body: "плитка порівнює витрату з межею, а не показує абстрактну суму" });
-  D.band(s, { x: MX, y: 4.35, w: 12.1, h: 1.35, tone: "card",
+  D.tile(s, { x: MX, y: 1.9, w: 3.9, h: 2.35, title: "Гроші видно одразу", body: "cost_usd з'являється разом із відповіддю, а не в рахунку", tone: "good" });
+  D.tile(s, { x: 4.72, y: 1.9, w: 3.9, h: 2.35, title: "Важіль порахований", body: "різниця маршрутів — у доларах, а не у відчуттях", tone: "acc" });
+  D.tile(s, { x: 8.82, y: 1.9, w: 3.9, h: 2.35, title: "Бюджет — сигнал", body: "плитка порівнює витрату з межею, а не показує абстрактну суму" });
+  D.band(s, { x: MX, y: 4.70, w: 12.1, h: 1.75, tone: "card",
     text: "Тиждень «Routing + cost» закрито: трафік розведений і порахований. Далі — найдешевший запит із можливих: той, якого не було." });
 }
 
 {
   const s = D.slide({ title: "Перевір себе", pill: "connect", notes: N() });
-  s.addShape("roundRect", { x: MX, y: 1.95, w: 12.1, h: 2.05, rectRadius: 0.12, fill: { color: P.card }, line: { color: P.line, width: 1 } });
-  D.checklist(s, { x: MX + 0.45, y: 2.3, w: 11.3, cols: 2, items: [
+  s.addShape("roundRect", { x: MX, y: 1.95, w: 12.1, h: 4.00, rectRadius: 0.12, fill: { color: P.card }, line: { color: P.line, width: 1 } });
+  D.checklist(s, { x: MX + 0.45, y: 2.3, w: 11.3, cols: 2, h: 3.20, size: 14, items: [
     "cost_usd заповнений ненульовими значеннями",
     "ескалація дорожча за FAQ — видно SELECT'ом",
     "GET /cost повертає today_usd і budget_usd",
     "поясню, чому звернення ≠ виклик",
   ] });
   s.addText("Де завагалися — туди і повертайтеся. Питання — у канал потоку або на Q&A.",
-    { x: MX, y: 4.25, w: 12, h: 0.35, fontFace: F.body, fontSize: 12, italic: true, color: P.faint, margin: 0 });
+    { x: MX, y: 6.20, w: 12, h: 0.35, fontFace: F.body, fontSize: 12, italic: true, color: P.faint, margin: 0 });
 }
 
 {

@@ -20,7 +20,7 @@ D.titleSlide({
    ["Зробити activate атомарним", "promote і rollback — одна операція"],
    ["Заповнити prompt_version", "знайти регресію SQL-запитом"],
    ["Відтворити регресію наживо", "v1 → «не знаю» → повернути v2"],
-  ].forEach(([t, b], i) => D.tile(s, { x: MX + (i % 3) * 4.05, y: 1.95 + Math.floor(i / 3) * 1.9, w: 3.85, h: 1.6, badge: i + 1, title: t, body: b }));
+  ].forEach(([t, b], i) => D.tile(s, { x: MX + (i % 3) * 4.05, y: 1.95 + Math.floor(i / 3) * 2.30, w: 3.85, h: 2.05, badge: i + 1, title: t, body: b }));
 }
 
 // карта
@@ -40,7 +40,7 @@ D.titleSlide({
   const s = D.slide({ title: "Терміни, якими користуватимемось", pill: "absorb",
     kicker: "Шість слів сьогоднішнього уроку — щоб вони не відволікали по ходу",
     notes: N() });
-  D.terms(s, { x: MX, y: 1.95, w: 12.1, cols: 3, rowH: 1.3, items: [
+  D.terms(s, { x: MX, y: 1.95, w: 12.1, cols: 3, rowH: 1.62, items: [
     { term: "реєстр промптів", def: "таблиця в базі: кожна версія — рядок, активна одна" },
     { term: "версія", def: "незмінний текст промпта; активну не редагуємо ніколи" },
     { term: "promote / rollback", def: "зробити версію активною; у нас це одна операція" },
@@ -48,7 +48,7 @@ D.titleSlide({
     { term: "few-shot", def: "1–5 показових пар просто в промпті" },
     { term: "prompt injection", def: "дані, які модель прочитала як інструкцію (урок 8)" },
   ] });
-  D.band(s, { x: MX, y: 4.95, w: 12.1, h: 0.85, tone: "card", text: "Кожне розберемо на місці — тут вони лише щоб не спотикатися." });
+  D.band(s, { x: MX, y: 5.62, w: 12.1, h: 0.85, tone: "card", text: "Кожне розберемо на місці — тут вони лише щоб не спотикатися." });
 }
 
 // 01 регресія — таймлайн
@@ -263,8 +263,8 @@ D.titleSlide({
   [["Активну не редагуємо ніколи", "створюємо нову і promote'имо її"],
    ["Стара лишається в історії", "для порівняння «що саме змінили» і для відкату"],
    ["Одруківка — теж нова версія", "дешевше зайвий рядок, ніж «та сама v3» з різною поведінкою"],
-  ].forEach(([t, b], i) => D.tile(s, { x: MX + i * 4.05, y: 1.9, w: 3.85, h: 1.85, badge: i + 1, title: t, body: b, tone: "good" }));
-  D.band(s, { x: MX, y: 4.1, w: 12.1, h: 1.35, tone: "crit", label: "Рев'ю зміни промпта — чесний diff двох body",
+  ].forEach(([t, b], i) => D.tile(s, { x: MX + i * 4.05, y: 1.9, w: 3.85, h: 2.30, badge: i + 1, title: t, body: b, tone: "good" }));
+  D.band(s, { x: MX, y: 4.55, w: 12.1, h: 1.75, tone: "crit", label: "Рев'ю зміни промпта — чесний diff двох body",
     text: "Шукати зміни інструкцій, тону і видалені приклади: найнебезпечніше саме видалене — прибрали «уточнюй, якщо не впевнений», і бот упевнено вигадує." });
 }
 
@@ -354,9 +354,9 @@ D.titleSlide({
 
 {
   const s = D.slide({ title: "Що це довело", pill: "connect", notes: N() });
-  D.tile(s, { x: MX, y: 1.9, w: 3.9, h: 2.0, title: "Регресія без коміта — реальна", body: "activate v1 зламав відповіді: git чистий, деплою не було", tone: "crit" });
-  D.tile(s, { x: 4.72, y: 1.9, w: 3.9, h: 2.0, title: "Rollback — одна операція", body: "activate v2 полагодив за секунди: той самий ендпоінт", tone: "good" });
-  D.tile(s, { x: 8.82, y: 1.9, w: 3.9, h: 2.0, title: "Лог знає, кого винуватити", body: "сплеск «не знаю» збігається з активацією v1", tone: "acc" });
+  D.tile(s, { x: MX, y: 1.9, w: 3.9, h: 2.35, title: "Регресія без коміта — реальна", body: "activate v1 зламав відповіді: git чистий, деплою не було", tone: "crit" });
+  D.tile(s, { x: 4.72, y: 1.9, w: 3.9, h: 2.35, title: "Rollback — одна операція", body: "activate v2 полагодив за секунди: той самий ендпоінт", tone: "good" });
+  D.tile(s, { x: 8.82, y: 1.9, w: 3.9, h: 2.35, title: "Лог знає, кого винуватити", body: "сплеск «не знаю» збігається з активацією v1", tone: "acc" });
   D.flow(s, { x: MX, y: 4.35, w: 12.1, h: 0.75, size: 11.5, items: [
     { label: "сьогодні: ловлять очі", tone: "warn" }, { label: "W5: eval-кейси" }, { label: "W6: гейт у CI", tone: "good" }] });
   D.band(s, { x: MX, y: 5.45, w: 12.1, h: 1.0, tone: "card",
@@ -366,15 +366,15 @@ D.titleSlide({
 // перевір себе
 {
   const s = D.slide({ title: "Перевір себе", pill: "connect", notes: N() });
-  s.addShape("roundRect", { x: MX, y: 1.95, w: 12.1, h: 2.05, rectRadius: 0.12, fill: { color: P.card }, line: { color: P.line, width: 1 } });
-  D.checklist(s, { x: MX + 0.45, y: 2.3, w: 11.3, cols: 2, items: [
+  s.addShape("roundRect", { x: MX, y: 1.95, w: 12.1, h: 4.00, rectRadius: 0.12, fill: { color: P.card }, line: { color: P.line, width: 1 } });
+  D.checklist(s, { x: MX + 0.45, y: 2.3, w: 11.3, cols: 2, h: 3.20, size: 14, items: [
     "промпт живе в БД — хардкоду в сервісі немає",
     "у свіжих рядках лога заповнений prompt_version",
     "activate v1 ламає, v2 — лагодить, і це відтворюється",
     "консоль показує список версій з активною",
   ] });
   s.addText("Де завагалися — туди і повертайтеся. Питання — у канал потоку або на Q&A.",
-    { x: MX, y: 4.25, w: 12, h: 0.35, fontFace: F.body, fontSize: 12, italic: true, color: P.faint, margin: 0 });
+    { x: MX, y: 6.20, w: 12, h: 0.35, fontFace: F.body, fontSize: 12, italic: true, color: P.faint, margin: 0 });
 }
 
 // антипатерни

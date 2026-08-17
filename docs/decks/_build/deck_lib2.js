@@ -519,14 +519,22 @@ function createDeck({ lesson, week, fileTitle, notes: reader }) {
     }));
   }
 
-  function checklist(s, { x, y, w, items, cols = 1 }) {
+  // `h` — висота, на яку рядки розкладаються РІВНОМІРНО. Без неї крок фіксований
+  // 0.62", і тоді список тулиться вгорі панелі: на «Перевір себе» з чотирьох
+  // пунктів це давало 2.3" порожнини під ним. Крок мусить залежати від
+  // кількості пунктів, бо в різних уроках їх від чотирьох до шести.
+  function checklist(s, { x, y, w, h, items, cols = 1, size = 12.5 }) {
     const per = Math.ceil(items.length / cols), cw = w / cols;
+    const pitch = h ? h / per : 0.62;
+    const box = Math.max(0.42, Math.min(0.72, pitch - 0.10));
+    const bs = 0.28;                                     // чекбокс
     items.forEach((it, i) => {
       const col = Math.floor(i / per), row = i % per;
-      const xx = x + col * cw, yy = y + row * 0.62;
-      s.addShape("roundRect", { x: xx, y: yy + 0.06, w: 0.28, h: 0.28, rectRadius: 0.06, fill: { color: P.cardbg }, line: { color: P.acc, width: 1 } });
-      tick(s, { x: xx, y: yy + 0.06, size: 0.28, color: P.acc });
-      s.addText(it, { x: xx + 0.42, y: yy, w: cw - 0.6, h: 0.42, fontFace: F.body, fontSize: 12.5, color: P.ink, valign: "middle", margin: 0 });
+      const xx = x + col * cw, yy = y + row * pitch + (pitch - box) / 2;
+      const by = yy + (box - bs) / 2;
+      s.addShape("roundRect", { x: xx, y: by, w: bs, h: bs, rectRadius: 0.06, fill: { color: P.cardbg }, line: { color: P.acc, width: 1 } });
+      tick(s, { x: xx, y: by, size: bs, color: P.acc });
+      s.addText(it, { x: xx + 0.42, y: yy, w: cw - 0.6, h: box, fontFace: F.body, fontSize: size, color: P.ink, valign: "middle", margin: 0 });
     });
   }
 

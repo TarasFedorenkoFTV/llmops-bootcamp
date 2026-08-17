@@ -26,7 +26,7 @@ D.titleSlide({
     ["Знайти запит у лозі", "і сказати, яких полів бракує"],
   ];
   items.forEach(([tt, bb], i) => D.tile(s, {
-    x: MX + (i % 3) * 4.05, y: 1.95 + Math.floor(i / 3) * 1.9, w: 3.85, h: 1.6,
+    x: MX + (i % 3) * 4.05, y: 1.95 + Math.floor(i / 3) * 2.30, w: 3.85, h: 2.05,
     badge: i + 1, title: tt, body: bb, tone: "card",
   }));
 }
@@ -57,7 +57,7 @@ D.titleSlide({
   const s = D.slide({ title: "Терміни, якими користуватимемось", pill: "absorb",
     kicker: "Шість слів, які сьогодні звучатимуть постійно — щоб вони не відволікали",
     notes: N() });
-  D.terms(s, { x: MX, y: 1.95, w: 12.1, cols: 3, rowH: 1.3, items: [
+  D.terms(s, { x: MX, y: 1.95, w: 12.1, cols: 3, rowH: 1.62, items: [
     { term: "токен", def: "частинка тексту, якою модель міряє вхід і вихід; у них рахується рахунок" },
     { term: "системний промпт", def: "інструкція, як поводитись; їде в кожному запиті" },
     { term: "finish_reason", def: "чому модель зупинилася: завершила, вперлася в стелю, просить інструмент" },
@@ -65,7 +65,7 @@ D.titleSlide({
     { term: "контур керування", def: "control plane: шар, що ухвалює рішення, а не виконує виклик" },
     { term: "mock-провайдер", def: "фейкова модель: падає на замовлення, реагує на промпт" },
   ] });
-  D.band(s, { x: MX, y: 4.95, w: 12.1, h: 0.85, tone: "card",
+  D.band(s, { x: MX, y: 5.62, w: 12.1, h: 0.85, tone: "card",
     text: "Кожне розберемо на місці — тут лише щоб не спотикатися." });
 }
 
@@ -424,8 +424,8 @@ D.titleSlide({
 {
   const s = D.slide({ title: "Перевір себе", pill: "connect",
     notes: N() });
-  s.addShape("roundRect", { x: MX, y: 1.95, w: 12.1, h: 2.65, rectRadius: 0.12, fill: { color: P.card }, line: { color: P.line, width: 1 } });
-  D.checklist(s, { x: MX + 0.45, y: 2.3, w: 11.3, cols: 2, items: [
+  s.addShape("roundRect", { x: MX, y: 1.95, w: 12.1, h: 4.00, rectRadius: 0.12, fill: { color: P.card }, line: { color: P.line, width: 1 } });
+  D.checklist(s, { x: MX + 0.45, y: 2.3, w: 11.3, cols: 2, h: 3.20, size: 14, items: [
     "стек піднявся, консоль показує «—»",
     "малюю шлях запиту з пам'яті",
     "знайшов свій рядок у requests",
@@ -434,7 +434,7 @@ D.titleSlide({
     "назву дві невидимі категорії відмов",
   ] });
   s.addText("Де завагалися — туди і повертайтеся. Питання — у канал потоку або на Q&A.",
-    { x: MX, y: 4.85, w: 12, h: 0.35, fontFace: F.body, fontSize: 12, italic: true, color: P.faint, margin: 0 });
+    { x: MX, y: 6.20, w: 12, h: 0.35, fontFace: F.body, fontSize: 12, italic: true, color: P.faint, margin: 0 });
 }
 
 // ─── S22 антипатерни ───
