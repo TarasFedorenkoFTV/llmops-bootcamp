@@ -44,10 +44,14 @@ def bg_lum_map(path):
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 BGMAP = {}
-for key, fn in (("content", "neo-bg-content.jpg"), ("cover", "neo-bg-cover.jpg")):
+BGSIZE = {}          # розмір файлу ассета -> тип фону
+for key, fn in (("content", "neo-bg-content.jpg"),
+                ("cover", "neo-bg-cover.jpg"),
+                ("dark", "neo-bg-dark.jpg")):
     p = os.path.join(HERE, "assets", fn)
     if os.path.exists(p):
         BGMAP[key] = bg_lum_map(p)
+        BGSIZE[os.path.getsize(p)] = key
 
 
 def worst_bg_lum(kind, x, y, w, h):
@@ -84,7 +88,13 @@ def shapes(xml):
             f = re.search(r"<a:solidFill><a:srgbClr val=\"(\w{6})\"", clean)
             fill = f.group(1).upper() if f else None
         runs = []
-        for r in re.finditer(r"<a:r>(.*?)</a:r>", body, re.S):
+        # У graphicFrame (таблиці) текст лежить у клітинках, і кожна має ВЛАСНУ
+        # заливку. Якщо збирати його ще й як звичайні рани, той самий текст
+        # перевіряється двічі, причому вдруге — проти підкладки під таблицею.
+        # Саме через це аудит показував «білий текст на білій підкладці» для
+        # шапки таблиці, яка насправді лежить на чорній клітинці.
+        is_tbl = kind == "graphicFrame" and "<a:tbl>" in body
+        for r in ([] if is_tbl else re.finditer(r"<a:r>(.*?)</a:r>", body, re.S)):
             rb = r.group(1)
             t = "".join(re.findall(r"<a:t(?:\s[^>]*)?>(.*?)</a:t>", rb, re.S)).strip()
             if not t:
@@ -140,12 +150,13 @@ def master_kind(z, slide_name):
         mst = re.search(r"slideMasters/(slideMaster\d+)\.xml", lrel).group(1)
         mrel = z.read(f"ppt/slideMasters/_rels/{mst}.xml.rels").decode()
         imgs = re.findall(r'Target="\.\./media/(image\d+\.\w+)"', mrel)
-        mx = z.read(f"ppt/slideMasters/{mst}.xml").decode()
-        # обкладинковий фон більший за контентний — але надійніше за розміром файлу
-        if imgs:
-            sizes = {i: z.getinfo("ppt/media/" + i).file_size for i in imgs}
-            big = max(sizes, key=sizes.get)
-            return "cover" if sizes[big] > 95000 else "content"
+        # Тип фону визначаємо ТОЧНИМ розміром файлу ассета, а не порогом: фонів
+        # три (контент / обкладинка з «N» / фінал без неї), і поріг «більше за
+        # 95 КБ» їх уже не розрізняв.
+        for i in imgs:
+            k = BGSIZE.get(z.getinfo("ppt/media/" + i).file_size)
+            if k:
+                return k
     except Exception:
         pass
     return "content"

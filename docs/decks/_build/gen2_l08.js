@@ -103,7 +103,7 @@ D.titleSlide({
       s.addText(title, { x: x + 0.2, y: zy + 0.1, w: w - 0.4, h: 0.26,
         fontFace: F.mono, fontSize: 9, bold: true, color: c.fg, charSpacing: 1, margin: 0 });
       s.addText(body, { x: x + 0.2, y: zy + 0.38, w: w - 0.4, h: 0.4,
-        fontFace: F.body, fontSize: 11, color: P.soft, valign: "top", margin: 0 });
+        fontFace: F.body, fontSize: 11, color: P.onsoft, valign: "top", margin: 0 });
     };
     zone(MX, 5.2, "ВАШ ПЕРИМЕТР", "лог, база, повні персональні дані — звідси не виходять", "good");
     D.arrow(s, { x: 6.0, y: zy + zh / 2, len: 1.4 });
@@ -315,8 +315,8 @@ D.titleSlide({
   ].forEach(([t, q, b], i) => {
     const x = MX + i * 4.05;
     D.tile(s, { x, y: 1.95, w: 3.85, h: 2.35, badge: i + 1, title: t, tone: "crit" });
-    s.addText([{ text: q + "\n", options: { fontFace: F.mono, fontSize: 10.5, color: P.crit } },
-               { text: b, options: { fontFace: F.body, fontSize: 12, color: P.ink } }],
+    s.addText([{ text: q + "\n", options: { fontFace: F.mono, fontSize: 10.5, color: P.oncrit } },
+               { text: b, options: { fontFace: F.body, fontSize: 12, color: P.onsoft } }],
       { x: x + 0.22, y: 2.72, w: 3.41, h: 1.42, valign: "top", lineSpacingMultiple: 1.15, margin: 0 });
   });
   D.band(s, { x: MX, y: 4.6, w: 12.1, h: 1.7, tone: "warn", label: "Опційна доріжка ДЗ тижня 4",
@@ -383,7 +383,7 @@ D.titleSlide({
   ].forEach(([t, b], i) => {
     const y = 1.95 + i * 0.95;
     s.addShape("roundRect", { x: MX, y, w: 12.1, h: 0.8, rectRadius: 0.1, fill: { color: P.card }, line: { color: P.line, width: 1 } });
-    s.addShape("ellipse", { x: MX + 0.22, y: y + 0.19, w: 0.42, h: 0.42, fill: { color: P.critbg }, line: { type: "none" } });
+    s.addShape("ellipse", { x: MX + 0.22, y: y + 0.19, w: 0.42, h: 0.42, fill: { color: P.critbg }, line: { color: P.crit, width: 1 } });
     D.cross(s, { x: MX + 0.22, y: y + 0.19, size: 0.42, color: P.crit });
     s.addText([{ text: t + "   ", options: { bold: true, fontSize: 13, color: P.ink } },
                { text: b, options: { fontSize: 11.5, color: P.soft } }],

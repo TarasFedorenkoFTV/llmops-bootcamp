@@ -189,13 +189,13 @@ D.titleSlide({
     notes: N() });
   // діаграма: смуга часу з двох частин
   s.addText("КОРОТКА ВІДПОВІДЬ", { x: MX, y: 1.75, w: 3, h: 0.28, fontFace: F.mono, fontSize: 9.5, bold: true, color: P.faint, charSpacing: 1, margin: 0 });
-  s.addShape("roundRect", { x: MX, y: 2.1, w: 2.2, h: 0.6, rectRadius: 0.08, fill: { color: P.acctint }, line: { type: "none" } });
+  s.addShape("roundRect", { x: MX, y: 2.1, w: 2.2, h: 0.6, rectRadius: 0.08, fill: { color: P.acctint }, line: { color: P.acc, width: 1 } });
   s.addText("час до 1-го токена", { x: MX, y: 2.1, w: 2.2, h: 0.6, align: "center", valign: "middle", fontFace: F.body, fontSize: 10.5, color: P.acc, margin: 0 });
   s.addShape("roundRect", { x: MX + 2.25, y: 2.1, w: 1.5, h: 0.6, rectRadius: 0.08, fill: { color: P.accsolid }, line: { type: "none" } });
   s.addText("генерація", { x: MX + 2.25, y: 2.1, w: 1.5, h: 0.6, align: "center", valign: "middle", fontFace: F.body, fontSize: 10.5, bold: true, color: "FFFFFF", margin: 0 });
 
   s.addText("ТРИ АБЗАЦИ — ТА САМА МОДЕЛЬ, ТОЙ САМИЙ ПРОВАЙДЕР", { x: MX, y: 3.1, w: 7, h: 0.28, fontFace: F.mono, fontSize: 9.5, bold: true, color: P.faint, charSpacing: 1, margin: 0 });
-  s.addShape("roundRect", { x: MX, y: 3.45, w: 2.2, h: 0.6, rectRadius: 0.08, fill: { color: P.acctint }, line: { type: "none" } });
+  s.addShape("roundRect", { x: MX, y: 3.45, w: 2.2, h: 0.6, rectRadius: 0.08, fill: { color: P.acctint }, line: { color: P.acc, width: 1 } });
   s.addText("час до 1-го токена", { x: MX, y: 3.45, w: 2.2, h: 0.6, align: "center", valign: "middle", fontFace: F.body, fontSize: 10.5, color: P.acc, margin: 0 });
   s.addShape("roundRect", { x: MX + 2.25, y: 3.45, w: 6.6, h: 0.6, rectRadius: 0.08, fill: { color: P.accsolid }, line: { type: "none" } });
   s.addText("генерація: послідовно, токен за токеном", { x: MX + 2.25, y: 3.45, w: 6.6, h: 0.6, align: "center", valign: "middle", fontFace: F.body, fontSize: 11, bold: true, color: "FFFFFF", margin: 0 });
@@ -213,7 +213,7 @@ D.titleSlide({
 {
   const s = D.slide({ num: "05", title: "П'ять способів зламатися — і сліпа зона моніторингу", pill: "absorb",
     notes: N() });
-  s.addShape("roundRect", { x: MX, y: 1.75, w: 5.85, h: 3.55, rectRadius: 0.12, fill: { color: P.goodbg }, line: { type: "none" } });
+  s.addShape("roundRect", { x: MX, y: 1.75, w: 5.85, h: 3.55, rectRadius: 0.12, fill: { color: P.goodbg }, line: { color: P.good, width: 1 } });
   s.addText("МОНІТОРИНГ БАЧИТЬ", { x: MX + 0.25, y: 1.95, w: 5.35, h: 0.3, fontFace: F.mono, fontSize: 10, bold: true, color: P.good, charSpacing: 1.5, margin: 0 });
   [["429", "вичерпана квота"], ["5xx", "інцидент провайдера"], ["таймаут", "відповідь після того, як пішов користувач"]].forEach(([k, v], i) => {
     const y = 2.45 + i * 0.88;
@@ -221,7 +221,7 @@ D.titleSlide({
     s.addText(k, { x: MX + 0.25, y, w: 1.35, h: 0.5, align: "center", valign: "middle", fontFace: F.mono, fontSize: 11.5, bold: true, color: P.good, margin: 0 });
     s.addText(v, { x: MX + 1.75, y, w: 3.85, h: 0.5, fontFace: F.body, fontSize: 12, color: P.ink, valign: "middle", margin: 0 });
   });
-  s.addShape("roundRect", { x: 6.87, y: 1.75, w: 5.85, h: 3.55, rectRadius: 0.12, fill: { color: P.critbg }, line: { type: "none" } });
+  s.addShape("roundRect", { x: 6.87, y: 1.75, w: 5.85, h: 3.55, rectRadius: 0.12, fill: { color: P.critbg }, line: { color: P.crit, width: 1 } });
   s.addText("НЕ БАЧИТЬ У ПРИНЦИПІ", { x: 7.12, y: 1.95, w: 5.35, h: 0.3, fontFace: F.mono, fontSize: 10, bold: true, color: P.crit, charSpacing: 1.5, margin: 0 });
   [["200 + сміття", "обрізана, порожня або не-JSON відповідь"], ["200 + тихо гірше", "новий снапшот моделі або правка промпта"]].forEach(([k, v], i) => {
     const y = 2.45 + i * 1.35;
@@ -242,7 +242,7 @@ D.titleSlide({
     { label: "Gateway-адаптер" }, { label: "Модель / mock" }] });
   // гілка лога вниз від сервісу
   D.arrow(s, { x: 6.3, y: 3.35, len: 0.9, dir: "down", color: P.good, dashed: true });
-  s.addShape("roundRect", { x: 5.25, y: 4.3, w: 2.1, h: 0.62, rectRadius: 0.1, fill: { color: P.goodbg }, line: { type: "none" } });
+  s.addShape("roundRect", { x: 5.25, y: 4.3, w: 2.1, h: 0.62, rectRadius: 0.1, fill: { color: P.goodbg }, line: { color: P.good, width: 1 } });
   s.addText("Лог у БД", { x: 5.25, y: 4.3, w: 2.1, h: 0.62, align: "center", valign: "middle", fontFace: F.mono, fontSize: 12, bold: true, color: P.good, margin: 0 });
   D.code(s, { x: MX, y: 5.35, w: 5.6, h: 0.72, size: 13, lines: [[{ t: "docker compose up", c: P.codeStr }, { t: "  # п'ять компонентів", c: P.dim }]] });
   D.band(s, { x: 6.6, y: 5.35, w: 6.12, h: 0.72, tone: "card",
@@ -302,7 +302,7 @@ D.titleSlide({
     s.addText(f, { x: MX, y, w: 2.9, h: 0.5, fontFace: F.mono, fontSize: 11, bold: true, color: P.acc, valign: "middle", margin: 0 });
     D.arrow(s, { x: MX + 3.0, y: y + 0.25, len: 0.55 });
     s.addText(v, { x: MX + 3.7, y, w: 7.2, h: 0.5, fontFace: F.body, fontSize: 12.5, color: P.ink, valign: "middle", margin: 0 });
-    s.addShape("roundRect", { x: 11.95, y: y + 0.09, w: 0.77, h: 0.32, rectRadius: 0.06, fill: { color: P.acctint }, line: { type: "none" } });
+    s.addShape("roundRect", { x: 11.95, y: y + 0.09, w: 0.77, h: 0.32, rectRadius: 0.06, fill: { color: P.acctint }, line: { color: P.acc, width: 1 } });
     s.addText(w, { x: 11.95, y: y + 0.09, w: 0.77, h: 0.32, align: "center", valign: "middle", fontFace: F.mono, fontSize: 9, bold: true, color: P.acc, margin: 0 });
   });
   D.band(s, { x: MX, y: 6.32, w: 12.1, h: 0.44, tone: "good", text: "Немає лога — немає операцій." });
@@ -433,7 +433,7 @@ D.titleSlide({
   anti.forEach(([tt, bb], i) => {
     const y = 1.85 + i * 0.95;
     s.addShape("roundRect", { x: MX, y, w: 12.1, h: 0.8, rectRadius: 0.1, fill: { color: P.card }, line: { color: P.line, width: 1 } });
-    s.addShape("ellipse", { x: MX + 0.22, y: y + 0.19, w: 0.42, h: 0.42, fill: { color: P.critbg }, line: { type: "none" } });
+    s.addShape("ellipse", { x: MX + 0.22, y: y + 0.19, w: 0.42, h: 0.42, fill: { color: P.critbg }, line: { color: P.crit, width: 1 } });
     D.cross(s, { x: MX + 0.22, y: y + 0.19, size: 0.42, color: P.crit });
     s.addText([{ text: tt + "   ", options: { bold: true, fontSize: 14, color: P.ink } },
                { text: bb, options: { fontSize: 12.5, color: P.soft } }],

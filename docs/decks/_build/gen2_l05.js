@@ -316,7 +316,7 @@ D.titleSlide({
   ].forEach(([t, b], i) => {
     const y = 2.0 + i * 1.0;
     s.addShape("roundRect", { x: MX, y, w: 12.1, h: 0.85, rectRadius: 0.1, fill: { color: P.card }, line: { color: P.line, width: 1 } });
-    s.addShape("ellipse", { x: MX + 0.22, y: y + 0.21, w: 0.42, h: 0.42, fill: { color: P.critbg }, line: { type: "none" } });
+    s.addShape("ellipse", { x: MX + 0.22, y: y + 0.21, w: 0.42, h: 0.42, fill: { color: P.critbg }, line: { color: P.crit, width: 1 } });
     D.cross(s, { x: MX + 0.22, y: y + 0.21, size: 0.42, color: P.crit });
     s.addText([{ text: t + "   ", options: { bold: true, fontSize: 13.5, color: P.ink } },
                { text: b, options: { fontSize: 12, color: P.soft } }],

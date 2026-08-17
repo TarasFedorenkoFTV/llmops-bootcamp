@@ -25,7 +25,8 @@ TW, TH = 10.0, 5.625
 OW, OH = 13.333, 7.5
 PX = 1920
 PY = int(round(PX * OH / OW))
-K = PX / TW
+K = PX / TW          # шаблонні дюйми -> пікселі
+KO = PX / OW         # НАШІ дюйми -> пікселі (слайд 13.333", а шаблон 10")
 
 # Найтемніший текст, що лежить прямо на фоні (P.faint #9A94AA), має яскравість
 # 0.309. Щоб він давав 4.5:1, яскравість фону під ним не може перевищувати
@@ -37,6 +38,22 @@ T_MAX = 0.0298
 def lumap(a):
     lin = np.where(a <= .04045, a / 12.92, ((a + .055) / 1.055) ** 2.4)
     return .2126 * lin[:, :, 0] + .7152 * lin[:, :, 1] + .0722 * lin[:, :, 2]
+
+
+def place_asset(canvas, fname, x, y, w):
+    """Ассет шаблону «як є», з обрізкою порожніх полів за альфою. Пропорції
+    беремо з самого зображення. Скляна «N» стоїть у шаблоні і на обкладинці
+    (сл. 9), і на фіналі (сл. 42) — це брендовий об'єкт, не топікальний."""
+    im = Image.open(io.BytesIO(z.read('ppt/media/' + fname))).convert('RGBA')
+    a = np.array(im)
+    ys, xs = np.where(a[:, :, 3] > 8)
+    im = im.crop((xs.min(), ys.min(), xs.max() + 1, ys.max() + 1))
+    # УВАГА: позиція задається в НАШИХ дюймах (13.333"), тож масштаб KO, а не K.
+    # З K ассет улітав за правий край полотна і не з'являвся взагалі.
+    pw = int(round(w * KO))
+    ph = int(round(pw * im.size[1] / im.size[0]))
+    im = im.resize((pw, ph), Image.LANCZOS)
+    canvas.alpha_composite(im, (int(round(x * KO)), int(round(y * KO))))
 
 
 def place(canvas, fname, x, y, w, h, alpha, crop, rot):
@@ -67,7 +84,7 @@ def rolloff(raw, ceil):
     return Image.fromarray((np.clip(a * f[:, :, None], 0, 1) * 255 + .5).astype(np.uint8))
 
 
-def build(spec, out):
+def build(spec, out, asset=None):
     c = Image.new('RGBA', (PX, PY), (0, 0, 0, 255))
     for s in spec:
         place(c, *s)
@@ -75,8 +92,17 @@ def build(spec, out):
     before = lumap(np.array(raw).astype(np.float32) / 255).max()
     ceil = T_MAX
     for _ in range(24):                       # добираємо стелю під JPEG
-        rolloff(raw, ceil).save(os.path.join(S, out), quality=93)
-        got = lumap(np.array(Image.open(os.path.join(S, out)).convert('RGB')).astype(np.float32) / 255)
+        img = rolloff(raw, ceil)
+        # Ассет впікаємо ПІСЛЯ компресії верхів: він мусить лишитись яскравим
+        # хромом, як у шаблоні. Якби він проходив через rolloff, став би темною
+        # плямою. Стелю яскравості міряємо лише по ФОНУ — під ассетом тексту нема.
+        if asset:
+            over = img.convert('RGBA')
+            place_asset(over, *asset)
+            img = over.convert('RGB')
+        img.save(os.path.join(S, out), quality=93)
+        bg_only = rolloff(raw, ceil)
+        got = lumap(np.array(bg_only).astype(np.float32) / 255)
         if got.max() <= T_MAX:
             break
         ceil *= 0.93
@@ -106,4 +132,9 @@ GLOW = ("image2.png", 6.14, 1.64, 3.86, 3.98, 86, (0, 0, 29933, 42096), 0)
 build([BORD, VIO10], "neo-bg-content.jpg")
 # Обкладинка й підсумок розріджені, тож саме там доречні вордмарк (CUSTOM_3)
 # і бордовий акцент праворуч (CUSTOM_1).
-build([BORD, VIO942, GLOW, WM], "neo-bg-cover.jpg")
+# Обкладинка — з тією самою скляною «N», що в шаблоні на сл. 9 і 42. Вона
+# впечена у фон, тож у файл потрапляє один раз, а не копією на слайд.
+build([BORD, VIO942, GLOW, WM], "neo-bg-cover.jpg",
+      asset=("image33.png", 10.3, 1.15, 3.30))
+# Фінал — той самий фон БЕЗ «N»: там текст іде на всю ширину і ліг би на хром.
+build([BORD, VIO942, GLOW, WM], "neo-bg-dark.jpg")

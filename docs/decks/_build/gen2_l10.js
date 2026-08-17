@@ -120,7 +120,7 @@ D.titleSlide({
     const y = 4.2 + i * 0.62;
     s.addText(t, { x: MX, y, w: 2.4, h: 0.5, fontFace: F.mono, fontSize: 10.5, bold: true, color: P.acc, valign: "middle", margin: 0 });
     s.addText(b, { x: MX + 2.5, y, w: 8.3, h: 0.5, fontFace: F.body, fontSize: 12, color: P.ink, valign: "middle", margin: 0 });
-    s.addShape("roundRect", { x: 11.95, y: y + 0.09, w: 0.77, h: 0.32, rectRadius: 0.06, fill: { color: P.acctint }, line: { type: "none" } });
+    s.addShape("roundRect", { x: 11.95, y: y + 0.09, w: 0.77, h: 0.32, rectRadius: 0.06, fill: { color: P.acctint }, line: { color: P.acc, width: 1 } });
     s.addText(w, { x: 11.95, y: y + 0.09, w: 0.77, h: 0.32, align: "center", valign: "middle", fontFace: F.mono, fontSize: 8.5, bold: true, color: P.acc, margin: 0 });
   });
 }
@@ -320,7 +320,7 @@ D.titleSlide({
   ].forEach(([t, b], i) => {
     const y = 1.95 + i * 0.95;
     s.addShape("roundRect", { x: MX, y, w: 12.1, h: 0.8, rectRadius: 0.1, fill: { color: P.card }, line: { color: P.line, width: 1 } });
-    s.addShape("ellipse", { x: MX + 0.22, y: y + 0.19, w: 0.42, h: 0.42, fill: { color: P.critbg }, line: { type: "none" } });
+    s.addShape("ellipse", { x: MX + 0.22, y: y + 0.19, w: 0.42, h: 0.42, fill: { color: P.critbg }, line: { color: P.crit, width: 1 } });
     D.cross(s, { x: MX + 0.22, y: y + 0.19, size: 0.42, color: P.crit });
     s.addText([{ text: t + "   ", options: { bold: true, fontSize: 13, color: P.ink } },
                { text: b, options: { fontSize: 11.5, color: P.soft } }],

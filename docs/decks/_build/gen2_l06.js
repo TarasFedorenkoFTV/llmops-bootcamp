@@ -232,7 +232,7 @@ D.titleSlide({
     const bh = 0.24, y0 = 3.66;
     ["читання 1", "читання 2", "читання 3"].forEach((lbl, i) => {
       s.addShape("roundRect", { x: 1.35, y: y0 + i * 0.3, w: 2.6, h: bh, rectRadius: 0.05,
-        fill: { color: P.goodbg }, line: { type: "none" } });
+        fill: { color: P.goodbg }, line: { color: P.good, width: 1 } });
       s.addText(lbl, { x: 1.35, y: y0 + i * 0.3, w: 2.6, h: bh, align: "center", valign: "middle",
         fontFace: F.mono, fontSize: 8.5, bold: true, color: P.good, margin: 0 });
     });
@@ -241,7 +241,7 @@ D.titleSlide({
       fontFace: F.mono, fontSize: 8.5, color: P.faint, charSpacing: 1, margin: 0 });
     ["дія 1", "дія 2", "дія 3"].forEach((lbl, i) => {
       s.addShape("roundRect", { x: 7.15 + i * 1.85, y: y0 + i * 0.3, w: 1.6, h: bh, rectRadius: 0.05,
-        fill: { color: P.critbg }, line: { type: "none" } });
+        fill: { color: P.critbg }, line: { color: P.crit, width: 1 } });
       s.addText(lbl, { x: 7.15 + i * 1.85, y: y0 + i * 0.3, w: 1.6, h: bh, align: "center", valign: "middle",
         fontFace: F.mono, fontSize: 8.5, bold: true, color: P.crit, margin: 0 });
     });
@@ -340,7 +340,7 @@ D.titleSlide({
   ].forEach(([t, b], i) => {
     const y = 1.95 + i * 0.95;
     s.addShape("roundRect", { x: MX, y, w: 12.1, h: 0.8, rectRadius: 0.1, fill: { color: P.card }, line: { color: P.line, width: 1 } });
-    s.addShape("ellipse", { x: MX + 0.22, y: y + 0.19, w: 0.42, h: 0.42, fill: { color: P.critbg }, line: { type: "none" } });
+    s.addShape("ellipse", { x: MX + 0.22, y: y + 0.19, w: 0.42, h: 0.42, fill: { color: P.critbg }, line: { color: P.crit, width: 1 } });
     D.cross(s, { x: MX + 0.22, y: y + 0.19, size: 0.42, color: P.crit });
     s.addText([{ text: t + "   ", options: { bold: true, fontSize: 13, color: P.ink } },
                { text: b, options: { fontSize: 11.5, color: P.soft } }],

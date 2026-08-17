@@ -284,11 +284,11 @@ D.titleSlide({
   {
     const ty = 4.28, th = 0.34, x0 = MX + 1.0, w1 = 2.6, w2 = 7.5;
     s.addShape("roundRect", { x: x0, y: ty, w: w1, h: th, rectRadius: 0.06,
-      fill: { color: P.acctint }, line: { type: "none" } });
+      fill: { color: P.acctint }, line: { color: P.acc, width: 1 } });
     s.addText("час до 1-го токена", { x: x0, y: ty, w: w1, h: th, align: "center", valign: "middle",
       fontFace: F.mono, fontSize: 9, bold: true, color: P.acc, margin: 0 });
     s.addShape("roundRect", { x: x0 + w1 + 0.06, y: ty, w: w2, h: th, rectRadius: 0.06,
-      fill: { color: P.goodbg }, line: { type: "none" } });
+      fill: { color: P.goodbg }, line: { color: P.good, width: 1 } });
     s.addText("генерація — токен за токеном", { x: x0 + w1 + 0.06, y: ty, w: w2, h: th,
       align: "center", valign: "middle", fontFace: F.mono, fontSize: 9, bold: true, color: P.good, margin: 0 });
     [[x0, "запит"], [x0 + w1, "перший токен"], [x0 + w1 + w2 + 0.06, "останній байт"]]
@@ -387,7 +387,7 @@ D.titleSlide({
   ].forEach(([t, b], i) => {
     const y = 1.95 + i * 0.95;
     s.addShape("roundRect", { x: MX, y, w: 12.1, h: 0.8, rectRadius: 0.1, fill: { color: P.card }, line: { color: P.line, width: 1 } });
-    s.addShape("ellipse", { x: MX + 0.22, y: y + 0.19, w: 0.42, h: 0.42, fill: { color: P.critbg }, line: { type: "none" } });
+    s.addShape("ellipse", { x: MX + 0.22, y: y + 0.19, w: 0.42, h: 0.42, fill: { color: P.critbg }, line: { color: P.crit, width: 1 } });
     D.cross(s, { x: MX + 0.22, y: y + 0.19, size: 0.42, color: P.crit });
     s.addText([{ text: t + "   ", options: { bold: true, fontSize: 13, color: P.ink } },
                { text: b, options: { fontSize: 11.5, color: P.soft } }],
