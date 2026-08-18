@@ -48,6 +48,7 @@ const P = {
   // (не зелена й не червона — саме через колірні заливки й були зауваження),
   // а сигнал дає колір підпису. Заливки в усіх трьох однакові НАВМИСНО.
   goodbg: "F5F3FA", warnbg: "F5F3FA", critbg: "F5F3FA", warn: "1A4FBF",
+  rowlite: "F5F3FA",                    // підсвітка рядка таблиці — нейтральна
   codebg: "0A0810", darktext: "D8D4E4", dim: "9A94AA",
   codeKey: "A98BFF", codeStr: "6BA0F8", codeNum: "C9C4D6",
 };
@@ -542,13 +543,18 @@ function createDeck({ lesson, week, fileTitle, notes: reader }) {
   }
 
   function table(s, { x, y, w, head, rows, colW, rowH, size = 11.5 }) {
-    const data = [head.map(h => ({ text: h, options: { fontFace: F.mono, fontSize: 9, bold: true, color: P.onink, fill: { color: P.plate }, charSpacing: 1 } }))];
+    // Шапка — ФІОЛЕТОВА, а не чорна. Чорна зливалася з рядком-акцентом (теж
+    // чорним), і той читався як друга шапка: так було в 9 таблицях із 18.
+    const data = [head.map(h => ({ text: h, options: { fontFace: F.mono, fontSize: 9, bold: true,
+      color: P.onink, fill: { color: P.accsolid }, charSpacing: 1 } }))];
+    // Рядок-акцент — світла нейтральна підсвітка + ТЕМНИЙ семантичний текст.
+    // Жорстка чорна заливка перебивала і шапку, і сусідні рядки; логіка та сама,
+    // що для виносок: поверхня нейтральна, сигнал несе колір підпису.
+    const semantic = (name) => (name ? (TONE_ON_CARD[name] || P.ink) : null);
     rows.forEach(r => data.push(r.cells.map((cText, i) => {
-      const ct = (r.cellTones && r.cellTones[i]) ? t(r.cellTones[i]) : null;
-      const c = ct || (r.tone ? t(r.tone) : null);
-      return { text: cText, options: Object.assign({ fontSize: size },
-        i === 0 ? { bold: true, color: c ? c.fg : P.ink } : { color: c ? c.fg : P.ink },
-        c ? { fill: { color: c.bg } } : {}) };
+      const c = semantic((r.cellTones && r.cellTones[i]) || r.tone);
+      return { text: cText, options: Object.assign({ fontSize: size, bold: i === 0 },
+        { color: c || P.ink }, c ? { fill: { color: P.rowlite } } : {}) };
     })));
     s.addTable(data, { x, y, w, colW, rowH, border: { pt: 0.5, color: P.line }, fontFace: F.body, valign: "middle", fill: { color: P.cardbg }, margin: 0.08 });
   }
