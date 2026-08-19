@@ -546,7 +546,7 @@ function createDeck({ lesson, week, fileTitle, notes: reader }) {
     // Шапка — ФІОЛЕТОВА, а не чорна. Чорна зливалася з рядком-акцентом (теж
     // чорним), і той читався як друга шапка: так було в 9 таблицях із 18.
     const data = [head.map(h => ({ text: h, options: { fontFace: F.mono, fontSize: 9, bold: true,
-      color: P.onink, fill: { color: P.accsolid }, charSpacing: 1 } }))];
+      color: P.onink, fill: { color: P.accsolid }, charSpacing: 1, align: "center" } }))];
     // Рядок-акцент — світла нейтральна підсвітка + ТЕМНИЙ семантичний текст.
     // Жорстка чорна заливка перебивала і шапку, і сусідні рядки; логіка та сама,
     // що для виносок: поверхня нейтральна, сигнал несе колір підпису.
