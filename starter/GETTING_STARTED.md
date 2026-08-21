@@ -104,7 +104,7 @@ docker compose down -v     # + стерти дані Postgres (чистий ст
 │  └─ Dockerfile
 │
 ├─ gateway/                    # LiteLLM — провайдер-адаптер (конфіг, не код)
-│  ├─ litellm-config.yaml      #   список моделей: mock, gpt-4o-mini, gpt-4o, azure
+│  ├─ litellm-config.yaml      #   список моделей: mock, gpt-5-mini, gpt-5, azure
 │  └─ .env.example             #   ключі провайдерів (для mock не потрібні)
 │
 ├─ mock-provider/              # фейковий OpenAI-провайдер — ДАЄТЬСЯ ГОТОВИМ
@@ -385,7 +385,7 @@ public static class Guards
 3. підніми стек з реальною моделлю:
 
 ```bash
-MODEL=gpt-4o-mini docker compose up --build
+MODEL=gpt-5-mini docker compose up --build
 ```
 
 Сервіс бере модель зі змінної `MODEL` (див. `service/Program.cs`), LiteLLM підставляє ключ

@@ -131,7 +131,7 @@ D.titleSlide({
   D.code(s, { x: MX, y: 1.9, w: 12.1, h: 2.35, size: 11.5, lines: [
     [{ t: "// [W4] fallback: пробуємо по черзі", c: P.dim }],
     [{ t: 'var chain = defaultModel == "mock" ? new[] { model, "mock" }', c: P.codeKey }],
-    [{ t: '                                   : new[] { model, "azure-gpt-4o" };', c: P.codeKey }],
+    [{ t: '                                   : new[] { model, "azure-gpt-5" };', c: P.codeKey }],
     [{ t: "for (int i = 0; i < chain.Length && !ok; i++) {", c: P.darktext }],
     [{ t: "    if (i > 0) Interlocked.Increment(ref stats.Fallbacks);", c: P.codeNum }],
     [{ t: "    var res = await CallGateway(http, gateway, chain[i], …);", c: P.darktext }],

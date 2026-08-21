@@ -221,9 +221,9 @@ D.titleSlide({
 {
   const s = D.slide({ num: "08", title: "Додати провайдера — без зміни коду", pill: "absorb", notes: N() });
   D.code(s, { x: MX, y: 1.9, w: 12.1, h: 1.9, size: 12, lines: [
-    [{ t: "  - model_name: ", c: P.darktext }, { t: "azure-gpt-4o", c: P.codeStr }],
+    [{ t: "  - model_name: ", c: P.darktext }, { t: "azure-gpt-5", c: P.codeStr }],
     [{ t: "    litellm_params:", c: P.codeKey }],
-    [{ t: "      model: azure/gpt-4o", c: P.darktext }],
+    [{ t: "      model: azure/gpt-5", c: P.darktext }],
     [{ t: "      api_base: os.environ/AZURE_API_BASE", c: P.darktext }],
     [{ t: "      api_key:  os.environ/AZURE_API_KEY", c: P.darktext }],
   ] });

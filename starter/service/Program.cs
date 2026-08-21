@@ -1,6 +1,6 @@
 // Сервіс — це наш control plane. LiteLLM тільки ходить у модель, а рішення
 // (яку модель брати, коли ретраїти, скільки коштує) робимо тут.
-// MODEL=mock — дефолт, грошей не треба. MODEL=gpt-4o-mini + ключ у gateway/.env — реальна модель.
+// MODEL=mock — дефолт, грошей не треба. MODEL=gpt-5-mini + ключ у gateway/.env — реальна модель.
 
 using System.Text;
 using System.Text.Json;

@@ -23,22 +23,22 @@ model_list:
   # УВАГА (урок 3): нижче — alias'и, а не снапшоти. Провайдер оновлює модель за
   # такою назвою без вашої участі — це «регресія без коміта» з уроку 2, тільки
   # причина поза вашою організацією. У проді пінять конкретний снапшот, напр.
-  #     model: openai/gpt-4o-mini-2024-07-18
+  #     model: openai/gpt-5-mini-<дата-снапшота>
   # і перехід на новий снапшот їде окремим PR через eval-гейт (урок 11).
   # Тут alias свідомо: реальний ключ опційний, і механіку ми перевіряємо на mock.
-  - model_name: gpt-4o-mini
+  - model_name: gpt-5-mini
     litellm_params:
-      model: openai/gpt-4o-mini
+      model: openai/gpt-5-mini
       api_key: os.environ/OPENAI_API_KEY
 
-  - model_name: gpt-4o
+  - model_name: gpt-5
     litellm_params:
-      model: openai/gpt-4o
+      model: openai/gpt-5
       api_key: os.environ/OPENAI_API_KEY
 
-  - model_name: azure-gpt-4o
+  - model_name: azure-gpt-5
     litellm_params:
-      model: azure/gpt-4o
+      model: azure/gpt-5
       api_base: os.environ/AZURE_API_BASE
       api_key: os.environ/AZURE_API_KEY
 

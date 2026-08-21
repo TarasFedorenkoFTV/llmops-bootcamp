@@ -10,7 +10,7 @@ services:
     environment:
       - GATEWAY_URL=http://gateway:4000
       - DB_CONN=Host=postgres;Database=llmops;Username=llmops;Password=llmops
-      - MODEL=${MODEL:-mock}   # mock (за замовч.) або напр. gpt-4o-mini (потрібен ключ у gateway/.env)
+      - MODEL=${MODEL:-mock}   # mock (за замовч.) або напр. gpt-5-mini (потрібен ключ у gateway/.env)
     depends_on: [gateway, postgres]
 
   gateway:
