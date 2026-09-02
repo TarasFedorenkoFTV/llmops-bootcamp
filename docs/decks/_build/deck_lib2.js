@@ -509,6 +509,9 @@ function createDeck({ lesson, week, fileTitle, notes: reader }) {
   }
 
   // смуга-акцент: акцентна — суцільний фіолет + білий текст (сигнатура Neoversity)
+  // Повторювані типи плашок отримують іконку в кружечку — візуальний якір,
+  // за яким тип зчитується без читання підпису.
+  const BAND_ICONS = [["ПРИНЦИП", "◆"], ["ТИПОВА ПОМИЛКА", "✕"], ["ПОРАДА", "★"], ["НАВІЩО", "?"]];
   function band(s, { x, y, w, h = 1.05, label, text, tone = "acc" }) {
     const solid = tone === "acc";
     const c = t(tone);
@@ -519,8 +522,18 @@ function createDeck({ lesson, week, fileTitle, notes: reader }) {
     const bodyColor = solid ? P.onink : P.ink;
     const labelColor = solid ? P.onink : (tone === "card" ? P.soft : TONE_ON_CARD[tone] || P.soft);
     s.addShape("roundRect", { x, y, w, h, rectRadius: 0.12, fill: { color: bg }, line: solid ? { type: "none" } : { color: tone === "card" ? P.line : (TONE_ON_CARD[tone] || P.line), width: 1 } });
-    if (label) s.addText(label.toUpperCase(), { x: x + 0.24, y: y + 0.14, w: w - 0.48, h: 0.24, fontFace: F.mono, fontSize: 9.5, bold: true, color: labelColor, charSpacing: 1.5, margin: 0 });
-    s.addText(text, { x: x + 0.24, y: y + (label ? 0.42 : 0.16), w: w - 0.48, h: h - (label ? 0.56 : 0.32), fontFace: F.body, fontSize: 13, color: bodyColor, valign: "middle", lineSpacingMultiple: 1.12, margin: 0 });
+    const up = label ? label.toUpperCase() : "";
+    const icon = BAND_ICONS.find(([k]) => up.startsWith(k));
+    const ix = icon ? 0.50 : 0; // зсув тексту праворуч під іконку
+    if (icon) {
+      const d = 0.34, iy = y + h / 2 - d / 2;
+      const circleFill = solid ? P.onink : (tone === "card" ? P.soft : TONE_ON_CARD[tone] || P.soft);
+      const glyphColor = solid ? P.accsolid : "FFFFFF";
+      s.addShape("ellipse", { x: x + 0.20, y: iy, w: d, h: d, fill: { color: circleFill }, line: { type: "none" } });
+      s.addText(icon[1], { x: x + 0.20, y: iy, w: d, h: d, align: "center", valign: "middle", fontFace: "Arial", fontSize: 12, bold: true, color: glyphColor, margin: 0 });
+    }
+    if (label) s.addText(label.toUpperCase(), { x: x + 0.24 + ix, y: y + 0.14, w: w - 0.48 - ix, h: 0.24, fontFace: F.mono, fontSize: 9.5, bold: true, color: labelColor, charSpacing: 1.5, margin: 0 });
+    s.addText(text, { x: x + 0.24 + ix, y: y + (label ? 0.42 : 0.16), w: w - 0.48 - ix, h: h - (label ? 0.56 : 0.32), fontFace: F.body, fontSize: 13, color: bodyColor, valign: "middle", lineSpacingMultiple: 1.12, margin: 0 });
   }
 
   function terms(s, { x, y, w, items, cols = 3, rowH = 1.15 }) {

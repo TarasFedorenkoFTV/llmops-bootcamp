@@ -124,7 +124,7 @@ D.titleSlide({
     s.addText("час →", { x: MX + 0.2, y: ty - 0.28, w: 2, h: 0.22,
       fontFace: F.mono, fontSize: 8.5, color: P.faint, charSpacing: 1, margin: 0 });
   }
-  D.band(s, { x: MX, y: 4.92, w: 12.1, h: 1.15, tone: "warn", label: "Лайфхак",
+  D.band(s, { x: MX, y: 4.92, w: 12.1, h: 1.15, tone: "warn", label: "Порада",
     text: "Той самий принцип, що з образами контейнерів: у прод не котять latest. Ми і gateway пінимо за digest'ом, а не за рухомим тегом." });
   D.band(s, { x: MX, y: 6.2, w: 12.1, h: 0.55, tone: "acc", text: "Правило production: у конфізі — snapshot; оновлення версії — окрема свідома зміна." });
 }
@@ -148,7 +148,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "04", title: "Що ще каже цей код — до того, як вкусить", pill: "absorb", notes: N() });
+  const s = D.slide({ num: "04", title: "Що ще каже цей код — властивості, які варто знати", pill: "absorb", notes: N() });
   [["Чиста функція = дешеві тести", "рядок на вході, ім'я моделі на виході: десяток assert'ів без стека й бази", "good"],
    ["Конфлікти маркерів", "сумнів — на користь дорожчого: «дякую, але хочу повернути гроші» їде на strong", "card"],
    ["Маркери двомовні", "«поверн» і «refund» навмисно: у проді словники розповзаються по мовах", "warn"],
@@ -229,7 +229,7 @@ D.titleSlide({
   ] });
   D.flow(s, { x: MX, y: 4.15, w: 12.1, h: 0.78, size: 11.5, items: [
     { label: "+ блок у YAML", tone: "good" }, { label: "+ рядок у Route()" }, { label: "код виклику не змінився", tone: "acc" }] });
-  D.band(s, { x: MX, y: 5.2, w: 12.1, h: 1.2, tone: "warn", label: "Лайфхак",
+  D.band(s, { x: MX, y: 5.2, w: 12.1, h: 1.2, tone: "warn", label: "Порада",
     text: "Називайте моделі за роллю, а не за брендом: mock-mini, mock-strong. Тоді заміна провайдера — правка конфіга, а не пошук імені по всьому коду." });
 }
 

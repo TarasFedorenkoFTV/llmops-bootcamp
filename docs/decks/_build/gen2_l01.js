@@ -123,7 +123,7 @@ D.authorSlide({
     ["Гроші", "скільки коштує тиждень — і хто помітить"],
     ["Надійність", "провайдер ліг на 20 хвилин у робочий час"],
     ["Якість", "«маленька» правка промпта без компіляції"],
-    ["Видимість", "«бот верзе дурниці», а графіки зелені"],
+    ["Видимість", "«бот відповідає не по темі», а графіки зелені"],
   ];
   q.forEach(([tt, bb], i) => D.tile(s, {
     x: 4.55 + (i % 2) * 4.3, y: 1.8 + Math.floor(i / 2) * 1.95, w: 4.1, h: 1.75,
@@ -184,7 +184,7 @@ D.authorSlide({
     head: ["finish_reason", "що означає", "що робити"],
     rows: [
       { cells: ["stop", "модель завершила думку", "нормальний випадок"] },
-      { cells: ["length", "вдарилась у max_tokens", "збій формату: не кешувати, не показувати"], tone: "crit" },
+      { cells: ["length", "досягла ліміту max_tokens", "збій формату: не кешувати, не показувати"], tone: "crit" },
       { cells: ["tool_calls", "просить інструмент (урок 6)", "текст може бути порожнім"] },
       { cells: ["content_filter", "зрізав фільтр провайдера", "окрема категорія в метриках"] },
     ] });
@@ -267,7 +267,7 @@ D.authorSlide({
   });
   s.addShape("roundRect", { x: 6.87, y: 1.75, w: 5.85, h: 3.55, rectRadius: 0.12, fill: { color: P.critbg }, line: { color: P.crit, width: 1 } });
   s.addText("НЕ БАЧИТЬ У ПРИНЦИПІ", { x: 7.12, y: 1.95, w: 5.35, h: 0.3, fontFace: F.mono, fontSize: 10, bold: true, color: P.crit, charSpacing: 1.5, margin: 0 });
-  [["200 + сміття", "обрізана, порожня або не-JSON відповідь"], ["200 + тихо гірше", "новий снапшот моделі або правка промпта"]].forEach(([k, v], i) => {
+  [["200 + невалідний вміст", "обрізана, порожня або не-JSON відповідь"], ["200 + деградація якості", "новий снапшот моделі або правка промпта"]].forEach(([k, v], i) => {
     const y = 2.45 + i * 1.35;
     s.addShape("roundRect", { x: 7.12, y, w: 5.35, h: 1.15, rectRadius: 0.1, fill: { color: P.card }, line: { type: "none" } });
     s.addText(k, { x: 7.34, y: y + 0.14, w: 5, h: 0.4, fontFace: F.body, fontSize: 15, bold: true, color: P.crit, margin: 0 });
@@ -356,8 +356,8 @@ D.authorSlide({
 {
   const s = D.slide({ num: "08", title: "Mock: керовані збої + чутливість до промпта", pill: "absorb",
     notes: N() });
-  s.addText("СУПЕРСИЛА 1 · ПАДАЄ НА ЗАМОВЛЕННЯ", { x: MX, y: 1.75, w: 6, h: 0.3, fontFace: F.mono, fontSize: 10, bold: true, color: P.faint, charSpacing: 1.5, margin: 0 });
-  [["__fail_503", "провайдер лежить", "W4", "crit"], ["__fail_429", "вичерпані ліміти", "урок 7", "crit"],
+  s.addText("ВЛАСТИВІСТЬ 1 · КЕРОВАНІ ЗБОЇ", { x: MX, y: 1.75, w: 6, h: 0.3, fontFace: F.mono, fontSize: 10, bold: true, color: P.faint, charSpacing: 1.5, margin: 0 });
+  [["__fail_503", "провайдер недоступний", "W4", "crit"], ["__fail_429", "вичерпані ліміти", "урок 7", "crit"],
    ["__delay", "стрибок latency", "W4–5", "warn"], ["__garbage", "беззмістовна відповідь", "ДЗ W5", "warn"]].forEach(([m, v, w, tone], i) => {
     const y = 2.2 + i * 0.72, c = tone === "crit" ? P.crit : P.warn, bg = tone === "crit" ? P.critbg : P.warnbg;
     s.addShape("roundRect", { x: MX, y, w: 1.75, h: 0.55, rectRadius: 0.08, fill: { color: bg }, line: { type: "none" } });
@@ -367,7 +367,7 @@ D.authorSlide({
   });
   s.addText("Надійність, яку тренують лише на реальних інцидентах, — це сподівання.",
     { x: MX, y: 5.2, w: 6, h: 0.6, fontFace: F.body, fontSize: 12, italic: true, color: P.soft, valign: "top", margin: 0 });
-  s.addText("СУПЕРСИЛА 2 · РЕАГУЄ НА ПРОМПТ", { x: 7.1, y: 1.75, w: 5.6, h: 0.3, fontFace: F.mono, fontSize: 10, bold: true, color: P.faint, charSpacing: 1.5, margin: 0 });
+  s.addText("ВЛАСТИВІСТЬ 2 · ЧУТЛИВІСТЬ ДО ПРОМПТА", { x: 7.1, y: 1.75, w: 5.6, h: 0.3, fontFace: F.mono, fontSize: 10, bold: true, color: P.faint, charSpacing: 1.5, margin: 0 });
   D.flow(s, { x: 7.1, y: 2.2, w: 5.62, h: 0.62, size: 11, items: [
     { label: "промпт v2", tone: "good" }, { label: "відповідь по суті" }] });
   D.flow(s, { x: 7.1, y: 3.15, w: 5.62, h: 0.62, size: 11, items: [
@@ -389,7 +389,7 @@ D.authorSlide({
   ] });
   D.tile(s, { x: MX, y: 3.75, w: 3.9, h: 1.9, title: "Зміниться", body: "якість відповідей, багатоходовий діалог, цифри вартості", tone: "card" });
   D.tile(s, { x: 4.72, y: 3.75, w: 3.9, h: 1.9, title: "Не зміниться", body: "жоден механізм контуру: routing, лог, кеш, fallback, гейти", tone: "acc" });
-  D.band(s, { x: 8.82, y: 3.75, w: 3.9, h: 1.9, tone: "warn", label: "Лайфхак",
+  D.band(s, { x: 8.82, y: 3.75, w: 3.9, h: 1.9, tone: "warn", label: "Порада",
     text: "Берете ключ — одразу ставте ліміт витрат у провайдера." });
   s.addText("Радимо не вмикати в перші тижні: на mock видно механіку, а не магію моделі.",
     { x: MX, y: 5.9, w: 12, h: 0.35, fontFace: F.body, fontSize: 12, italic: true, color: P.soft, margin: 0 });

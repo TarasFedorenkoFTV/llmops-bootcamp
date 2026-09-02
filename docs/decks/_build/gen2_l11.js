@@ -100,7 +100,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "03", title: "Розтин eval-gate.yml: кожен крок — граблі", pill: "absorb", notes: N() });
+  const s = D.slide({ num: "03", title: "Розтин eval-gate.yml: кожен крок має причину", pill: "absorb", notes: N() });
   D.code(s, { x: MX, y: 1.9, w: 7.5, h: 3.55, size: 10.5, lines: [
     [{ t: "- name: Up stack        ", c: P.codeKey }, { t: "# без UI — для evals не потрібен", c: P.dim }],
     [{ t: "  run: docker compose up -d --build service", c: P.darktext }],
@@ -138,7 +138,7 @@ D.titleSlide({
     body: "перший запит дає 500. Локально не видно: поки відкриваєте браузер, адаптер прогрівається", tone: "crit" });
   D.band(s, { x: MX, y: 4.1, w: 12.1, h: 1.2, tone: "acc",
     text: "Два червоні прогони, потім зелений — це не сором, а налагодження гейта." });
-  D.band(s, { x: MX, y: 5.45, w: 12.1, h: 0.95, tone: "warn", label: "Лайфхак",
+  D.band(s, { x: MX, y: 5.45, w: 12.1, h: 0.95, tone: "warn", label: "Порада",
     text: "Гейт треба прогнати на зламаному PR — інакше не знаєте, чи він блокує." });
 }
 
@@ -236,7 +236,7 @@ D.titleSlide({
 
 {
   const s = D.slide({ title: "Зараз ви побачите — і навіщо", pill: "do", notes: N() });
-  [["eval-gate.yml по кроках", "кожен крок — відповідь на конкретні граблі"],
+  [["eval-gate.yml по кроках", "кожен крок — відповідь на конкретну проблему"],
    ["PR зі зламаним промптом", "Actions червоний, merge заблоковано"],
    ["фікс → зелений", "той самий PR стає мержабельним"],
    ["required check у налаштуваннях", "job eval, а не workflow"],
