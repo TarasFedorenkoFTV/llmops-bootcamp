@@ -344,7 +344,9 @@ D.titleSlide({
    ["GET /observability", "ті самі цифри + cache-hit і fallback"],
    ["консоль: усі шість плиток", "живі, з числами замість «—»"],
    ["«детектив»: серія __fail_503", "fallback і error rate ростуть, користувач не бачить 500"],
-  ].forEach(([t, b], i) => D.tile(s, { x: MX + (i % 2) * 6.25, y: 1.9 + Math.floor(i / 2) * 1.8, w: 6.05, h: 1.6, badge: i + 1, title: t, body: b, tone: i === 3 ? "crit" : "good" }));
+  ].forEach(([t, b], i) => D.tile(s, { x: MX + (i % 2) * 4.15, y: 1.9 + Math.floor(i / 2) * 1.8, w: 3.95, h: 1.6, badge: i + 1, title: t, body: b, tone: i === 3 ? "crit" : "good" }));
+  D.consoleMock(s, { x: 8.92, y: 1.9, w: 3.8, h: 3.4, caption: "консоль · всі плитки живі",
+    values: [["requests", "128"], ["cost", "$0.42"], ["p95", "1.8 s"], ["error", "1.4%"], ["cache-hit", "31%"], ["fallback", "3"]] });
   D.band(s, { x: MX, y: 5.55, w: 12.1, h: 1.15, tone: "acc", label: "Навіщо",
     text: "Побачити, що моніторинг LLM-системи — це SQL по власному лозі плюс кілька лічильників. І навчитися впізнавати тихий інцидент — той, якого не видно в жодному uptime." });
 }

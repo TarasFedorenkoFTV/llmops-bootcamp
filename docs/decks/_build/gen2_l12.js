@@ -245,8 +245,13 @@ D.titleSlide({
   D.tile(s, { x: MX, y: 1.9, w: 3.9, h: 2.35, title: "Система відтворювана", body: "з чистого клону, без прихованих кроків і локальних змінних", tone: "good" });
   D.tile(s, { x: 4.72, y: 1.9, w: 3.9, h: 2.35, title: "Інцидент керований", body: "деградація, метрики, відновлення — за сценарієм, не імпровізацією", tone: "acc" });
   D.tile(s, { x: 8.82, y: 1.9, w: 3.9, h: 2.35, title: "Робота пояснювана", body: "кожна плитка перекладається мовою грошей і ризику" });
-  D.band(s, { x: MX, y: 4.70, w: 12.1, h: 1.75, tone: "card",
-    text: "Порівняйте з точкою А з уроку 1: та сама консоль, ті самі плитки — і жодного «—». Це і є різниця, яку ви зробили за шість тижнів." });
+  D.consoleMock(s, { x: MX, y: 4.50, w: 5.35, h: 2.0, caption: "точка А · урок 1",
+    values: [["requests", "—"], ["cost", "—"], ["p95", "—"], ["error", "—"], ["cache-hit", "—"], ["fallback", "—"]] });
+  s.addText("→", { x: 6.05, y: 4.50, w: 1.2, h: 2.0, align: "center", valign: "middle", fontFace: D.F.body, fontSize: 26, bold: true, color: P.acc, margin: 0 });
+  D.consoleMock(s, { x: 7.37, y: 4.50, w: 5.35, h: 2.0, caption: "точка Б · урок 12",
+    values: [["requests", "128"], ["cost", "$0.42"], ["p95", "1.8 s"], ["error", "1.4%"], ["cache-hit", "31%"], ["fallback", "3"]] });
+  s.addText("Та сама консоль, ті самі плитки — і жодного «—». Це і є різниця, яку ви зробили за шість тижнів.",
+    { x: MX, y: 6.58, w: 12.1, h: 0.3, fontFace: D.F.body, fontSize: 11.5, italic: true, color: P.soft, margin: 0 });
 }
 
 {

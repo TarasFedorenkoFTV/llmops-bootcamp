@@ -408,9 +408,17 @@ D.authorSlide({
   const fr = [["стек піднявся", "docker compose up --build"], ["чат відповідає", "«Як скинути пароль?»"],
               ["консоль порожня", "«—» у кожній плитці"], ["TODO у коді", "мапа роботи на 6 тижнів"],
               ["рядок у лозі", "таблиця requests"], ["чесний злам", "__fail_503 — і жодного плану Б"]];
-  fr.forEach(([tt, bb], i) => D.tile(s, {
-    x: MX + (i % 3) * 4.05, y: 1.8 + Math.floor(i / 3) * 1.75, w: 3.85, h: 1.55,
-    badge: i + 1, title: tt, body: bb, tone: i === 5 ? "crit" : "good" }));
+  // ліворуч — нумерований список кадрів, праворуч — мокап консолі точки А
+  fr.forEach(([tt, bb], i) => {
+    const y = 1.85 + i * 0.58, crit = i === 5;
+    s.addShape("ellipse", { x: MX, y, w: 0.42, h: 0.42, fill: { color: crit ? P.crit : P.accsolid }, line: { type: "none" } });
+    s.addText(String(i + 1), { x: MX, y, w: 0.42, h: 0.42, align: "center", valign: "middle", fontFace: D.F.mono, fontSize: 12, bold: true, color: "FFFFFF", margin: 0 });
+    s.addText([{ text: tt + "  ", options: { bold: true, fontSize: 14, color: crit ? P.crit : P.ink } },
+               { text: bb, options: { fontSize: 12, color: P.soft } }],
+      { x: MX + 0.60, y, w: 7.1, h: 0.42, fontFace: D.F.body, valign: "middle", margin: 0 });
+  });
+  D.consoleMock(s, { x: 8.5, y: 1.85, w: 4.22, h: 3.3, caption: "консоль · точка А",
+    values: [["requests", "—"], ["cost", "—"], ["p95", "—"], ["error", "—"], ["cache-hit", "—"], ["fallback", "—"]] });
   D.band(s, { x: MX, y: 5.5, w: 12.1, h: 1.15, tone: "acc", label: "Навіщо",
     text: "Зафіксувати точку А — стан системи до шарів керування. Порожня консоль і збій без плану Б — не дефект демо, а предмет курсу." });
 }

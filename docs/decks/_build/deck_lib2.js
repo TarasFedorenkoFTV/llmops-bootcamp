@@ -536,6 +536,27 @@ function createDeck({ lesson, week, fileTitle, notes: reader }) {
     s.addText(text, { x: x + 0.24 + ix, y: y + (label ? 0.42 : 0.16), w: w - 0.48 - ix, h: h - (label ? 0.56 : 0.32), fontFace: F.body, fontSize: 13, color: bodyColor, valign: "middle", lineSpacingMultiple: 1.12, margin: 0 });
   }
 
+  // Мокап консолі: віконна рамка з трьома «кнопками», підпис-адреса і сітка
+  // KPI-плиток 3×2. values — шість пар [підпис, значення]; значення "—" малюється
+  // тьмяним (точка А), решта — світлим (жива консоль). Мінімум ~3.6 × 2.4.
+  function consoleMock(s, { x, y, w, h = 2.6, caption = "Консоль · localhost:4200", values }) {
+    const bar = 0.34, innerLine = "2A2438";
+    s.addShape("roundRect", { x, y, w, h, rectRadius: 0.08, fill: { color: P.codebg }, line: { color: P.line, width: 1 } });
+    [P.oncrit, P.onblue, P.ongood].forEach((c, i) =>
+      s.addShape("ellipse", { x: x + 0.14 + i * 0.16, y: y + bar / 2 - 0.04, w: 0.08, h: 0.08, fill: { color: c }, line: { type: "none" } }));
+    s.addText(caption, { x: x + 0.66, y, w: w - 0.78, h: bar, fontFace: F.mono, fontSize: 8, color: P.dim, valign: "middle", margin: 0 });
+    s.addShape("line", { x, y: y + bar, w, h: 0, line: { color: innerLine, width: 0.75 } });
+    const gx = 0.12, gy = 0.10, cols = 3, rows = 2;
+    const tw = (w - gx * (cols + 1)) / cols, th = (h - bar - gy * (rows + 1)) / rows;
+    values.forEach(([lab, val], i) => {
+      const cx = x + gx + (i % cols) * (tw + gx), cy = y + bar + gy + Math.floor(i / cols) * (th + gy);
+      s.addShape("roundRect", { x: cx, y: cy, w: tw, h: th, rectRadius: 0.05, fill: { color: P.codebg }, line: { color: innerLine, width: 1 } });
+      s.addText(lab, { x: cx + 0.08, y: cy + 0.04, w: tw - 0.16, h: th * 0.26, fontFace: F.mono, fontSize: 7.5, color: P.dim, valign: "top", margin: 0 });
+      const dash = val === "—";
+      s.addText(val, { x: cx + 0.08, y: cy + th * 0.34, w: tw - 0.16, h: th * 0.58, fontFace: F.mono, fontSize: dash ? 15 : 13, bold: !dash, color: dash ? P.dim : P.darktext, valign: "middle", margin: 0 });
+    });
+  }
+
   function terms(s, { x, y, w, items, cols = 3, rowH = 1.15 }) {
     const cw = (w - (cols - 1) * 0.22) / cols;
     items.forEach((it, i) => {
@@ -651,7 +672,7 @@ function createDeck({ lesson, week, fileTitle, notes: reader }) {
   }
 
   return { pres, P, F, W, H, MX, TONE, titleSlide, slide, divider, authorSlide, thanksSlide, closingSlide,
-           stat, tile, arrow, flow, bars, states, layers, timeline, band, code, table, checklist, terms,
+           stat, tile, arrow, flow, bars, states, layers, timeline, band, code, table, checklist, terms, consoleMock,
            tick, cross, save };
 }
 
