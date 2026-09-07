@@ -230,7 +230,7 @@ function createDeck({ lesson, week, fileTitle, notes: reader }) {
     // Праворуч — скляна «N» із ассетів шаблону (сл. 9 і 42). Вона впечена у фон
     // обкладинки, тож окремої фігури тут немає. Раніше на цьому місці стояли
     // мої власні концентричні рамки — у шаблоні такого елемента не існує.
-    s.addText(`ТИЖДЕНЬ ${week} · УРОК ${lesson} З 12`, { x: MX, y: 1.7, w: 8, h: 0.3, fontFace: F.mono, fontSize: 12, bold: true, color: DK.sub, charSpacing: 3, margin: 0 });
+    s.addText(`ТИЖДЕНЬ ${week} · ТЕМА ${lesson} З 12`, { x: MX, y: 1.7, w: 8, h: 0.3, fontFace: F.mono, fontSize: 12, bold: true, color: DK.sub, charSpacing: 3, margin: 0 });
     s.addText(title, { x: MX, y: 2.15, w: 9.0, h: 2.0, fontFace: F.display, fontSize: 36, color: DK.ink, valign: "top", lineSpacingMultiple: 1.02, margin: 0 });
     s.addText(lead, { x: MX, y: 4.5, w: 8.4, h: 1.2, fontFace: F.body, fontSize: 15, color: DK.sub, lineSpacingMultiple: 1.2, margin: 0 });
     let cx = MX;
@@ -389,7 +389,7 @@ function createDeck({ lesson, week, fileTitle, notes: reader }) {
     const s = newDarkSlide(); idx++;
     coverBg(s);
     wordmark(s);
-    s.addText(`ПІДСУМОК УРОКУ ${lesson}`, { x: MX, y: 0.95, w: 8, h: 0.3, fontFace: F.mono, fontSize: 11, bold: true, color: DK.sub, charSpacing: 3, margin: 0 });
+    s.addText(`ПІДСУМОК ТЕМИ ${lesson}`, { x: MX, y: 0.95, w: 8, h: 0.3, fontFace: F.mono, fontSize: 11, bold: true, color: DK.sub, charSpacing: 3, margin: 0 });
     summary.forEach((txt, i) => {
       const y = 1.5 + i * 0.72;
       s.addShape("ellipse", { x: MX, y: y + 0.1, w: 0.16, h: 0.16, fill: { color: DK.solid }, line: { type: "none" } });
@@ -660,7 +660,7 @@ function createDeck({ lesson, week, fileTitle, notes: reader }) {
 
   function save(deckPath, scriptPath) {
     assertNotesAligned();
-    const md = [`# Сценарій начитки · Урок ${lesson} · ${fileTitle}`, "",
+    const md = [`# Сценарій начитки · Тема ${lesson} · ${fileTitle}`, "",
       `Слайдів: ${script.length}. Начитка: ${script.reduce((a, s) => a + (s.notes || "").split(/\s+/).filter(Boolean).length, 0)} слів.`,
       "", "---", ""];
     script.forEach(sl => {
