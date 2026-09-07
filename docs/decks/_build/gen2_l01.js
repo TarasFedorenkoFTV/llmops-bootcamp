@@ -172,7 +172,7 @@ D.authorSlide({
     { label: "max_tokens", body: "стеля довжини = стеля вартості виклику", tone: "card" },
     { label: "response_format", body: "строгий JSON, який валідує провайдер", tone: "card" },
   ] });
-  s.addText("system — це той промпт, яка у наступній темі переїде в реєстр.",
+  s.addText("system — це той промпт, який у наступній темі переїде в реєстр.",
     { x: 7.1, y: 4.9, w: 5.6, h: 0.4, fontFace: F.body, fontSize: 12, italic: true, color: P.acc, margin: 0 });
 }
 
@@ -209,7 +209,7 @@ D.authorSlide({
     { label: "Вхідні", value: 2.2, note: "промпт та історія — найдешевші", tone: "acc" },
     { label: "Вихідні", value: 6, note: "у кілька разів дорожчі", tone: "crit" },
   ] });
-  s.addText("схематично: порядок величин, а не точні коефіцієнти — прайс розбираємо в уроці 4",
+  s.addText("схематично: порядок величин, а не точні коефіцієнти — прайс розбираємо в Темі 4",
     { x: 4.6, y: 4.5, w: 8.12, h: 0.3, fontFace: F.body, fontSize: 10, italic: true, color: P.faint, margin: 0 });
   D.band(s, { x: 4.6, y: 5.0, w: 8.12, h: 1.4, tone: "good", label: "Принцип",
     text: "Без окремих вхідних і вихідних токенів цифра вартості вигадана." });

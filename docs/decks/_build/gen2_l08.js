@@ -219,7 +219,7 @@ D.titleSlide({
     [{ t: "} else { var result = RunTool(toolCall); … }", c: P.codeKey }],
   ] });
   D.tile(s, { x: MX, y: 4.45, w: 5.85, h: 1.6, title: "lookup_order — вільно",
-    body: "читання виконується одразу, як в уроці 6", tone: "good" });
+    body: "читання виконується одразу, як в Темі 6", tone: "good" });
   D.tile(s, { x: 6.87, y: 4.45, w: 5.85, h: 1.6, title: "create_ticket — заявка",
     body: "RunTool не викликається взагалі: дія ще не сталася, вона лише запропонована", tone: "crit" });
 }
