@@ -58,9 +58,12 @@ D.titleSlide({
     body: "п'ятниця, дедлайн, «та я ж одне слово поміняв» — найгірші регресії приходять саме так", tone: "crit" });
   D.tile(s, { x: 6.87, y: 1.95, w: 5.85, h: 1.8, title: "Гейт у CI",
     body: "PR зі зламаним промптом фізично не мержиться: кнопка заблокована, а не «хтось пильний»", tone: "good" });
-  D.band(s, { x: MX, y: 4.0, w: 12.1, h: 1.2, tone: "acc",
+  D.flow(s, { x: MX, y: 3.95, w: 12.1, h: 0.56, size: 10.5, items: [
+    { label: "PR: зміна промпта" }, { label: "Actions: eval-гейт", tone: "acc", sub: "запускає механізм, не людина" },
+    { label: "червоний → merge заблоковано", tone: "crit" }, { label: "зелений → merge", tone: "good" }] });
+  D.band(s, { x: MX, y: 4.95, w: 12.1, h: 0.7, tone: "acc",
     text: "Промпт остаточно стає кодом — з рев'ю і заблокованим мержем." });
-  D.band(s, { x: MX, y: 5.35, w: 12.1, h: 1.05, tone: "good", label: "Принцип",
+  D.band(s, { x: MX, y: 5.8, w: 12.1, h: 0.9, tone: "good", label: "Принцип",
     text: "Усе, що тримається на «не забути», буде забуто. Перевірки запускає механізм." });
 }
 
@@ -136,9 +139,12 @@ D.titleSlide({
     body: "Actions виконує кроки з bash -e: перший невдалий curl убиває крок", tone: "crit" });
   D.tile(s, { x: 6.87, y: 1.95, w: 5.85, h: 1.9, title: "Сюрприз 2 · холодний gateway",
     body: "перший запит дає 500. Локально не видно: поки відкриваєте браузер, адаптер прогрівається", tone: "crit" });
-  D.band(s, { x: MX, y: 4.1, w: 12.1, h: 1.2, tone: "acc",
+  D.flow(s, { x: MX, y: 4.05, w: 12.1, h: 0.56, size: 10, items: [
+    { label: "up stack" }, { label: "wait service", tone: "crit", sub: "цикл замість bash -e" }, { label: "wait gateway", tone: "crit", sub: "холодний старт" },
+    { label: "evals", tone: "acc" }, { label: "logs on failure", tone: "warn" }, { label: "down · always", tone: "good" }] });
+  D.band(s, { x: MX, y: 5.0, w: 12.1, h: 0.7, tone: "acc",
     text: "Два червоні прогони, потім зелений — це не сором, а налагодження гейта." });
-  D.band(s, { x: MX, y: 5.45, w: 12.1, h: 0.95, tone: "warn", label: "Порада",
+  D.band(s, { x: MX, y: 5.85, w: 12.1, h: 0.85, tone: "warn", label: "Порада",
     text: "Гейт треба прогнати на зламаному PR — інакше не знаєте, чи він блокує." });
 }
 
