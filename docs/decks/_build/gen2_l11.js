@@ -95,7 +95,7 @@ D.titleSlide({
     { label: "protection", tone: "good" }, { label: "merge", tone: "crit" },
   ] });
   D.band(s, { x: 8.35, y: 1.95, w: 4.37, h: 2.4, tone: "crit", label: "Пастка: job, а не workflow",
-    text: "У списку — назва job (eval), а не workflow. Неіснуючий чек нічого не блокує." });
+    text: "У списку — назва job (eval), а не workflow. Неіснуючий чек ніколи не звітує — PR застрягає на «Expected»." });
   D.band(s, { x: 8.35, y: 4.5, w: 4.37, h: 1.15, tone: "warn", label: "Безкоштовний план",
     text: "на приватному репозиторії protection може бути недоступний — перевірте заздалегідь." });
   D.band(s, { x: MX, y: 5.75, w: 12.1, h: 0.65, tone: "card",
@@ -220,7 +220,7 @@ D.titleSlide({
   const s = D.slide({ num: "09", title: "Rollback-критерії пишуться до пожежі", pill: "absorb", notes: N() });
   D.code(s, { x: MX, y: 1.9, w: 12.1, h: 2.25, size: 12, lines: [
     [{ t: "Відкочуємо, якщо:", c: P.codeKey }],
-    [{ t: "  eval pass rate < 5/6         ", c: P.codeNum }, { t: "(прогін після деплою)", c: P.dim }],
+    [{ t: "  eval pass rate < поріг (5/6) ", c: P.codeNum }, { t: "(прогін після деплою)", c: P.dim }],
     [{ t: "  або fallback_events зростає  ", c: P.codeNum }, { t: "протягом 15 хв", c: P.dim }],
     [{ t: "  або error rate > 5%          ", c: P.codeNum }, { t: "протягом 15 хв", c: P.dim }],
     [{ t: "Хто смикає: черговий, без погоджень.", c: P.codeStr }],
@@ -273,7 +273,7 @@ D.titleSlide({
 
 // ─── РОЗДІЛЮВАЧ · рефлексія ───
 {
-  D.divider({ big: "РЕФЛЕКСІЯ", sub: "що це довело · перевір себе · антипатерни тижня", notes: N() });
+  D.divider({ big: "РЕФЛЕКСІЯ", sub: "що це довело · перевірте себе · антипатерни тижня", notes: N() });
 }
 
 {
@@ -289,7 +289,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Перевір себе", pill: "connect", notes: N() });
+  const s = D.slide({ title: "Перевірте себе", pill: "connect", notes: N() });
   s.addShape("roundRect", { x: MX, y: 1.95, w: 12.1, h: 4.00, rectRadius: 0.12, fill: { color: P.card }, line: { color: P.line, width: 1 } });
   D.checklist(s, { x: MX + 0.45, y: 2.3, w: 11.3, cols: 2, h: 3.20, size: 14, items: [
     "в історії Actions є червоний і зелений прогін",
@@ -304,7 +304,7 @@ D.titleSlide({
 {
   const s = D.slide({ title: "Антипатерни тижня", pill: "connect", notes: N() });
   [["Мерж повз червоний гейт", "один прецедент — і за місяць гейт обходять усі"],
-   ["Protection на неіснуючий чек", "захист, який нічого не блокує, гірший за відсутній"],
+   ["Protection на неіснуючий чек", "чек ніколи не звітує; PR застрягають на «Expected» — і захист знімають"],
    ["Гейт, що триває пів години", "обхід стає раціональним рішенням"],
    ["Feature flag без плану прибирання", "кладовище мертвих гілок через рік"],
    ["Rollback-критерії під час інциденту", "рішення обговорюється, поки користувачі чекають"],

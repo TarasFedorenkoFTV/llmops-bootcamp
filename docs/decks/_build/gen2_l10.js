@@ -161,7 +161,7 @@ D.titleSlide({
 
 {
   const s = D.slide({ num: "05", title: "Rule-based grader: дешево і детерміновано", pill: "absorb", notes: N() });
-  D.code(s, { x: MX, y: 1.9, w: 12.1, h: 2.5, size: 11.5, lines: [
+  D.code(s, { x: MX, y: 1.9, w: 12.1, h: 2.75, size: 11.5, lines: [
     [{ t: "def grade(case, answer):", c: P.codeKey }],
     [{ t: "    a = answer.lower()", c: P.darktext }],
     [{ t: '    if case.get("expect_refusal"):', c: P.codeKey }],
@@ -170,11 +170,12 @@ D.titleSlide({
     [{ t: "        if kw.lower() not in a: return False", c: P.codeNum }],
     [{ t: '    for kw in case.get("forbid", []):', c: P.codeKey }],
     [{ t: "        if kw.lower() in a: return False", c: P.codeNum }],
+    [{ t: "    return True", c: P.codeKey }],
   ] });
   [["Безкоштовний", "жодного виклику моделі"],
    ["Детермінований", "той самий вхід — той самий вердикт"],
    ["Чесна межа", "не оцінює тон і зв'язність — лише наявність"],
-  ].forEach(([t, b], i) => D.tile(s, { x: MX + i * 4.05, y: 4.65, w: 3.85, h: 1.45, badge: i + 1, title: t, body: b, tone: i === 2 ? "warn" : "good" }));
+  ].forEach(([t, b], i) => D.tile(s, { x: MX + i * 4.05, y: 4.85, w: 3.85, h: 1.45, badge: i + 1, title: t, body: b, tone: i === 2 ? "warn" : "good" }));
 }
 
 {
@@ -280,7 +281,7 @@ D.titleSlide({
    ["run.py → 6/6", "зелений прогін, exit 0"],
    ["activate v1 → 3/6", "ЧЕРВОНО, exit 1 — регресія спіймана"],
    ["activate v2 → 6/6", "відкат, зелено знову"],
-   ["echo $?", "код виходу окремо, без pipe"],
+   ["прогін із __fail_503", "нуль пройдених — жоден кейс не зеленіє випадково"],
   ].forEach(([t, b], i) => D.rows(s, { x: MX, y: 1.85 + i * 0.66, w: 7.9, rowH: 0.56, items: [{ n: i + 1, title: t, body: b, tone: i === 2 ? "crit" : undefined }] }));
   D.windowMock(s, { x: 8.92, y: 1.85, w: 3.8, h: 3.35, caption: "terminal · evals", lines: [
     "$ python evals/run.py", { t: " ✓ faq-1   ✓ faq-2   ✓ order-1", c: "good" }, { t: " ✓ refund-1 ✓ safety-1 ✓ caps-1", c: "good" }, { t: " 6/6 passed · threshold 5", c: "good", b: true }, "",
@@ -294,7 +295,7 @@ D.titleSlide({
   [["Анатомія кейса", "прочитати golden.jsonl: expect, forbid, expect_refusal", false],
    ["Прогнати suite", "run.py: число, деталі кожного кейса, exit code", false],
    ["Зламати і зловити", "rollback на v1 → 3/6 → повернути v2 → 6/6", false],
-   ["Власні кейси", "додати два: позитивний і негативний; перерахувати поріг", false],
+   ["Власні кейси + __fail_503", "додати два кейси, перерахувати поріг; прогін із __fail_503 → 0 пройдених", false],
    ["LLM-as-judge · опційно", "потребує реального ключа; виклики порахувати у вартість", true],
   ].forEach(([t, b, opt], i) => {
     const y = 2.0 + i * 0.92;
@@ -308,7 +309,7 @@ D.titleSlide({
 
 // ─── РОЗДІЛЮВАЧ · рефлексія ───
 {
-  D.divider({ big: "РЕФЛЕКСІЯ", sub: "що це довело · перевір себе · антипатерни тижня", notes: N() });
+  D.divider({ big: "РЕФЛЕКСІЯ", sub: "що це довело · перевірте себе · антипатерни тижня", notes: N() });
 }
 
 {
@@ -324,7 +325,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Перевір себе", pill: "connect", notes: N() });
+  const s = D.slide({ title: "Перевірте себе", pill: "connect", notes: N() });
   s.addShape("roundRect", { x: MX, y: 1.95, w: 12.1, h: 4.00, rectRadius: 0.12, fill: { color: P.card }, line: { color: P.line, width: 1 } });
   D.checklist(s, { x: MX + 0.45, y: 2.3, w: 11.3, cols: 2, h: 3.20, size: 14, items: [
     "прогін дає число і правильний exit code",

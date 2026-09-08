@@ -77,7 +77,7 @@ D.titleSlide({
       { cells: ["Головний ризик", "DDoS власного провайдера", "непомітна різниця якості моделей"], tone: "crit" },
     ] });
   D.band(s, { x: MX, y: 4.85, w: 12.1, h: 1.55, tone: "acc",
-    text: "Retry в коді курсу свідомо не будуємо: на mock «ще раз туди само» і «в інше місце» дають той самий результат. Порядок правильний — спершу fallback, і бюджет часу на все разом." });
+    text: "Retry в коді курсу свідомо не будуємо: на mock «ще раз туди само» і «в інше місце» дають той самий результат. У проді — короткий retry, потім fallback; у нас — одразу fallback, і бюджет часу на все разом." });
 }
 
 {
@@ -238,7 +238,7 @@ D.titleSlide({
   const s = D.slide({ num: "08", title: "Три стани — і чому half-open обов'язковий", pill: "absorb", opt: true, notes: N() });
   D.states(s, { x: MX + 1.5, y: 2.2, items: [
     { label: "closed", sub: "усе працює", tone: "good", edge: "3 збої" },
-    { label: "open", sub: "не питаємо зовсім", tone: "crit", edge: "~30 с" },
+    { label: "open", sub: "не питаємо зовсім", tone: "crit", edge: "~5 с · probe" },
     { label: "half-open", sub: "один пробний запит", tone: "warn" },
   ] });
   D.band(s, { x: MX, y: 4.6, w: 12.1, h: 1.25, tone: "crit", label: "Без half-open — самостріл",
@@ -251,7 +251,7 @@ D.titleSlide({
   const s = D.slide({ num: "09", title: "Слід у метриках: інцидент без сліду повториться", pill: "absorb", notes: N() });
   D.layers(s, { x: MX, y: 1.95, w: 12.1, h: 0.8, gap: 0.14, items: [
     { label: "fallback_events", body: "лічильник переходів росте з кожним спрацюванням ланцюга", tone: "acc" },
-    { label: "статуси збоїв", body: "503, 429, 0 лежать у лозі поруч зі звичайними 200" },
+    { label: "статуси збоїв", body: "503 і 429 лежать у лозі поруч зі звичайними 200" },
     { label: "заглушка деградації", body: "пише чесний статус, а не 200 — інакше метрики брешуть" },
   ] });
   D.band(s, { x: MX, y: 4.78, w: 12.1, h: 1.15, tone: "good",
@@ -317,7 +317,7 @@ D.titleSlide({
 
 // ─── РОЗДІЛЮВАЧ · рефлексія ───
 {
-  D.divider({ big: "РЕФЛЕКСІЯ", sub: "що це довело · перевір себе · антипатерни тижня", notes: N() });
+  D.divider({ big: "РЕФЛЕКСІЯ", sub: "що це довело · перевірте себе · антипатерни тижня", notes: N() });
 }
 
 {
@@ -333,7 +333,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Перевір себе", pill: "connect", notes: N() });
+  const s = D.slide({ title: "Перевірте себе", pill: "connect", notes: N() });
   s.addShape("roundRect", { x: MX, y: 1.95, w: 12.1, h: 4.00, rectRadius: 0.12, fill: { color: P.card }, line: { color: P.line, width: 1 } });
   D.checklist(s, { x: MX + 0.45, y: 2.3, w: 11.3, cols: 2, h: 3.20, size: 14, items: [
     "__fail_503 дає ввічливу заглушку, не 500",
@@ -368,7 +368,7 @@ D.titleSlide({
   D.tile(s, { x: MX, y: 1.9, w: 5.85, h: 2.4, title: "Обов'язково — без здачі",
     body: "• закріпити лабу: __fail_503 → fallback → ввічлива заглушка\n\n• переконатися, що збій швидкий і лишає чесний статус у лозі\n\n• проговорити свою драбину деградації" });
   D.tile(s, { x: 6.87, y: 1.9, w: 5.85, h: 2.4, title: "Опційно", tone: "warn",
-    body: "• circuit breaker: 3 збої → open на 30 с, обов'язково з half-open (пробний запит раз на ~5 с) — інакше сам собі влаштуєш outage" });
+    body: "• circuit breaker: 3 збої → open на 30 с, обов'язково з half-open (пробний запит раз на ~5 с) — інакше самі собі влаштуєте outage" });
   s.addShape("roundRect", { x: MX, y: 4.6, w: 12.1, h: 1.6, rectRadius: 0.14, fill: { color: P.card }, line: { color: P.acc, width: 1.5 } });
   s.addText("ДЗ тижня 4 — після наступної теми", { x: MX + 0.3, y: 4.8, w: 11.5, h: 0.4, fontFace: F.body, fontSize: 15, bold: true, color: P.acc, margin: 0 });
   s.addText("Тиждень об'єднує надійність і безпеку: сьогоднішній fallback із деградацією вже у Вас в руках, після наступної теми додасться черга підтверджень для незворотних дій — і тиждень здається одним PR.",
@@ -379,7 +379,7 @@ D.closingSlide({
   summary: [
     "reliability — не «щоб не падало», а щоб падіння було керованим",
     "збій — значення, а не виняток: тільки так будуються ланцюги",
-    "retry і fallback вирішують різні задачі; порядок — спершу fallback",
+    "retry і fallback вирішують різні задачі; у проді — короткий retry, потім fallback; у нас — одразу fallback",
     "деградація має сходинки, а остання з них — UX-рішення з чесним статусом",
     "інцидент без сліду в метриках повториться",
   ],

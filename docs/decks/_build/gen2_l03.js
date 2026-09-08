@@ -62,7 +62,7 @@ D.titleSlide({
     { label: "FAQ через сильну модель", value: 10, note: "×10 — порядок вартості", tone: "crit" },
     { label: "той самий FAQ через дешеву", value: 1, note: "×1 — та сама відповідь", tone: "good" }] });
   D.band(s, { x: MX, y: 5.2, w: 12.1, h: 1.2, tone: "acc", label: "Навіщо цей шар",
-    text: "Маршрутизація — перший механізм тижня «гроші»: вона розводить трафік за задачами, і саме на ній тримається все, що рахуватимемо у наступній темі." });
+    text: "Маршрутизація — перший механізм тижня «Routing + cost»: вона розводить трафік за задачами, і саме на ній тримається все, що рахуватимемо у наступній темі." });
 }
 
 {
@@ -285,7 +285,7 @@ D.titleSlide({
   D.windowMock(s, { x: 8.92, y: 1.9, w: 3.8, h: 3.4, caption: "psql · requests", lines: [
     "SELECT model, count(*)", "  FROM requests", "  GROUP BY model;", "", { t: " mock-mini   |  7", c: "good" }, { t: " mock-strong |  3", c: "acc" }, "", { t: "трафік розведений ✓", c: "good" }] });
   D.band(s, { x: MX, y: 5.55, w: 12.1, h: 1.15, tone: "acc", label: "Навіщо",
-    text: "Побачити перший операційний доказ, що routing працює: не «код написаний», а «трафік розведений». Різниця між цими формулюваннями і є темою теми." });
+    text: "Побачити перший операційний доказ, що routing працює: не «код написаний», а «трафік розведений». Різниця між цими формулюваннями — і є суть сьогоднішньої теми." });
 }
 
 {
@@ -307,14 +307,14 @@ D.titleSlide({
 
 // ─── РОЗДІЛЮВАЧ · рефлексія ───
 {
-  D.divider({ big: "РЕФЛЕКСІЯ", sub: "що це довело · перевір себе · антипатерни маршрутизації", notes: N() });
+  D.divider({ big: "РЕФЛЕКСІЯ", sub: "що це довело · перевірте себе · антипатерни маршрутизації", notes: N() });
 }
 
 {
   const s = D.slide({ title: "Що це довело", pill: "connect", notes: N() });
   D.tile(s, { x: MX, y: 1.9, w: 7.9, h: 1.15, title: "Трафік розведений", body: "дві моделі, різні лічильники — доказ, а не «код написаний»", tone: "good" });
   D.tile(s, { x: MX, y: 3.2, w: 7.9, h: 1.15, title: "Рішення читається", body: "уся політика в одній функції; кожен вибір — подія в лозі", tone: "acc" });
-  D.tile(s, { x: MX, y: 4.5, w: 7.9, h: 1.15, title: "Розширення дешеве", body: "«третій провайдер» = один YAML-блок і нуль рядків коду" });
+  D.tile(s, { x: MX, y: 4.5, w: 7.9, h: 1.15, title: "Розширення дешеве", body: "«третій провайдер» = один YAML-блок; у коді — лише рядок у Route()" });
   D.windowMock(s, { x: 8.92, y: 1.9, w: 3.8, h: 3.75, caption: "gateway/litellm-config.yaml", lines: [
     "model_list:", { t: "  - model_name: mock-mini", c: "good" }, { t: "  - model_name: mock-strong", c: "acc" }, { t: "  - model_name: azure-gpt-5", c: "warn" },
     "    litellm_params:", "      model: azure/<deployment>", "      api_key: os.environ/…", "", { t: "service/: 0 рядків змінено", c: "good" }] });
@@ -323,7 +323,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Перевір себе", pill: "connect", notes: N() });
+  const s = D.slide({ title: "Перевірте себе", pill: "connect", notes: N() });
   s.addShape("roundRect", { x: MX, y: 1.95, w: 12.1, h: 4.00, rectRadius: 0.12, fill: { color: P.card }, line: { color: P.line, width: 1 } });
   D.checklist(s, { x: MX + 0.45, y: 2.3, w: 11.3, cols: 2, h: 3.20, size: 14, items: [
     "звичайне питання і ескалація дають різні моделі",
