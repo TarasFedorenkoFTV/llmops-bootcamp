@@ -384,10 +384,13 @@ D.titleSlide({
 
 {
   const s = D.slide({ title: "Що це довело", pill: "connect", notes: N() });
-  D.tile(s, { x: MX, y: 1.9, w: 3.9, h: 2.35, title: "Моніторинг — це Ваш лог", body: "SQL по таблиці, яку Ви писали з першої теми", tone: "good" });
-  D.tile(s, { x: 4.72, y: 1.9, w: 3.9, h: 2.35, title: "Плитки відповідають на питання", body: "шість цифр, кожна з приводу, а не для краси", tone: "acc" });
-  D.tile(s, { x: 8.82, y: 1.9, w: 3.9, h: 2.35, title: "Тихий інцидент видно", body: "fallback і error rate ростуть, поки uptime зелений", tone: "crit" });
-  D.band(s, { x: MX, y: 4.70, w: 12.1, h: 1.75, tone: "card",
+  D.tile(s, { x: MX, y: 1.9, w: 7.9, h: 1.15, title: "Моніторинг — це Ваш лог", body: "SQL по таблиці, яку Ви писали з першої теми", tone: "good" });
+  D.tile(s, { x: MX, y: 3.2, w: 7.9, h: 1.15, title: "Плитки відповідають на питання", body: "шість цифр, кожна з приводу, а не для краси", tone: "acc" });
+  D.tile(s, { x: MX, y: 4.5, w: 7.9, h: 1.15, title: "Тихий інцидент видно", body: "fallback і error rate ростуть, поки uptime зелений", tone: "crit" });
+  D.windowMock(s, { x: 8.92, y: 1.9, w: 3.8, h: 3.75, caption: "psql = плитки консолі", lines: [
+    "count(*)                 128", "percentile_cont(0.95)  1.8 s", "error rate            1.4 %", "", { t: "плитки: 128 · 1.8 s · 1.4 %", c: "good" }, { t: "збіг ✓", c: "good" }, "",
+    { t: "серія __fail_503:", c: "dim" }, { t: " fallback 0 → 3, error 1.4 → 4 %", c: "crit" }, { t: " uptime: зелений", c: "warn" }] });
+  D.band(s, { x: MX, y: 5.85, w: 12.1, h: 0.8, tone: "card",
     text: "Видимість є. У наступній темі до неї додається судження: не «скільки запитів», а «чи стали відповіді гіршими» — і це вже перевірки якості." });
 }
 

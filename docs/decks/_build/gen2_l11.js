@@ -246,7 +246,10 @@ D.titleSlide({
    ["PR зі зламаним промптом", "Actions червоний, merge заблоковано"],
    ["фікс → зелений", "той самий PR стає мержабельним"],
    ["required check у налаштуваннях", "job eval, а не workflow"],
-  ].forEach(([t, b], i) => D.tile(s, { x: MX + (i % 2) * 6.25, y: 1.9 + Math.floor(i / 2) * 1.8, w: 6.05, h: 1.6, badge: i + 1, title: t, body: b, tone: i === 1 ? "crit" : "good" }));
+  ].forEach(([t, b], i) => D.tile(s, { x: MX + (i % 2) * 4.15, y: 1.9 + Math.floor(i / 2) * 1.8, w: 3.95, h: 1.6, badge: i + 1, title: t, body: b, tone: i === 1 ? "crit" : "good" }));
+  D.windowMock(s, { x: 8.92, y: 1.9, w: 3.8, h: 3.4, caption: "github · PR #1 · checks", lines: [
+    { t: "✗ eval — failed", c: "crit", b: true }, { t: "  3/6 passed · threshold 5", c: "dim" }, { t: "  Merging is blocked", c: "crit" }, "",
+    { t: "push: fix prompt", c: "dim" }, "", { t: "✓ eval — passed", c: "good", b: true }, { t: "  6/6 passed · threshold 5", c: "dim" }, { t: "  Merge pull request", c: "good" }] });
   D.band(s, { x: MX, y: 5.55, w: 12.1, h: 1.15, tone: "acc", label: "Навіщо",
     text: "Побачити, як якість перестає залежати від дисципліни: перевірка, яку Ви вміли робити руками, стає умовою мержу — і працює без Вас." });
 }
@@ -275,10 +278,13 @@ D.titleSlide({
 
 {
   const s = D.slide({ title: "Що це довело", pill: "connect", notes: N() });
-  D.tile(s, { x: MX, y: 1.9, w: 3.9, h: 2.35, title: "Регресія не пройде", body: "червоний прогін блокує merge механічно, а не за домовленістю", tone: "good" });
-  D.tile(s, { x: 4.72, y: 1.9, w: 3.9, h: 2.35, title: "Гейт теж код", body: "два червоні прогони, поки він сам не запрацював, — нормальна історія", tone: "acc" });
-  D.tile(s, { x: 8.82, y: 1.9, w: 3.9, h: 2.35, title: "Відкат — рішення заздалегідь", body: "умови, роль і команда записані до, а не під час інциденту" });
-  D.band(s, { x: MX, y: 4.70, w: 12.1, h: 1.75, tone: "card",
+  D.tile(s, { x: MX, y: 1.9, w: 7.9, h: 1.15, title: "Регресія не пройде", body: "червоний прогін блокує merge механічно, а не за домовленістю", tone: "good" });
+  D.tile(s, { x: MX, y: 3.2, w: 7.9, h: 1.15, title: "Гейт теж код", body: "два червоні прогони, поки він сам не запрацював, — нормальна історія", tone: "acc" });
+  D.tile(s, { x: MX, y: 4.5, w: 7.9, h: 1.15, title: "Відкат — рішення заздалегідь", body: "умови, роль і команда записані до, а не під час інциденту" });
+  D.windowMock(s, { x: 8.92, y: 1.9, w: 3.8, h: 3.75, caption: "github · branch protection", lines: [
+    "Require status checks", { t: " ✓ required: eval (job)", c: "good" }, "", { t: "PR #1  eval ✗", c: "crit" }, { t: "  Merging is blocked", c: "crit" }, "",
+    { t: "PR #1  eval ✓", c: "good" }, { t: "  Merge pull request", c: "good" }, "", { t: "rollback: activate v2 · < 1 хв", c: "warn" }] });
+  D.band(s, { x: MX, y: 5.85, w: 12.1, h: 0.8, tone: "card",
     text: "Контур замкнувся: зміна проходить перевірку, перевірка блокує регресію, відкат описаний. Лишилося зібрати це в operating model — остання тема." });
 }
 

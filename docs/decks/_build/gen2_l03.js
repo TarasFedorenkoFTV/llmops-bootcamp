@@ -281,7 +281,9 @@ D.titleSlide({
    ["Route() у сервісі", "точка рішення на десять рядків"],
    ["питання обох типів", "звичайні + ескалації («поверніть гроші, терміново»)"],
    ["розподіл у БД", "SELECT model, count(*) FROM requests GROUP BY model"],
-  ].forEach(([t, b], i) => D.tile(s, { x: MX + (i % 2) * 6.25, y: 1.9 + Math.floor(i / 2) * 1.8, w: 6.05, h: 1.6, badge: i + 1, title: t, body: b, tone: "good" }));
+  ].forEach(([t, b], i) => D.tile(s, { x: MX + (i % 2) * 4.15, y: 1.9 + Math.floor(i / 2) * 1.8, w: 3.95, h: 1.6, badge: i + 1, title: t, body: b, tone: "good" }));
+  D.windowMock(s, { x: 8.92, y: 1.9, w: 3.8, h: 3.4, caption: "psql · requests", lines: [
+    "SELECT model, count(*)", "  FROM requests", "  GROUP BY model;", "", { t: " mock-mini   |  7", c: "good" }, { t: " mock-strong |  3", c: "acc" }, "", { t: "трафік розведений ✓", c: "good" }] });
   D.band(s, { x: MX, y: 5.55, w: 12.1, h: 1.15, tone: "acc", label: "Навіщо",
     text: "Побачити перший операційний доказ, що routing працює: не «код написаний», а «трафік розведений». Різниця між цими формулюваннями і є темою теми." });
 }
@@ -310,10 +312,13 @@ D.titleSlide({
 
 {
   const s = D.slide({ title: "Що це довело", pill: "connect", notes: N() });
-  D.tile(s, { x: MX, y: 1.9, w: 3.9, h: 2.35, title: "Трафік розведений", body: "дві моделі, різні лічильники — доказ, а не «код написаний»", tone: "good" });
-  D.tile(s, { x: 4.72, y: 1.9, w: 3.9, h: 2.35, title: "Рішення читається", body: "уся політика в одній функції; кожен вибір — подія в лозі", tone: "acc" });
-  D.tile(s, { x: 8.82, y: 1.9, w: 3.9, h: 2.35, title: "Розширення дешеве", body: "«третій провайдер» = один YAML-блок і нуль рядків коду" });
-  D.band(s, { x: MX, y: 4.70, w: 12.1, h: 1.75, tone: "card",
+  D.tile(s, { x: MX, y: 1.9, w: 7.9, h: 1.15, title: "Трафік розведений", body: "дві моделі, різні лічильники — доказ, а не «код написаний»", tone: "good" });
+  D.tile(s, { x: MX, y: 3.2, w: 7.9, h: 1.15, title: "Рішення читається", body: "уся політика в одній функції; кожен вибір — подія в лозі", tone: "acc" });
+  D.tile(s, { x: MX, y: 4.5, w: 7.9, h: 1.15, title: "Розширення дешеве", body: "«третій провайдер» = один YAML-блок і нуль рядків коду" });
+  D.windowMock(s, { x: 8.92, y: 1.9, w: 3.8, h: 3.75, caption: "gateway/litellm-config.yaml", lines: [
+    "model_list:", { t: "  - model_name: mock-mini", c: "good" }, { t: "  - model_name: mock-strong", c: "acc" }, { t: "  - model_name: azure-gpt-5", c: "warn" },
+    "    litellm_params:", "      model: azure/<deployment>", "      api_key: os.environ/…", "", { t: "service/: 0 рядків змінено", c: "good" }] });
+  D.band(s, { x: MX, y: 5.85, w: 12.1, h: 0.8, tone: "card",
     text: "Це фундамент тижня «Routing + cost»: у наступній темі на те саме поле model ляже вартість кожного запиту — і розподіл трафіку стане розподілом грошей." });
 }
 

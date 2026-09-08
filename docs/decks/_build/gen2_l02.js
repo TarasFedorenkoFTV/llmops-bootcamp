@@ -325,8 +325,10 @@ D.titleSlide({
    ["те саме питання", "«не знаю» — регресія на очах"],
    ["activate v2", "полагодилось, без деплою"],
    ["картка Prompt registry", "версії з активною в консолі"],
-  ].forEach(([t, b], i) => D.tile(s, { x: MX + (i % 3) * 4.05, y: 1.8 + Math.floor(i / 3) * 1.75, w: 3.85, h: 1.55,
-      badge: i + 1, title: t, body: b, tone: i === 3 ? "crit" : "good" }));
+  ].forEach(([t, b], i) => D.rows(s, { x: MX, y: 1.85 + i * 0.58, w: 7.9, rowH: 0.5, items: [{ n: i + 1, title: t, body: b, tone: i === 3 ? "crit" : undefined }] }));
+  D.windowMock(s, { x: 8.92, y: 1.85, w: 3.8, h: 3.35, caption: "psql · prompts", lines: [
+    "SELECT name, version, active", "  FROM prompts;", { t: " support-system | v1 | f", c: "dim" }, { t: " support-system | v2 | t", c: "good" },
+    "", { t: "POST /prompts/v1/activate", c: "warn" }, { t: "→ чат: «не знаю»", c: "crit" }, { t: "POST /prompts/v2/activate", c: "warn" }, { t: "→ чат: по суті ✓", c: "good" }] });
   D.band(s, { x: MX, y: 5.5, w: 12.1, h: 1.15, tone: "acc", label: "Навіщо",
     text: "Побачити регресію і відкат наживо: зміна версії ламає і лагодить відповіді без жодної зміни коду — git чистий. Сьогодні це ловлять Ваші очі; на тижні 5–6 робитиме гейт." });
 }
@@ -357,13 +359,14 @@ D.titleSlide({
 
 {
   const s = D.slide({ title: "Що це довело", pill: "connect", notes: N() });
-  D.tile(s, { x: MX, y: 1.9, w: 3.9, h: 2.35, title: "Регресія без коміта — реальна", body: "activate v1 зламав відповіді: git чистий, деплою не було", tone: "crit" });
-  D.tile(s, { x: 4.72, y: 1.9, w: 3.9, h: 2.35, title: "Rollback — одна операція", body: "activate v2 полагодив за секунди: той самий ендпоінт", tone: "good" });
-  D.tile(s, { x: 8.82, y: 1.9, w: 3.9, h: 2.35, title: "Лог знає, кого винуватити", body: "сплеск «не знаю» збігається з активацією v1", tone: "acc" });
-  D.flow(s, { x: MX, y: 4.35, w: 12.1, h: 0.75, size: 11.5, items: [
+  D.tile(s, { x: MX, y: 1.9, w: 7.9, h: 1.15, title: "Регресія без коміта — реальна", body: "activate v1 зламав відповіді: git чистий, деплою не було", tone: "crit" });
+  D.tile(s, { x: MX, y: 3.2, w: 7.9, h: 1.15, title: "Rollback — одна операція", body: "activate v2 полагодив за секунди: той самий ендпоінт", tone: "good" });
+  D.tile(s, { x: MX, y: 4.5, w: 7.9, h: 1.15, title: "Лог знає, кого винуватити", body: "сплеск «не знаю» збігається з активацією v1", tone: "acc" });
+  D.windowMock(s, { x: 8.92, y: 1.9, w: 3.8, h: 3.75, caption: "лог · prompt_version", lines: [
+    { t: "10:41  activate v1", c: "warn" }, { t: "10:41  v1  «не знаю»", c: "crit" }, { t: "10:42  v1  «не знаю»", c: "crit" }, { t: "10:43  v1  «не знаю»", c: "crit" },
+    { t: "10:44  activate v2", c: "warn" }, { t: "10:44  v2  по суті ✓", c: "good" }, { t: "10:45  v2  по суті ✓", c: "good" }, "", { t: "git status: clean", c: "dim" }] });
+  D.flow(s, { x: MX, y: 5.9, w: 12.1, h: 0.6, size: 11.5, items: [
     { label: "сьогодні: ловлять очі", tone: "warn" }, { label: "W5: eval-кейси" }, { label: "W6: гейт у CI", tone: "good" }] });
-  D.band(s, { x: MX, y: 5.45, w: 12.1, h: 1.0, tone: "card",
-    text: "Механіка та сама: вхід, очікування щодо відповіді, версія промпта в лозі — змінюється лише те, хто дивиться." });
 }
 
 // перевірте себе

@@ -281,8 +281,10 @@ D.titleSlide({
    ["activate v1 → 3/6", "ЧЕРВОНО, exit 1 — регресія спіймана"],
    ["activate v2 → 6/6", "відкат, зелено знову"],
    ["echo $?", "код виходу окремо, без pipe"],
-  ].forEach(([t, b], i) => D.tile(s, { x: MX + (i % 3) * 4.05, y: 1.85 + Math.floor(i / 3) * 1.75, w: 3.85, h: 1.55,
-      badge: i + 1, title: t, body: b, tone: i === 2 ? "crit" : "good" }));
+  ].forEach(([t, b], i) => D.rows(s, { x: MX, y: 1.85 + i * 0.66, w: 7.9, rowH: 0.56, items: [{ n: i + 1, title: t, body: b, tone: i === 2 ? "crit" : undefined }] }));
+  D.windowMock(s, { x: 8.92, y: 1.85, w: 3.8, h: 3.35, caption: "terminal · evals", lines: [
+    "$ python evals/run.py", { t: " ✓ faq-1   ✓ faq-2   ✓ order-1", c: "good" }, { t: " ✓ refund-1 ✓ safety-1 ✓ caps-1", c: "good" }, { t: " 6/6 passed · threshold 5", c: "good", b: true }, "",
+    "$ curl -X POST …/prompts/v1/activate", "$ python evals/run.py", { t: " 3/6 passed · threshold 5 · FAIL", c: "crit", b: true }, "$ echo $?", { t: " 1", c: "crit" }] });
   D.band(s, { x: MX, y: 5.5, w: 12.1, h: 1.15, tone: "acc", label: "Навіщо",
     text: "Побачити, як якість стає числом: та сама регресія, яку у Темі 2 ловили очима, тепер має вимірюваний вердикт і код виходу для машини." });
 }
@@ -311,10 +313,13 @@ D.titleSlide({
 
 {
   const s = D.slide({ title: "Що це довело", pill: "connect", notes: N() });
-  D.tile(s, { x: MX, y: 1.9, w: 3.9, h: 2.35, title: "Якість стала числом", body: "«6/6, поріг 5» однакове для всіх, хто дивиться", tone: "good" });
-  D.tile(s, { x: 4.72, y: 1.9, w: 3.9, h: 2.35, title: "Регресія ловиться командою", body: "не очима і не настроєм — відтворюваним прогоном", tone: "acc" });
-  D.tile(s, { x: 8.82, y: 1.9, w: 3.9, h: 2.35, title: "Exit code готовий до CI", body: "усе, чого бракує гейту, — місце, де це запускати" });
-  D.band(s, { x: MX, y: 4.70, w: 12.1, h: 1.75, tone: "card",
+  D.tile(s, { x: MX, y: 1.9, w: 7.9, h: 1.15, title: "Якість стала числом", body: "«6/6, поріг 5» однакове для всіх, хто дивиться", tone: "good" });
+  D.tile(s, { x: MX, y: 3.2, w: 7.9, h: 1.15, title: "Регресія ловиться командою", body: "не очима і не настроєм — відтворюваним прогоном", tone: "acc" });
+  D.tile(s, { x: MX, y: 4.5, w: 7.9, h: 1.15, title: "Exit code готовий до CI", body: "усе, чого бракує гейту, — місце, де це запускати" });
+  D.windowMock(s, { x: 8.92, y: 1.9, w: 3.8, h: 3.75, caption: "два прогони · один датасет", lines: [
+    { t: "activate v2 → run.py", c: "dim" }, { t: " 6/6 · exit 0", c: "good", b: true }, "", { t: "activate v1 → run.py", c: "dim" }, { t: " 3/6 · exit 1", c: "crit", b: true }, "",
+    { t: "поріг 5 з 6:", c: "dim" }, { t: " одному кейсу можна впасти", c: "acc" }, "", { t: "exit code → гейт у CI (Тема 11)", c: "warn" }] });
+  D.band(s, { x: MX, y: 5.85, w: 12.1, h: 0.8, tone: "card",
     text: "Тиждень 5 закрито: систему видно і якість виміряна. Лишилося зробити так, щоб перевірка запускалася без Вас — це наступний тиждень." });
 }
 

@@ -557,6 +557,59 @@ function createDeck({ lesson, week, fileTitle, notes: reader }) {
     });
   }
 
+  // Віконце термінала/лога/перевірок: темна рамка з підписом і моноширинними
+  // рядками; колір рядка — семантика (good/crit/warn/acc/dim або hex).
+  const MOCK_COLORS = { good: P.ongood, crit: P.oncrit, warn: P.onblue, acc: P.onacc, dim: P.dim, text: P.darktext };
+  function windowMock(s, { x, y, w, h, caption = "термінал", lines, size = 9.5 }) {
+    const bar = 0.34, innerLine = "2A2438";
+    s.addShape("roundRect", { x, y, w, h, rectRadius: 0.08, fill: { color: P.codebg }, line: { color: P.line, width: 1 } });
+    [P.oncrit, P.onblue, P.ongood].forEach((c, i) =>
+      s.addShape("ellipse", { x: x + 0.14 + i * 0.16, y: y + bar / 2 - 0.04, w: 0.08, h: 0.08, fill: { color: c }, line: { type: "none" } }));
+    s.addText(caption, { x: x + 0.66, y, w: w - 0.78, h: bar, fontFace: F.mono, fontSize: 8, color: P.dim, valign: "middle", margin: 0 });
+    s.addShape("line", { x, y: y + bar, w, h: 0, line: { color: innerLine, width: 0.75 } });
+    const pitch = size * 0.0255;
+    lines.forEach((ln, i) => {
+      const it = typeof ln === "string" ? { t: ln } : ln;
+      const col = MOCK_COLORS[it.c || "text"] || it.c;
+      s.addText(it.t, { x: x + 0.18, y: y + bar + 0.12 + i * pitch, w: w - 0.36, h: pitch, fontFace: F.mono, fontSize: size, bold: !!it.b, color: col, valign: "middle", margin: 0 });
+    });
+  }
+  // Мокап чату: бабли користувача (праворуч, фіолетові) і бота (ліворуч, темні),
+  // під баблом бота — маленький технічний підпис (що спрацювало).
+  function chatMock(s, { x, y, w, h, caption = "Чат · localhost:4200", msgs, size = 9.5 }) {
+    const bar = 0.34, innerLine = "2A2438", bw = w * 0.78, cpl = Math.max(12, Math.floor((bw - 0.24) * 13.5 * 9.5 / size));
+    s.addShape("roundRect", { x, y, w, h, rectRadius: 0.08, fill: { color: P.codebg }, line: { color: P.line, width: 1 } });
+    [P.oncrit, P.onblue, P.ongood].forEach((c, i) =>
+      s.addShape("ellipse", { x: x + 0.14 + i * 0.16, y: y + bar / 2 - 0.04, w: 0.08, h: 0.08, fill: { color: c }, line: { type: "none" } }));
+    s.addText(caption, { x: x + 0.66, y, w: w - 0.78, h: bar, fontFace: F.mono, fontSize: 8, color: P.dim, valign: "middle", margin: 0 });
+    s.addShape("line", { x, y: y + bar, w, h: 0, line: { color: innerLine, width: 0.75 } });
+    let cy = y + bar + 0.14;
+    msgs.forEach(m => {
+      const lines = Math.max(1, Math.ceil(m.text.length / cpl)), bh = 0.14 + lines * (size * 0.0205);
+      const user = m.who === "user", bx = user ? x + w - 0.12 - bw : x + 0.12;
+      s.addShape("roundRect", { x: bx, y: cy, w: bw, h: bh, rectRadius: 0.1, fill: { color: user ? P.accsolid : "1E1A2B" }, line: { type: "none" } });
+      s.addText(m.text, { x: bx + 0.12, y: cy, w: bw - 0.24, h: bh, fontFace: F.body, fontSize: size, color: user ? "FFFFFF" : P.darktext, valign: "middle", margin: 0 });
+      cy += bh + 0.05;
+      if (m.badge) {
+        s.addText(m.badge, { x: bx + 0.04, y: cy, w: bw, h: 0.2, fontFace: F.mono, fontSize: 7.5, color: MOCK_COLORS[m.tone || "dim"], valign: "middle", margin: 0 });
+        cy += 0.22;
+      }
+      cy += 0.06;
+    });
+  }
+  // Нумеровані рядки замість сітки плиток: коли праворуч стоїть мокап.
+  function rows(s, { x, y, w, items, rowH = 0.5, gap = 0.1, size = 13 }) {
+    items.forEach((it, i) => {
+      const yy = y + i * (rowH + gap), crit = it.tone === "crit", warn = it.tone === "warn";
+      const bg = crit ? P.crit : warn ? P.blue : P.accsolid;
+      s.addShape("ellipse", { x, y: yy + (rowH - 0.42) / 2, w: 0.42, h: 0.42, fill: { color: bg }, line: { type: "none" } });
+      s.addText(String(it.n !== undefined ? it.n : i + 1), { x, y: yy + (rowH - 0.42) / 2, w: 0.42, h: 0.42, align: "center", valign: "middle", fontFace: F.mono, fontSize: 12, bold: true, color: "FFFFFF", margin: 0 });
+      s.addText([{ text: it.title + "  ", options: { bold: true, fontSize: size, color: crit ? P.crit : P.ink } },
+                 { text: it.body || "", options: { fontSize: size - 2, color: P.soft } }],
+        { x: x + 0.6, y: yy, w: w - 0.6, h: rowH, fontFace: F.body, valign: "middle", margin: 0 });
+    });
+  }
+
   function terms(s, { x, y, w, items, cols = 3, rowH = 1.15 }) {
     const cw = (w - (cols - 1) * 0.22) / cols;
     items.forEach((it, i) => {
@@ -672,7 +725,7 @@ function createDeck({ lesson, week, fileTitle, notes: reader }) {
   }
 
   return { pres, P, F, W, H, MX, TONE, titleSlide, slide, divider, authorSlide, thanksSlide, closingSlide,
-           stat, tile, arrow, flow, bars, states, layers, timeline, band, code, table, checklist, terms, consoleMock,
+           stat, tile, arrow, flow, bars, states, layers, timeline, band, code, table, checklist, terms, consoleMock, windowMock, chatMock, rows,
            tick, cross, save };
 }
 
