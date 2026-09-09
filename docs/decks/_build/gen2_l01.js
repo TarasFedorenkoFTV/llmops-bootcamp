@@ -29,7 +29,7 @@ D.authorSlide({
 });
 
 {
-  const s = D.slide({ title: "Що ви зможете після уроку", pill: "absorb", kicker: "Шість дій, які перевірите руками вже сьогодні",
+  const s = D.slide({ title: "Що Ви зможете після теми", pill: "absorb", kicker: "Шість дій, які перевірите руками вже сьогодні",
     notes: N() });
   const items = [
     ["Підняти стек", "одна команда — п'ять компонентів"],
@@ -45,31 +45,31 @@ D.authorSlide({
   }));
 }
 
-// ─── S3 карта уроку ───
+// ─── S3 карта теми ───
 {
   const s = D.slide({ title: "Маршрут на сьогодні", pill: "absorb",
     notes: N() });
   const map = [
-    ["01", "200 ≠ production"], ["02", "Анатомія виклику"], ["03", "Токени і три ціни"],
-    ["04", "Недетермінізм і латентність"], ["05", "П'ять способів зламатися"], ["06", "Стек: вирішує vs виконує"],
+    ["01", "200 ≠ production"], ["02", "Структура виклику"], ["03", "Токени і три ціни"],
+    ["04", "Недетермінізм і латентність"], ["05", "Сценарії відмови виклику"], ["06", "Архітектура стека"],
     ["07", "Unified log"], ["08", "Mock-провайдер"], ["09", "Реальний ключ · опційно"],
     ["10", "Лабораторна"], ["11", "Антипатерни"],
   ];
   map.forEach(([n, t], i) => {
     const x = MX + (i % 3) * 4.05, y = 1.8 + Math.floor(i / 3) * 1.15;
-    // тонується лише опційний блок — як на карті уроку в решті 11 колод.
+    // тонується лише опційний блок — як на карті теми в решті 11 колод.
     // Фіолетова заливка перших п'яти плиток читалася як дефект: цей поділ
     // трапляється один раз за курс, ніде не повторюється й нічого не вчить.
     D.tile(s, { x, y, w: 3.85, h: 0.95, badge: n, title: t, tone: n === "09" ? "warn" : "card" });
   });
   D.band(s, { x: MX, y: 6.32, w: 12.1, h: 0.44, tone: "card",
-    text: "Перші п'ять блоків — об'єкт керування. Наступні — каркас, який ви будуватимете шість тижнів." });
+    text: "Перші п'ять блоків — об'єкт керування. Наступні — каркас, який Ви будуватимете шість тижнів." });
 }
 
 // ─── КАРТА КУРСУ ПО ТИЖНЯХ (шаблон, сл. 13) ───
 {
   const s = D.slide({ title: "Курс складається з шести тижнів", pill: "absorb",
-    kicker: "Кожен тиждень — два уроки; кожен наступний шар лягає на той самий контур керування",
+    kicker: "Кожен тиждень — дві теми; кожен наступний шар лягає на той самий контур керування",
     notes: N() });
   [["Тиждень 1", "Основа + промпти", "архітектура production LLM-системи · промпт як артефакт"],
    ["Тиждень 2", "Routing + cost", "мультипровайдерний gateway · токеноміка і cost attribution"],
@@ -115,15 +115,15 @@ D.authorSlide({
 
 // ─── S5 · 01 проблема ───
 {
-  const s = D.slide({ num: "01", title: "Чому демо за день — а прод ніколи?", pill: "absorb",
+  const s = D.slide({ num: "01", title: "Чому 200 OK не підтверджує працездатності LLM-системи", pill: "absorb",
     notes: N() });
-  D.stat(s, { x: MX, y: 1.8, w: 3.5, h: 1.75, value: "200 OK", label: "усе, що каже вам HTTP", tone: "good", size: 38 });
+  D.stat(s, { x: MX, y: 1.8, w: 3.5, h: 1.75, value: "200 OK", label: "усе, що каже Вам HTTP", tone: "good", size: 38 });
   D.stat(s, { x: MX, y: 3.75, w: 3.5, h: 1.75, value: "0 / 4", label: "відповіді на операційні питання", tone: "crit", size: 44 });
   const q = [
     ["Гроші", "скільки коштує тиждень — і хто помітить"],
     ["Надійність", "провайдер ліг на 20 хвилин у робочий час"],
     ["Якість", "«маленька» правка промпта без компіляції"],
-    ["Видимість", "«бот верзе дурниці», а графіки зелені"],
+    ["Видимість", "«бот відповідає не по темі», а графіки зелені"],
   ];
   q.forEach(([tt, bb], i) => D.tile(s, {
     x: 4.55 + (i % 2) * 4.3, y: 1.8 + Math.floor(i / 2) * 1.95, w: 4.1, h: 1.75,
@@ -139,7 +139,7 @@ D.authorSlide({
     ["Недетермінізм", "той самий вхід — різний вихід"],
     ["Оплата за токен", "ціна залежить від поведінки, а не від кількості запитів"],
     ["Регресії без коміта", "промпт або снапшот моделі — без деплою"],
-    ["Чужа інфраструктура", "ваш uptime залежить від чужого"],
+    ["Чужа інфраструктура", "Ваш uptime залежить від чужого"],
   ];
   props.forEach(([tt, bb], i) => D.tile(s, { x: MX + i * 3.08, y: 1.75, w: 2.9, h: 1.72, badge: i + 1, title: tt, body: bb, tone: "acc" }));
   D.band(s, { x: MX, y: 3.8, w: 12.1, h: 1.25, tone: "card", label: "Теза курсу",
@@ -153,7 +153,7 @@ D.authorSlide({
 
 // ─── S6 · 02 що летить у модель ───
 {
-  const s = D.slide({ num: "02", title: "Анатомія виклику: що летить у модель", pill: "absorb",
+  const s = D.slide({ num: "02", title: "Структура LLM-виклику та базовий API-контракт", pill: "absorb",
     notes: N() });
   D.code(s, { x: MX, y: 1.75, w: 6.1, h: 2.75, size: 11.5, lines: [
     [{ t: "{", c: P.darktext }],
@@ -166,13 +166,13 @@ D.authorSlide({
     [{ t: "// саме це шле service/Program.cs", c: P.dim }],
   ] });
   D.band(s, { x: MX, y: 4.75, w: 6.1, h: 1.0, tone: "warn",
-    text: "Модель не має пам'яті: історію привозите ви — тому кожен наступний крок діалогу дорожчає, а сумарна вартість росте швидше за кількість кроків." });
+    text: "Модель не має пам'яті: історію привозите Ви — тому кожен наступний крок діалогу дорожчає, а сумарна вартість росте швидше за кількість кроків." });
   D.layers(s, { x: 7.1, y: 1.75, w: 5.62, h: 0.92, gap: 0.14, items: [
     { label: "temperature", body: "свобода вибору токена — тримають низькою", tone: "card" },
     { label: "max_tokens", body: "стеля довжини = стеля вартості виклику", tone: "card" },
     { label: "response_format", body: "строгий JSON, який валідує провайдер", tone: "card" },
   ] });
-  s.addText("system — це той промпт, який наступного уроку переїде в реєстр.",
+  s.addText("system — це той промпт, який у наступній темі переїде в реєстр.",
     { x: 7.1, y: 4.9, w: 5.6, h: 0.4, fontFace: F.body, fontSize: 12, italic: true, color: P.acc, margin: 0 });
 }
 
@@ -184,14 +184,14 @@ D.authorSlide({
     head: ["finish_reason", "що означає", "що робити"],
     rows: [
       { cells: ["stop", "модель завершила думку", "нормальний випадок"] },
-      { cells: ["length", "вдарилась у max_tokens", "збій формату: не кешувати, не показувати"], tone: "crit" },
-      { cells: ["tool_calls", "просить інструмент (урок 6)", "текст може бути порожнім"] },
+      { cells: ["length", "досягла ліміту max_tokens", "збій формату: не кешувати, не показувати"], tone: "crit" },
+      { cells: ["tool_calls", "просить інструмент (Тема 6)", "текст може бути порожнім"] },
       { cells: ["content_filter", "зрізав фільтр провайдера", "окрема категорія в метриках"] },
     ] });
   D.band(s, { x: 8.35, y: 1.75, w: 4.37, h: 2.05, tone: "crit", label: "Типова помилка",
     text: "Читати лише content: обрізана відповідь виглядає успішною — 200, текст є, метрики зелені." });
   D.band(s, { x: 8.35, y: 4.05, w: 4.37, h: 1.75, tone: "acc", label: "Третє поле — usage",
-    text: "Вхідні · вихідні · кеш провайдера. Єдине джерело правди про гроші (урок 4)." });
+    text: "Вхідні · вихідні · кеш провайдера. Єдине джерело правди про гроші (Тема 4)." });
   s.addText("Mock віддає лише stop і tool_calls — гілку length перевіряємо юніт-тестом.",
     { x: MX, y: 5.1, w: 7.4, h: 0.4, fontFace: F.body, fontSize: 11.5, italic: true, color: P.soft, margin: 0 });
 }
@@ -209,7 +209,7 @@ D.authorSlide({
     { label: "Вхідні", value: 2.2, note: "промпт та історія — найдешевші", tone: "acc" },
     { label: "Вихідні", value: 6, note: "у кілька разів дорожчі", tone: "crit" },
   ] });
-  s.addText("схематично: порядок величин, а не точні коефіцієнти — прайс розбираємо в уроці 4",
+  s.addText("схематично: порядок величин, а не точні коефіцієнти — прайс розбираємо в Темі 4",
     { x: 4.6, y: 4.5, w: 8.12, h: 0.3, fontFace: F.body, fontSize: 10, italic: true, color: P.faint, margin: 0 });
   D.band(s, { x: 4.6, y: 5.0, w: 8.12, h: 1.4, tone: "good", label: "Принцип",
     text: "Без окремих вхідних і вихідних токенів цифра вартості вигадана." });
@@ -217,7 +217,7 @@ D.authorSlide({
 
 // ─── S9 · 04 недетермінізм ───
 {
-  const s = D.slide({ num: "04", title: "temperature = 0 — це не детермінізм", pill: "absorb",
+  const s = D.slide({ num: "04", title: "Чому temperature=0 не гарантує детермінізму", pill: "absorb",
     notes: N() });
   const r = [["Пакети", "склад пакета впливає на арифметику"], ["Плаваюча точка", "обчислення не асоціативні"], ["Снапшоти", "назва та сама — модель оновлена"]];
   r.forEach(([tt, bb], i) => D.tile(s, { x: MX + i * 4.05, y: 1.8, w: 3.85, h: 1.45, badge: i + 1, title: tt, body: bb, tone: "card" }));
@@ -229,7 +229,7 @@ D.authorSlide({
 
 // ─── S10 · 04 латентність ───
 {
-  const s = D.slide({ num: "04", title: "Латентність: час залежить від довжини відповіді", pill: "absorb",
+  const s = D.slide({ num: "04", title: "Від чого залежить латентність LLM-виклику", pill: "absorb",
     notes: N() });
   // діаграма: смуга часу з двох частин
   s.addText("КОРОТКА ВІДПОВІДЬ", { x: MX, y: 1.75, w: 3, h: 0.28, fontFace: F.mono, fontSize: 9.5, bold: true, color: P.faint, charSpacing: 1, margin: 0 });
@@ -255,7 +255,7 @@ D.authorSlide({
 
 // ─── S11 · 05 таксономія відмов ───
 {
-  const s = D.slide({ num: "05", title: "П'ять способів зламатися — і сліпа зона моніторингу", pill: "absorb",
+  const s = D.slide({ num: "05", title: "Типові сценарії відмови LLM-виклику", pill: "absorb",
     notes: N() });
   s.addShape("roundRect", { x: MX, y: 1.75, w: 5.85, h: 3.55, rectRadius: 0.12, fill: { color: P.goodbg }, line: { color: P.good, width: 1 } });
   s.addText("МОНІТОРИНГ БАЧИТЬ", { x: MX + 0.25, y: 1.95, w: 5.35, h: 0.3, fontFace: F.mono, fontSize: 10, bold: true, color: P.good, charSpacing: 1.5, margin: 0 });
@@ -267,7 +267,7 @@ D.authorSlide({
   });
   s.addShape("roundRect", { x: 6.87, y: 1.75, w: 5.85, h: 3.55, rectRadius: 0.12, fill: { color: P.critbg }, line: { color: P.crit, width: 1 } });
   s.addText("НЕ БАЧИТЬ У ПРИНЦИПІ", { x: 7.12, y: 1.95, w: 5.35, h: 0.3, fontFace: F.mono, fontSize: 10, bold: true, color: P.crit, charSpacing: 1.5, margin: 0 });
-  [["200 + сміття", "обрізана, порожня або не-JSON відповідь"], ["200 + тихо гірше", "новий снапшот моделі або правка промпта"]].forEach(([k, v], i) => {
+  [["200 + невалідний вміст", "обрізана, порожня або не-JSON відповідь"], ["200 + деградація якості", "новий снапшот моделі або правка промпта"]].forEach(([k, v], i) => {
     const y = 2.45 + i * 1.35;
     s.addShape("roundRect", { x: 7.12, y, w: 5.35, h: 1.15, rectRadius: 0.1, fill: { color: P.card }, line: { type: "none" } });
     s.addText(k, { x: 7.34, y: y + 0.14, w: 5, h: 0.4, fontFace: F.body, fontSize: 15, bold: true, color: P.crit, margin: 0 });
@@ -290,22 +290,22 @@ D.authorSlide({
   s.addText("Лог у БД", { x: 5.25, y: 4.3, w: 2.1, h: 0.62, align: "center", valign: "middle", fontFace: F.mono, fontSize: 12, bold: true, color: P.good, margin: 0 });
   D.code(s, { x: MX, y: 5.35, w: 5.6, h: 0.72, size: 13, lines: [[{ t: "docker compose up", c: P.codeStr }, { t: "  # п'ять компонентів", c: P.dim }]] });
   D.band(s, { x: 6.6, y: 5.35, w: 6.12, h: 0.72, tone: "card",
-    text: "Ті самі ролі ви зустрінете в будь-якому проді — незалежно від інструментів." });
+    text: "Ті самі ролі Ви зустрінете в будь-якому проді — незалежно від інструментів." });
 }
 
 // ─── S13 · 06 п'ять компонентів ───
 {
-  const s = D.slide({ num: "06", title: "П'ять компонентів — і ваші стосунки з ними", pill: "absorb",
+  const s = D.slide({ num: "06", title: "Архітектура стека: компоненти та межі відповідальності", pill: "absorb",
     notes: N() });
   D.layers(s, { x: MX, y: 1.8, w: 12.1, h: 0.72, gap: 0.12, items: [
     { label: "Chat UI + консоль", body: "обличчя системи — користуєтесь, не змінюєте" },
-    { label: "Сервіс", body: "контур керування: модель, кеш, fallback, вартість — тут уся ваша робота", tone: "acc" },
+    { label: "Сервіс", body: "контур керування: модель, кеш, fallback, вартість — тут уся Ваша робота", tone: "acc" },
     { label: "Gateway-адаптер", body: "єдиний вихід до провайдерів — конфігуруєте список моделей" },
     { label: "База", body: "лог, реєстр промптів, вартість — читаєте і розширюєте" },
     { label: "Mock-провайдер", body: "керована «модель» для тестів і симуляції збоїв" },
   ] });
   D.band(s, { x: MX, y: 6.15, w: 12.1, h: 0.62, tone: "card",
-    text: "Права колонка чесно ділить стек: що ви будуєте — і чим просто користуєтесь." });
+    text: "Права колонка чесно ділить стек: що Ви будуєте — і чим просто користуєтесь." });
 }
 
 // ─── S14 · 06 вирішує / виконує ───
@@ -323,19 +323,19 @@ D.authorSlide({
   D.band(s, { x: MX, y: 4.2, w: 5.85, h: 1.85, tone: "good", label: "Принцип",
     text: "Ключ живе тільки в gateway — інакше контуру керування немає." });
   D.band(s, { x: 6.87, y: 4.2, w: 5.85, h: 1.85, tone: "crit", label: "Типова помилка",
-    text: "Рішення в адаптері — ви клікаєте прапорці, а не будуєте механізм." });
+    text: "Рішення в адаптері — Ви клікаєте прапорці, а не будуєте механізм." });
   s.addText("Інструменти змінюються — механізми лишаються.",
     { x: MX, y: 6.25, w: 12, h: 0.35, fontFace: F.body, fontSize: 12.5, italic: true, bold: true, color: P.ink, margin: 0 });
 }
 
 // ─── S15 · 07 unified log ───
 {
-  const s = D.slide({ num: "07", title: "Unified log: рядок, з якого виростає весь курс", pill: "absorb",
+  const s = D.slide({ num: "07", title: "Unified log як основа операційного контролю", pill: "absorb",
     notes: N() });
   D.code(s, { x: MX, y: 1.8, w: 12.1, h: 1.0, size: 13, lines: [
     [{ t: "request_id · model · ", c: P.darktext }, { t: "prompt_version", c: P.codeNum }, { t: " · latency_ms · prompt_tokens · completion_tokens · ", c: P.darktext }, { t: "cost_usd", c: P.codeNum }, { t: " · status", c: P.darktext }],
   ] });
-  s.addText("підсвічені поля сьогодні порожні — це ваша робота на два тижні",
+  s.addText("підсвічені поля сьогодні порожні — це Ваша робота на два тижні",
     { x: MX, y: 2.9, w: 12, h: 0.3, fontFace: F.body, fontSize: 11.5, italic: true, color: P.faint, margin: 0 });
   // впорядковано за тижнем: рядок читається як план курсу, а не врозбій
   const grow = [["prompt_version", "«що зламалось учора о 19:40»", "W1"], ["model", "розподіл трафіку, доказ routing", "W2"],
@@ -354,10 +354,10 @@ D.authorSlide({
 
 // ─── S16 · 08 mock ───
 {
-  const s = D.slide({ num: "08", title: "Mock: керовані збої + чутливість до промпта", pill: "absorb",
+  const s = D.slide({ num: "08", title: "Mock-провайдер для керованого тестування", pill: "absorb",
     notes: N() });
-  s.addText("СУПЕРСИЛА 1 · ПАДАЄ НА ЗАМОВЛЕННЯ", { x: MX, y: 1.75, w: 6, h: 0.3, fontFace: F.mono, fontSize: 10, bold: true, color: P.faint, charSpacing: 1.5, margin: 0 });
-  [["__fail_503", "провайдер лежить", "W4", "crit"], ["__fail_429", "вичерпані ліміти", "урок 7", "crit"],
+  s.addText("ВЛАСТИВІСТЬ 1 · КЕРОВАНІ ЗБОЇ", { x: MX, y: 1.75, w: 6, h: 0.3, fontFace: F.mono, fontSize: 10, bold: true, color: P.faint, charSpacing: 1.5, margin: 0 });
+  [["__fail_503", "провайдер недоступний", "W4", "crit"], ["__fail_429", "вичерпані ліміти", "Тема 7", "crit"],
    ["__delay", "стрибок latency", "W4–5", "warn"], ["__garbage", "беззмістовна відповідь", "ДЗ W5", "warn"]].forEach(([m, v, w, tone], i) => {
     const y = 2.2 + i * 0.72, c = tone === "crit" ? P.crit : P.warn, bg = tone === "crit" ? P.critbg : P.warnbg;
     s.addShape("roundRect", { x: MX, y, w: 1.75, h: 0.55, rectRadius: 0.08, fill: { color: bg }, line: { type: "none" } });
@@ -367,7 +367,7 @@ D.authorSlide({
   });
   s.addText("Надійність, яку тренують лише на реальних інцидентах, — це сподівання.",
     { x: MX, y: 5.2, w: 6, h: 0.6, fontFace: F.body, fontSize: 12, italic: true, color: P.soft, valign: "top", margin: 0 });
-  s.addText("СУПЕРСИЛА 2 · РЕАГУЄ НА ПРОМПТ", { x: 7.1, y: 1.75, w: 5.6, h: 0.3, fontFace: F.mono, fontSize: 10, bold: true, color: P.faint, charSpacing: 1.5, margin: 0 });
+  s.addText("ВЛАСТИВІСТЬ 2 · ЧУТЛИВІСТЬ ДО ПРОМПТА", { x: 7.1, y: 1.75, w: 5.6, h: 0.3, fontFace: F.mono, fontSize: 10, bold: true, color: P.faint, charSpacing: 1.5, margin: 0 });
   D.flow(s, { x: 7.1, y: 2.2, w: 5.62, h: 0.62, size: 11, items: [
     { label: "промпт v2", tone: "good" }, { label: "відповідь по суті" }] });
   D.flow(s, { x: 7.1, y: 3.15, w: 5.62, h: 0.62, size: 11, items: [
@@ -380,7 +380,7 @@ D.authorSlide({
 
 // ─── S17 · 09 опційно ───
 {
-  const s = D.slide({ num: "09", title: "Реальний ключ і розширений стек", pill: "absorb", opt: true,
+  const s = D.slide({ num: "09", title: "Підключення реального провайдера та розширеного стека", pill: "absorb", opt: true,
     notes: N() });
   D.code(s, { x: MX, y: 1.8, w: 12.1, h: 1.65, size: 12.5, lines: [
     [{ t: "cp gateway/.env.example gateway/.env", c: P.codeStr }, { t: "   # вписати ключ", c: P.dim }],
@@ -389,7 +389,7 @@ D.authorSlide({
   ] });
   D.tile(s, { x: MX, y: 3.75, w: 3.9, h: 1.9, title: "Зміниться", body: "якість відповідей, багатоходовий діалог, цифри вартості", tone: "card" });
   D.tile(s, { x: 4.72, y: 3.75, w: 3.9, h: 1.9, title: "Не зміниться", body: "жоден механізм контуру: routing, лог, кеш, fallback, гейти", tone: "acc" });
-  D.band(s, { x: 8.82, y: 3.75, w: 3.9, h: 1.9, tone: "warn", label: "Лайфхак",
+  D.band(s, { x: 8.82, y: 3.75, w: 3.9, h: 1.9, tone: "warn", label: "Порада",
     text: "Берете ключ — одразу ставте ліміт витрат у провайдера." });
   s.addText("Радимо не вмикати в перші тижні: на mock видно механіку, а не магію моделі.",
     { x: MX, y: 5.9, w: 12, h: 0.35, fontFace: F.body, fontSize: 12, italic: true, color: P.soft, margin: 0 });
@@ -403,21 +403,29 @@ D.authorSlide({
 
 // ─── S18 місток до демо ───
 {
-  const s = D.slide({ title: "Зараз ви побачите — і навіщо", pill: "do",
+  const s = D.slide({ title: "Зараз Ви побачите — і навіщо", pill: "do",
     notes: N() });
   const fr = [["стек піднявся", "docker compose up --build"], ["чат відповідає", "«Як скинути пароль?»"],
               ["консоль порожня", "«—» у кожній плитці"], ["TODO у коді", "мапа роботи на 6 тижнів"],
               ["рядок у лозі", "таблиця requests"], ["чесний злам", "__fail_503 — і жодного плану Б"]];
-  fr.forEach(([tt, bb], i) => D.tile(s, {
-    x: MX + (i % 3) * 4.05, y: 1.8 + Math.floor(i / 3) * 1.75, w: 3.85, h: 1.55,
-    badge: i + 1, title: tt, body: bb, tone: i === 5 ? "crit" : "good" }));
+  // ліворуч — нумерований список кадрів, праворуч — мокап консолі точки А
+  fr.forEach(([tt, bb], i) => {
+    const y = 1.85 + i * 0.58, crit = i === 5;
+    s.addShape("ellipse", { x: MX, y, w: 0.42, h: 0.42, fill: { color: crit ? P.crit : P.accsolid }, line: { type: "none" } });
+    s.addText(String(i + 1), { x: MX, y, w: 0.42, h: 0.42, align: "center", valign: "middle", fontFace: D.F.mono, fontSize: 12, bold: true, color: "FFFFFF", margin: 0 });
+    s.addText([{ text: tt + "  ", options: { bold: true, fontSize: 14, color: crit ? P.crit : P.ink } },
+               { text: bb, options: { fontSize: 12, color: P.soft } }],
+      { x: MX + 0.60, y, w: 7.1, h: 0.42, fontFace: D.F.body, valign: "middle", margin: 0 });
+  });
+  D.consoleMock(s, { x: 8.5, y: 1.85, w: 4.22, h: 3.3, caption: "консоль · точка А",
+    values: [["requests", "—"], ["cost", "—"], ["p95", "—"], ["error", "—"], ["cache-hit", "—"], ["fallback", "—"]] });
   D.band(s, { x: MX, y: 5.5, w: 12.1, h: 1.15, tone: "acc", label: "Навіщо",
     text: "Зафіксувати точку А — стан системи до шарів керування. Порожня консоль і збій без плану Б — не дефект демо, а предмет курсу." });
 }
 
 // ─── S19 лаба ───
 {
-  const s = D.slide({ title: "Лабораторна: п'ять кроків + один опційний", pill: "do",
+  const s = D.slide({ title: "Лабораторна робота: запуск, перевірка та відтворення збою", pill: "do",
     notes: N() });
   const st = [["Підняти стек", "docker compose up --build → localhost:4200"],
               ["Оглянути половини", "чат відповідає; консоль — «—» у кожній плитці"],
@@ -442,7 +450,7 @@ D.authorSlide({
 
 // ─── РОЗДІЛЮВАЧ · рефлексія ───
 {
-  D.divider({ big: "РЕФЛЕКСІЯ", sub: "що це довело · перевір себе · антипатерни тижня", notes: N() });
+  D.divider({ big: "РЕФЛЕКСІЯ", sub: "що це довело · перевірте себе · антипатерни тижня", notes: N() });
 }
 
 // ─── S20 що це довело ───
@@ -456,12 +464,12 @@ D.authorSlide({
     { label: "точка А", tone: "crit" }, { label: "промпти" }, { label: "гроші" }, { label: "кеш" },
     { label: "надійність" }, { label: "видимість" }, { label: "точка Б", tone: "good" }] });
   D.band(s, { x: MX, y: 5.55, w: 12.1, h: 1.15, tone: "acc",
-    text: "Точку Б ви збудуєте самі — шар за шаром, тиждень за тижнем. Сьогоднішній скріншот консолі збережіть: на тижні 6 порівняєте." });
+    text: "Точку Б Ви збудуєте самі — шар за шаром, тиждень за тижнем. Сьогоднішній скріншот консолі збережіть: на тижні 6 порівняєте." });
 }
 
-// ─── S21 перевір себе ───
+// ─── S21 перевірте себе ───
 {
-  const s = D.slide({ title: "Перевір себе", pill: "connect",
+  const s = D.slide({ title: "Перевірте себе", pill: "connect",
     notes: N() });
   s.addShape("roundRect", { x: MX, y: 1.95, w: 12.1, h: 4.00, rectRadius: 0.12, fill: { color: P.card }, line: { color: P.line, width: 1 } });
   D.checklist(s, { x: MX + 0.45, y: 2.3, w: 11.3, cols: 2, h: 3.20, size: 14, items: [
@@ -501,12 +509,12 @@ D.authorSlide({
   const s = D.slide({ title: "Домашнє завдання", pill: "do",
     notes: N() });
   D.tile(s, { x: MX, y: 1.85, w: 5.85, h: 2.6, title: "Обов'язково — без здачі", tone: "card",
-    body: "• пройти 5 обов'язкових кроків лабораторної\n\n• витримати чек-лист «перевір себе»\n\n• переглянути гайд для студента по діагоналі" });
+    body: "• пройти 5 обов'язкових кроків лабораторної\n\n• витримати чек-лист «перевірте себе»\n\n• переглянути гайд для студента по діагоналі" });
   D.tile(s, { x: 6.87, y: 1.85, w: 5.85, h: 2.6, title: "Опційно", tone: "warn",
     body: "• підняти розширений профіль стека\n\n• якщо є свій ключ — поставити ліміт витрат у кабінеті провайдера (ключ поки не підключати)" });
   s.addShape("roundRect", { x: MX, y: 4.75, w: 12.1, h: 1.5, rectRadius: 0.14, fill: { color: P.card }, line: { color: P.acc, width: 1.5 } });
-  s.addText("ДЗ тижня 1 — здається після уроку 2", { x: MX + 0.3, y: 4.95, w: 11.5, h: 0.4, fontFace: F.body, fontSize: 15, bold: true, color: P.acc, margin: 0 });
-  s.addText("Логування + prompt registry. Тиждень здається одним PR у своєму репозиторії; критерії — у файлі ДЗ після наступного уроку.",
+  s.addText("ДЗ тижня 1 — здається після Теми 2", { x: MX + 0.3, y: 4.95, w: 11.5, h: 0.4, fontFace: F.body, fontSize: 15, bold: true, color: P.acc, margin: 0 });
+  s.addText("Логування + prompt registry. Тиждень здається одним PR у своєму репозиторії; критерії — у файлі ДЗ після наступної теми.",
     { x: MX + 0.3, y: 5.4, w: 11.5, h: 0.7, fontFace: F.body, fontSize: 12.5, color: P.ink, valign: "top", margin: 0 });
 }
 
@@ -519,7 +527,7 @@ D.closingSlide({
     "сервіс вирішує — адаптер виконує; ключ живе тільки в gateway",
     "unified log — рядок, з якого виростає весь курс",
   ],
-  nextTitle: "Наступний крок → Урок 2 · Prompt lifecycle: промпт як production-артефакт",
+  nextTitle: "Наступний крок → Тема 2 · Prompt lifecycle: промпт як production-артефакт",
   nextBody: "Ваш системний промпт захардкоджений у коді — і це остання доба, коли це прийнятно. Далі: версії, promote, rollback і відкат за секунди.",
   notes: N(),
 });

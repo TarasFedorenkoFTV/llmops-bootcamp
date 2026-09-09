@@ -8,12 +8,12 @@ const { P, F, MX } = D;
 
 D.titleSlide({
   title: "CI/CD quality gates,\ncanary і rollback",
-  lead: "Зміна промпта — це реліз, повторюємо ми з другого уроку. Сьогодні вона нарешті проходить релізний процес: eval-гейт на кожен PR, який фізично не пускає регресію в main.",
+  lead: "Зміна промпта — це реліз, повторюємо ми з другої теми. Сьогодні вона нарешті проходить релізний процес: eval-гейт на кожен PR, який фізично не пускає регресію в main.",
   notes: N(),
 });
 
 {
-  const s = D.slide({ title: "Що ви зможете після уроку", pill: "absorb", kicker: "П'ять дій, які перевірите руками", notes: N() });
+  const s = D.slide({ title: "Що Ви зможете після теми", pill: "absorb", kicker: "П'ять дій, які перевірите руками", notes: N() });
   [["Увімкнути eval-гейт", "на кожен PR, із доказом «червоний → зелений»"],
    ["Налаштувати protection", "required check = job eval, а не workflow"],
    ["Записати rollback-критерії", "умови, хто смикає, якою командою"],
@@ -34,7 +34,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Терміни, якими користуватимемось", pill: "absorb", kicker: "Шість слів сьогоднішнього уроку",
+  const s = D.slide({ title: "Терміни, якими користуватимемось", pill: "absorb", kicker: "Шість слів сьогоднішньої теми",
     notes: N() });
   D.terms(s, { x: MX, y: 1.95, w: 12.1, cols: 3, rowH: 1.62, items: [
     { term: "quality gate", def: "перевірка, без якої зміна не потрапляє в main" },
@@ -58,29 +58,32 @@ D.titleSlide({
     body: "п'ятниця, дедлайн, «та я ж одне слово поміняв» — найгірші регресії приходять саме так", tone: "crit" });
   D.tile(s, { x: 6.87, y: 1.95, w: 5.85, h: 1.8, title: "Гейт у CI",
     body: "PR зі зламаним промптом фізично не мержиться: кнопка заблокована, а не «хтось пильний»", tone: "good" });
-  D.band(s, { x: MX, y: 4.0, w: 12.1, h: 1.2, tone: "acc",
+  D.flow(s, { x: MX, y: 3.95, w: 12.1, h: 0.56, size: 10.5, items: [
+    { label: "PR: зміна промпта" }, { label: "Actions: eval-гейт", tone: "acc", sub: "запускає механізм, не людина" },
+    { label: "червоний → merge заблоковано", tone: "crit" }, { label: "зелений → merge", tone: "good" }] });
+  D.band(s, { x: MX, y: 4.95, w: 12.1, h: 0.7, tone: "acc",
     text: "Промпт остаточно стає кодом — з рев'ю і заблокованим мержем." });
-  D.band(s, { x: MX, y: 5.35, w: 12.1, h: 1.05, tone: "good", label: "Принцип",
+  D.band(s, { x: MX, y: 5.8, w: 12.1, h: 0.9, tone: "good", label: "Принцип",
     text: "Усе, що тримається на «не забути», буде забуто. Перевірки запускає механізм." });
 }
 
 {
-  const s = D.slide({ num: "02", title: "Гейт = ваш eval + exit code + CI", pill: "absorb", notes: N() });
+  const s = D.slide({ num: "02", title: "Гейт = Ваш eval + exit code + CI", pill: "absorb", notes: N() });
   D.flow(s, { x: MX, y: 2.1, w: 12.1, h: 0.85, size: 10, items: [
     { label: "PR відкрито" }, { label: "стек у CI" }, { label: "очікування готовності" },
     { label: "run.py → 0/1", tone: "acc" }, { label: "merge дозволено", tone: "good" }] });
   D.tile(s, { x: MX, y: 3.3, w: 5.85, h: 1.75, title: "Майже нічого не пишемо",
-    body: "run.py повертає 0/1 (урок 10), стек — одна команда (урок 1), поріг обраний і обґрунтований", tone: "good" });
+    body: "run.py повертає 0/1 (Тема 10), стек — одна команда (Тема 1), поріг обраний і обґрунтований", tone: "good" });
   D.tile(s, { x: 6.87, y: 3.3, w: 5.85, h: 1.75, title: "Цінність — у «кожен PR»",
     body: "той самий прогін, що руками, — тепер завжди: промпт, роутер, навіть «я тільки README»", tone: "acc" });
   D.band(s, { x: MX, y: 5.25, w: 12.1, h: 1.15, tone: "card",
-    text: "CI лише виконує у чистому середовищі те, що ви вже вміли робити руками. Нового коду майже немає — з'являється невідворотність." });
+    text: "CI лише виконує у чистому середовищі те, що Ви вже вміли робити руками. Нового коду майже немає — з'являється невідворотність." });
 }
 
 {
   const s = D.slide({ num: "02", title: "Червоний прогін сам по собі merge не блокує", pill: "absorb", notes: N() });
   D.layers(s, { x: MX, y: 1.95, w: 7.4, h: 0.66, gap: 0.12, items: [
-    { label: "Settings → Branches", body: "у репозиторії, де живе ваш main" },
+    { label: "Settings → Branches", body: "у репозиторії, де живе Ваш main" },
     { label: "Add branch protection", body: "захищаємо гілку main", tone: "acc" },
     { label: "Require status checks", body: "перевірка стає обов'язковою", tone: "acc" },
     { label: "Вибрати чек eval", body: "саме job, не workflow", tone: "crit" },
@@ -92,7 +95,7 @@ D.titleSlide({
     { label: "protection", tone: "good" }, { label: "merge", tone: "crit" },
   ] });
   D.band(s, { x: 8.35, y: 1.95, w: 4.37, h: 2.4, tone: "crit", label: "Пастка: job, а не workflow",
-    text: "У списку — назва job (eval), а не workflow. Неіснуючий чек нічого не блокує." });
+    text: "У списку — назва job (eval), а не workflow. Неіснуючий чек ніколи не звітує — PR застрягає на «Expected»." });
   D.band(s, { x: 8.35, y: 4.5, w: 4.37, h: 1.15, tone: "warn", label: "Безкоштовний план",
     text: "на приватному репозиторії protection може бути недоступний — перевірте заздалегідь." });
   D.band(s, { x: MX, y: 5.75, w: 12.1, h: 0.65, tone: "card",
@@ -100,7 +103,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "03", title: "Розтин eval-gate.yml: кожен крок — граблі", pill: "absorb", notes: N() });
+  const s = D.slide({ num: "03", title: "Розтин eval-gate.yml: кожен крок має причину", pill: "absorb", notes: N() });
   D.code(s, { x: MX, y: 1.9, w: 7.5, h: 3.55, size: 10.5, lines: [
     [{ t: "- name: Up stack        ", c: P.codeKey }, { t: "# без UI — для evals не потрібен", c: P.dim }],
     [{ t: "  run: docker compose up -d --build service", c: P.darktext }],
@@ -131,14 +134,17 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "04", title: "CI — це інше середовище, і воно вас здивує", pill: "absorb", notes: N() });
+  const s = D.slide({ num: "04", title: "CI — це інше середовище, і воно Вас здивує", pill: "absorb", notes: N() });
   D.tile(s, { x: MX, y: 1.95, w: 5.85, h: 1.9, title: "Сюрприз 1 · bash -e",
     body: "Actions виконує кроки з bash -e: перший невдалий curl убиває крок", tone: "crit" });
   D.tile(s, { x: 6.87, y: 1.95, w: 5.85, h: 1.9, title: "Сюрприз 2 · холодний gateway",
     body: "перший запит дає 500. Локально не видно: поки відкриваєте браузер, адаптер прогрівається", tone: "crit" });
-  D.band(s, { x: MX, y: 4.1, w: 12.1, h: 1.2, tone: "acc",
+  D.flow(s, { x: MX, y: 4.05, w: 12.1, h: 0.56, size: 10, items: [
+    { label: "up stack" }, { label: "wait service", tone: "crit", sub: "цикл замість bash -e" }, { label: "wait gateway", tone: "crit", sub: "холодний старт" },
+    { label: "evals", tone: "acc" }, { label: "logs on failure", tone: "warn" }, { label: "down · always", tone: "good" }] });
+  D.band(s, { x: MX, y: 5.0, w: 12.1, h: 0.7, tone: "acc",
     text: "Два червоні прогони, потім зелений — це не сором, а налагодження гейта." });
-  D.band(s, { x: MX, y: 5.45, w: 12.1, h: 0.95, tone: "warn", label: "Лайфхак",
+  D.band(s, { x: MX, y: 5.85, w: 12.1, h: 0.85, tone: "warn", label: "Порада",
     text: "Гейт треба прогнати на зламаному PR — інакше не знаєте, чи він блокує." });
 }
 
@@ -170,7 +176,7 @@ D.titleSlide({
 {
   const s = D.slide({ num: "07", title: "Feature flag і артефакти релізу", pill: "absorb", notes: N() });
   D.tile(s, { x: MX, y: 1.9, w: 5.85, h: 1.7, title: "Відкат версії промпта",
-    body: "активація попередньої версії — секунди, без деплою (урок 2)", tone: "good" });
+    body: "активація попередньої версії — секунди, без деплою (Тема 2)", tone: "good" });
   D.tile(s, { x: 6.87, y: 1.9, w: 5.85, h: 1.7, title: "Feature flag",
     body: "аварійний вимикач шару: кеш, інструмент, guardrail — вимикається без релізу", tone: "acc" });
   D.flow(s, { x: MX, y: 3.85, w: 12.1, h: 0.75, size: 10.5, items: [
@@ -190,8 +196,8 @@ D.titleSlide({
     rows: [
       { cells: ["Шаблон промпта: усі плейсхолдери на місці", "одна одрукована дужка — і в модель їде текст із дужками"] },
       { cells: ["Схеми інструментів — валідний JSON Schema", "зламану схему провайдер відкине вже на проді"] },
-      { cells: ["Прайс покриває всі моделі з конфіга", "інакше cost_usd тихо стає null, і облік бреше (урок 4)"] },
-      { cells: ["Моделі запінені, а не alias'и", "«регресія без коміта» від оновлення провайдера (урок 3)"] },
+      { cells: ["Прайс покриває всі моделі з конфіга", "інакше cost_usd тихо стає null, і облік бреше (Тема 4)"] },
+      { cells: ["Моделі запінені, а не alias'и", "«регресія без коміта» від оновлення провайдера (Тема 3)"] },
       { cells: ["У діфі немає ключів і секретів", "найдорожча помилка з найкоротшим фіксом"], tone: "crit" },
     ] });
   D.band(s, { x: MX, y: 5.55, w: 12.1, h: 1.1, tone: "good", label: "Порядок як у піраміді тестів",
@@ -203,7 +209,7 @@ D.titleSlide({
   D.flow(s, { x: MX + 1.0, y: 2.3, w: 10.3, h: 0.85, size: 11.5, items: [
     { label: "90% — стара версія", tone: "good" }, { label: "10% — нова", tone: "warn" }, { label: "порівняння метрик", tone: "acc" }] });
   D.tile(s, { x: MX, y: 3.6, w: 5.85, h: 1.7, title: "Композиція, а не новий механізм",
-    body: "routing (урок 3) + реєстр версій (урок 2) + лог (урок 1) — усе вже є" });
+    body: "routing (Тема 3) + реєстр версій (Тема 2) + лог (Тема 1) — усе вже є" });
   D.tile(s, { x: 6.87, y: 3.6, w: 5.85, h: 1.7, title: "Ділити за користувачем",
     body: "той самий стабільний вибір за ключем, що й для A/B промптів", tone: "acc" });
   D.band(s, { x: MX, y: 5.45, w: 12.1, h: 0.95, tone: "warn",
@@ -214,7 +220,7 @@ D.titleSlide({
   const s = D.slide({ num: "09", title: "Rollback-критерії пишуться до пожежі", pill: "absorb", notes: N() });
   D.code(s, { x: MX, y: 1.9, w: 12.1, h: 2.25, size: 12, lines: [
     [{ t: "Відкочуємо, якщо:", c: P.codeKey }],
-    [{ t: "  eval pass rate < 5/6         ", c: P.codeNum }, { t: "(прогін після деплою)", c: P.dim }],
+    [{ t: "  eval pass rate < поріг (5/6) ", c: P.codeNum }, { t: "(прогін після деплою)", c: P.dim }],
     [{ t: "  або fallback_events зростає  ", c: P.codeNum }, { t: "протягом 15 хв", c: P.dim }],
     [{ t: "  або error rate > 5%          ", c: P.codeNum }, { t: "протягом 15 хв", c: P.dim }],
     [{ t: "Хто смикає: черговий, без погоджень.", c: P.codeStr }],
@@ -235,14 +241,17 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Зараз ви побачите — і навіщо", pill: "do", notes: N() });
-  [["eval-gate.yml по кроках", "кожен крок — відповідь на конкретні граблі"],
+  const s = D.slide({ title: "Зараз Ви побачите — і навіщо", pill: "do", notes: N() });
+  [["eval-gate.yml по кроках", "кожен крок — відповідь на конкретну проблему"],
    ["PR зі зламаним промптом", "Actions червоний, merge заблоковано"],
    ["фікс → зелений", "той самий PR стає мержабельним"],
    ["required check у налаштуваннях", "job eval, а не workflow"],
-  ].forEach(([t, b], i) => D.tile(s, { x: MX + (i % 2) * 6.25, y: 1.9 + Math.floor(i / 2) * 1.8, w: 6.05, h: 1.6, badge: i + 1, title: t, body: b, tone: i === 1 ? "crit" : "good" }));
+  ].forEach(([t, b], i) => D.tile(s, { x: MX + (i % 2) * 4.15, y: 1.9 + Math.floor(i / 2) * 1.8, w: 3.95, h: 1.6, badge: i + 1, title: t, body: b, tone: i === 1 ? "crit" : "good" }));
+  D.windowMock(s, { x: 8.92, y: 1.9, w: 3.8, h: 3.4, caption: "github · PR #1 · checks", lines: [
+    { t: "✗ eval — failed", c: "crit", b: true }, { t: "  3/6 passed · threshold 5", c: "dim" }, { t: "  Merging is blocked", c: "crit" }, "",
+    { t: "push: fix prompt", c: "dim" }, "", { t: "✓ eval — passed", c: "good", b: true }, { t: "  6/6 passed · threshold 5", c: "dim" }, { t: "  Merge pull request", c: "good" }] });
   D.band(s, { x: MX, y: 5.55, w: 12.1, h: 1.15, tone: "acc", label: "Навіщо",
-    text: "Побачити, як якість перестає залежати від дисципліни: перевірка, яку ви вміли робити руками, стає умовою мержу — і працює без вас." });
+    text: "Побачити, як якість перестає залежати від дисципліни: перевірка, яку Ви вміли робити руками, стає умовою мержу — і працює без Вас." });
 }
 
 {
@@ -264,20 +273,23 @@ D.titleSlide({
 
 // ─── РОЗДІЛЮВАЧ · рефлексія ───
 {
-  D.divider({ big: "РЕФЛЕКСІЯ", sub: "що це довело · перевір себе · антипатерни тижня", notes: N() });
+  D.divider({ big: "РЕФЛЕКСІЯ", sub: "що це довело · перевірте себе · антипатерни тижня", notes: N() });
 }
 
 {
   const s = D.slide({ title: "Що це довело", pill: "connect", notes: N() });
-  D.tile(s, { x: MX, y: 1.9, w: 3.9, h: 2.35, title: "Регресія не пройде", body: "червоний прогін блокує merge механічно, а не за домовленістю", tone: "good" });
-  D.tile(s, { x: 4.72, y: 1.9, w: 3.9, h: 2.35, title: "Гейт теж код", body: "два червоні прогони, поки він сам не запрацював, — нормальна історія", tone: "acc" });
-  D.tile(s, { x: 8.82, y: 1.9, w: 3.9, h: 2.35, title: "Відкат — рішення заздалегідь", body: "умови, роль і команда записані до, а не під час інциденту" });
-  D.band(s, { x: MX, y: 4.70, w: 12.1, h: 1.75, tone: "card",
-    text: "Контур замкнувся: зміна проходить перевірку, перевірка блокує регресію, відкат описаний. Лишилося зібрати це в operating model — останній урок." });
+  D.tile(s, { x: MX, y: 1.9, w: 7.9, h: 1.15, title: "Регресія не пройде", body: "червоний прогін блокує merge механічно, а не за домовленістю", tone: "good" });
+  D.tile(s, { x: MX, y: 3.2, w: 7.9, h: 1.15, title: "Гейт теж код", body: "два червоні прогони, поки він сам не запрацював, — нормальна історія", tone: "acc" });
+  D.tile(s, { x: MX, y: 4.5, w: 7.9, h: 1.15, title: "Відкат — рішення заздалегідь", body: "умови, роль і команда записані до, а не під час інциденту" });
+  D.windowMock(s, { x: 8.92, y: 1.9, w: 3.8, h: 3.75, caption: "github · branch protection", lines: [
+    "Require status checks", { t: " ✓ required: eval (job)", c: "good" }, "", { t: "PR #1  eval ✗", c: "crit" }, { t: "  Merging is blocked", c: "crit" }, "",
+    { t: "PR #1  eval ✓", c: "good" }, { t: "  Merge pull request", c: "good" }, "", { t: "rollback: activate v2 · < 1 хв", c: "warn" }] });
+  D.band(s, { x: MX, y: 5.85, w: 12.1, h: 0.8, tone: "card",
+    text: "Контур замкнувся: зміна проходить перевірку, перевірка блокує регресію, відкат описаний. Лишилося зібрати це в operating model — остання тема." });
 }
 
 {
-  const s = D.slide({ title: "Перевір себе", pill: "connect", notes: N() });
+  const s = D.slide({ title: "Перевірте себе", pill: "connect", notes: N() });
   s.addShape("roundRect", { x: MX, y: 1.95, w: 12.1, h: 4.00, rectRadius: 0.12, fill: { color: P.card }, line: { color: P.line, width: 1 } });
   D.checklist(s, { x: MX + 0.45, y: 2.3, w: 11.3, cols: 2, h: 3.20, size: 14, items: [
     "в історії Actions є червоний і зелений прогін",
@@ -292,7 +304,7 @@ D.titleSlide({
 {
   const s = D.slide({ title: "Антипатерни тижня", pill: "connect", notes: N() });
   [["Мерж повз червоний гейт", "один прецедент — і за місяць гейт обходять усі"],
-   ["Protection на неіснуючий чек", "захист, який нічого не блокує, гірший за відсутній"],
+   ["Protection на неіснуючий чек", "чек ніколи не звітує; PR застрягають на «Expected» — і захист знімають"],
    ["Гейт, що триває пів години", "обхід стає раціональним рішенням"],
    ["Feature flag без плану прибирання", "кладовище мертвих гілок через рік"],
    ["Rollback-критерії під час інциденту", "рішення обговорюється, поки користувачі чекають"],
@@ -314,7 +326,7 @@ D.titleSlide({
   D.tile(s, { x: 6.87, y: 1.9, w: 5.85, h: 2.4, title: "Опційно", tone: "warn",
     body: "• canary-план: розподіл 90/10 своїм роутером, метрики порівняння, критерії promote/rollback" });
   s.addShape("roundRect", { x: MX, y: 4.6, w: 12.1, h: 1.6, rectRadius: 0.14, fill: { color: P.card }, line: { color: P.acc, width: 1.5 } });
-  s.addText("ДЗ тижня 6 — після наступного уроку", { x: MX + 0.3, y: 4.8, w: 11.5, h: 0.4, fontFace: F.body, fontSize: 15, bold: true, color: P.acc, margin: 0 });
+  s.addText("ДЗ тижня 6 — після наступної теми", { x: MX + 0.3, y: 4.8, w: 11.5, h: 0.4, fontFace: F.body, fontSize: 15, bold: true, color: P.acc, margin: 0 });
   s.addText("Фінальне ДЗ збирає все: CI-гейт із сьогоднішньої лаби, інцидент-демо в окремому INCIDENT_RUNBOOK.md і повна збірка системи з чистого клону. Сьогоднішній гейт — його найбільша частина, і вона вже готова.",
     { x: MX + 0.3, y: 5.25, w: 11.5, h: 0.8, fontFace: F.body, fontSize: 12.5, color: P.ink, valign: "top", margin: 0 });
 }
@@ -322,13 +334,13 @@ D.titleSlide({
 D.closingSlide({
   summary: [
     "усе, що тримається на «не забути», колись буде забуто",
-    "гейт = ваш eval + exit code + CI; нового коду майже немає",
+    "гейт = Ваш eval + exit code + CI; нового коду майже немає",
     "protection із правильним чеком — інакше захист лише на вигляд",
     "порядок викочування важливіший за сам факт релізу: читач перед писарем",
     "rollback-критерії пишуться до пожежі: умова, роль, команда",
   ],
-  nextTitle: "Наступний крок → Урок 12 · Фінал: LLMOps operating model",
-  nextBody: "Механізми зібрані й захищені гейтом. Останній урок — про те, як це живе далі: цикл роботи з якістю, розбір інциденту за рунбуком, KPI, які показують керівництву, і чесний план перенесення практик у свою команду.",
+  nextTitle: "Наступний крок → Тема 12 · Фінал: LLMOps operating model",
+  nextBody: "Механізми зібрані й захищені гейтом. Остання тема — про те, як це живе далі: цикл роботи з якістю, розбір інциденту за рунбуком, KPI, які показують керівництву, і чесний план перенесення практик у свою команду.",
   notes: N(),
 });
 

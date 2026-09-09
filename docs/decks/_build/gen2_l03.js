@@ -13,7 +13,7 @@ D.titleSlide({
 });
 
 {
-  const s = D.slide({ title: "Що ви зможете після уроку", pill: "absorb", kicker: "П'ять дій, які перевірите руками", notes: N() });
+  const s = D.slide({ title: "Що Ви зможете після теми", pill: "absorb", kicker: "П'ять дій, які перевірите руками", notes: N() });
   [["Написати Route()", "роутер на десять рядків: ескалації — окремо"],
    ["Пояснити межу ролей", "рішення в сервісі, виконання в адаптері"],
    ["Додати провайдера", "одним YAML-блоком, без зміни коду"],
@@ -24,9 +24,9 @@ D.titleSlide({
 
 {
   const s = D.slide({ title: "Маршрут на сьогодні", pill: "absorb", notes: N() });
-  [["01","Три біди однієї моделі"],["02","Сервіс вирішує, адаптер виконує"],["03","Розтин конфіга; alias vs snapshot"],
-   ["04","Route(): одна точка рішення"],["05","Маршрут за задачею"],["06","Ціна самого рішення"],
-   ["07","Fallback-порядок як політика"],["08","Додати провайдера без коду"],["09","Tier-система · опційно"],
+  [["01","Проблеми однієї моделі"],["02","Сервіс вирішує, адаптер виконує"],["03","Дві моделі на mock; alias vs snapshot"],
+   ["04","Route(): одна точка вибору"],["05","Маршрутизація за задачею"],["06","Вартість і стабільність"],
+   ["07","Fallback: резервний маршрут"],["08","Новий провайдер через адаптер"],["09","Tier-система · опційно"],
    ["10","Лабораторна"],["11","Антипатерни"],
   ].forEach(([n, t], i) => D.tile(s, { x: MX + (i % 3) * 4.05, y: 1.8 + Math.floor(i / 3) * 1.15, w: 3.85, h: 0.95,
       badge: n, title: t, tone: n === "09" ? "warn" : "card" }));
@@ -35,7 +35,7 @@ D.titleSlide({
 
 {
   const s = D.slide({ title: "Терміни, якими користуватимемось", pill: "absorb",
-    kicker: "Шість слів сьогоднішнього уроку", notes: N() });
+    kicker: "Шість слів сьогоднішньої теми", notes: N() });
   D.terms(s, { x: MX, y: 1.95, w: 12.1, cols: 3, rowH: 1.62, items: [
     { term: "gateway-адаптер", def: "єдиний вихід до провайдерів: виклик, ключі, згладжування API" },
     { term: "роутер · Route()", def: "точка рішення в сервісі: повідомлення → ім'я моделі" },
@@ -53,17 +53,20 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "01", title: "Три біди однієї моделі", pill: "absorb", notes: N() });
+  const s = D.slide({ num: "01", title: "Проблеми використання однієї моделі", pill: "absorb", notes: N() });
   [["Гроші", "різниця між дешевою і сильною на масовому трафіку — порядок вартості, не «трохи дорожче»", "crit"],
-   ["Залежність", "один провайдер — одна точка відмови, яка вам не належить; плану Б не існує теоретично", "crit"],
+   ["Залежність", "один провайдер — одна точка відмови, яка Вам не належить; плану Б не існує теоретично", "crit"],
    ["Несумісність у дрібницях", "«сумісні за стандартом» провайдери розходяться в деталях полів", "warn"],
-  ].forEach(([t, b, tone], i) => D.tile(s, { x: MX + i * 4.05, y: 1.9, w: 3.85, h: 2.05, badge: i + 1, title: t, body: b, tone }));
-  D.band(s, { x: MX, y: 4.35, w: 12.1, h: 1.5, tone: "acc", label: "Навіщо цей шар",
-    text: "Маршрутизація — перший механізм тижня «гроші»: вона розводить трафік за задачами, і саме на ній тримається все, що рахуватимемо наступного уроку." });
+  ].forEach(([t, b, tone], i) => D.tile(s, { x: MX + i * 4.05, y: 1.9, w: 3.85, h: 1.85, badge: i + 1, title: t, body: b, tone }));
+  D.bars(s, { x: MX, y: 4.0, w: 12.1, labelW: 3.2, noteW: 3.6, rowH: 0.42, gap: 0.16, rows: [
+    { label: "FAQ через сильну модель", value: 10, note: "×10 — порядок вартості", tone: "crit" },
+    { label: "той самий FAQ через дешеву", value: 1, note: "×1 — та сама відповідь", tone: "good" }] });
+  D.band(s, { x: MX, y: 5.2, w: 12.1, h: 1.2, tone: "acc", label: "Навіщо цей шар",
+    text: "Маршрутизація — перший механізм тижня «Routing + cost»: вона розводить трафік за задачами, і саме на ній тримається все, що рахуватимемо у наступній темі." });
 }
 
 {
-  const s = D.slide({ num: "02", title: "Сервіс вирішує. Адаптер виконує.", pill: "absorb", notes: N() });
+  const s = D.slide({ num: "02", title: "Розподіл відповідальності: сервіс вирішує, адаптер виконує", pill: "absorb", notes: N() });
   s.addShape("roundRect", { x: MX, y: 1.8, w: 5.85, h: 1.9, rectRadius: 0.12, fill: { color: P.accsolid }, line: { type: "none" } });
   s.addText("ВИРІШУЄ", { x: MX + 0.3, y: 1.98, w: 5.2, h: 0.3, fontFace: F.mono, fontSize: 10.5, bold: true, color: "C9C5F2", charSpacing: 2, margin: 0 });
   s.addText("Сервіс", { x: MX + 0.3, y: 2.3, w: 5.2, h: 0.5, fontFace: F.body, fontSize: 24, bold: true, color: "FFFFFF", margin: 0 });
@@ -79,7 +82,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "03", title: "Розтин конфіга: дві «моделі» на одному mock", pill: "absorb", notes: N() });
+  const s = D.slide({ num: "03", title: "Дві логічні моделі на одному mock-провайдері", pill: "absorb", notes: N() });
   D.code(s, { x: MX, y: 1.85, w: 7.0, h: 3.5, size: 11, lines: [
     [{ t: "model_list:", c: P.codeKey }],
     [{ t: "  - model_name: ", c: P.darktext }, { t: "mock-mini", c: P.codeStr }],
@@ -100,11 +103,11 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "03", title: "«Модель» за назвою — не та сама модель", pill: "absorb", notes: N() });
+  const s = D.slide({ num: "03", title: "Alias і snapshot моделі", pill: "absorb", notes: N() });
   D.tile(s, { x: MX, y: 1.9, w: 5.85, h: 1.62, title: "Alias — «остання версія сімейства»",
     body: "автоматично отримуєте покращення — і небезпечно тихі зміни поведінки", tone: "warn" });
   D.tile(s, { x: 6.87, y: 1.9, w: 5.85, h: 1.62, title: "Snapshot — зафіксована версія",
-    body: "не змінюється під вами, але й не оновлюється сама — і колись її виведуть з обігу", tone: "good" });
+    body: "не змінюється під Вами, але й не оновлюється сама — і колись її виведуть з обігу", tone: "good" });
   // Відмінність тут часова: snapshot прибитий до точки, alias їде за часом.
   // Двома картками цього не видно — видно на шкалі з кількома випусками.
   {
@@ -117,20 +120,20 @@ D.titleSlide({
       s.addText(name, { x: nx, y: ty, w: nw, h: nh, align: "center", valign: "middle",
         fontFace: F.mono, fontSize: 10, color: P.ink, margin: 0 });
     });
-    s.addText("snapshot — ви прибиті сюди", { x: MX + 0.5, y: ty + nh + 0.06, w: 3.6, h: 0.24,
+    s.addText("snapshot — Ви прибиті сюди", { x: MX + 0.5, y: ty + nh + 0.06, w: 3.6, h: 0.24,
       fontFace: F.mono, fontSize: 9, bold: true, color: P.good, margin: 0 });
-    s.addText("alias — ви завжди тут, і воно рухається", { x: MX + 7.9, y: ty + nh + 0.06, w: 4.2, h: 0.24,
+    s.addText("alias — Ви завжди тут, і воно рухається", { x: MX + 7.9, y: ty + nh + 0.06, w: 4.2, h: 0.24,
       align: "right", fontFace: F.mono, fontSize: 9, bold: true, color: P.warn, margin: 0 });
     s.addText("час →", { x: MX + 0.2, y: ty - 0.28, w: 2, h: 0.22,
       fontFace: F.mono, fontSize: 8.5, color: P.faint, charSpacing: 1, margin: 0 });
   }
-  D.band(s, { x: MX, y: 4.92, w: 12.1, h: 1.15, tone: "warn", label: "Лайфхак",
+  D.band(s, { x: MX, y: 4.92, w: 12.1, h: 1.15, tone: "warn", label: "Порада",
     text: "Той самий принцип, що з образами контейнерів: у прод не котять latest. Ми і gateway пінимо за digest'ом, а не за рухомим тегом." });
   D.band(s, { x: MX, y: 6.2, w: 12.1, h: 0.55, tone: "acc", text: "Правило production: у конфізі — snapshot; оновлення версії — окрема свідома зміна." });
 }
 
 {
-  const s = D.slide({ num: "04", title: "Route(): роутер на десять рядків", pill: "absorb", notes: N() });
+  const s = D.slide({ num: "04", title: "Route() як єдина точка вибору моделі", pill: "absorb", notes: N() });
   D.code(s, { x: MX, y: 1.85, w: 12.1, h: 2.35, size: 11.5, lines: [
     [{ t: "// [W2] routing: ескалація → сильна, решта → дешева", c: P.dim }],
     [{ t: "static string Route(string message, string def) {", c: P.codeKey }],
@@ -148,28 +151,31 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "04", title: "Що ще каже цей код — до того, як вкусить", pill: "absorb", notes: N() });
+  const s = D.slide({ num: "04", title: "Межі та тестування простого роутера", pill: "absorb", notes: N() });
   [["Чиста функція = дешеві тести", "рядок на вході, ім'я моделі на виході: десяток assert'ів без стека й бази", "good"],
    ["Конфлікти маркерів", "сумнів — на користь дорожчого: «дякую, але хочу повернути гроші» їде на strong", "card"],
    ["Маркери двомовні", "«поверн» і «refund» навмисно: у проді словники розповзаються по мовах", "warn"],
-  ].forEach(([t, b, tone], i) => D.tile(s, { x: MX + i * 4.05, y: 1.9, w: 3.85, h: 2.0, badge: i + 1, title: t, body: b, tone }));
-  D.band(s, { x: MX, y: 4.35, w: 12.1, h: 1.5, tone: "acc", label: "З одним реальним ключем роутер вироджується",
+  ].forEach(([t, b, tone], i) => D.tile(s, { x: MX + i * 4.05, y: 1.9, w: 3.85, h: 1.85, badge: i + 1, title: t, body: b, tone }));
+  D.flow(s, { x: MX, y: 4.0, w: 12.1, h: 0.6, size: 11, items: [
+    { label: "«дякую, але хочу повернути гроші»", w: 4.3, sub: "вхід: подяка + ескалація" }, { label: "Route()", tone: "acc", sub: "чиста функція" },
+    { label: "mock-strong", tone: "good", sub: "сумнів — на користь дорожчого" }] });
+  D.band(s, { x: MX, y: 5.25, w: 12.1, h: 1.2, tone: "acc", label: "З одним реальним ключем роутер вироджується",
     text: "Щойно MODEL не «mock», Route() повертає задану модель — другої в конфізі немає. Це чесний стан контуру з одним провайдером, а не «роутинг вимкнули»." });
 }
 
 {
-  const s = D.slide({ num: "05", title: "Маршрут — за задачею, не за текстом-в-лоб", pill: "absorb", notes: N() });
+  const s = D.slide({ num: "05", title: "Маршрутизація за задачею: інтент, контекст і рівень міркування", pill: "absorb", notes: N() });
   D.layers(s, { x: MX, y: 1.95, w: 12.1, h: 0.9, gap: 0.16, items: [
     { label: "Наш рівень", body: "маркери в тексті: дешево, прозоро, зрозуміло на розборі; ламається на перефразуванні" },
     { label: "Доросліше", body: "тенант, фіча, пріоритет клієнта, ліміт бюджету — текст лише один із сигналів", tone: "acc" },
     { label: "Режим мислення", body: "та сама модель у глибокому режимі коштує в рази більше — вмикати за явним критерієм", tone: "warn" },
   ] });
   D.band(s, { x: MX, y: 5.2, w: 12.1, h: 1.2, tone: "good", label: "Принцип",
-    text: "Дешеве — дешевій моделі, складне — сильній, рішення — задокументоване. Якщо не можете пояснити маршрут словами, у вас не політика, а випадковість." });
+    text: "Дешеве — дешевій моделі, складне — сильній, рішення — задокументоване. Якщо не можете пояснити маршрут словами, у Вас не політика, а випадковість." });
 }
 
 {
-  const s = D.slide({ num: "06", title: "Скільки коштує саме рішення", pill: "absorb", notes: N() });
+  const s = D.slide({ num: "06", title: "Вартість рішення про маршрут", pill: "absorb", notes: N() });
   D.table(s, { x: MX, y: 1.9, w: 12.1, colW: [3.6, 4.0, 4.5], rowH: 0.6, size: 11.5,
     head: ["спосіб вирішити", "що додає до кожного запиту", "коли доречний"],
     rows: [
@@ -182,7 +188,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "06", title: "Один користувач — один маршрут", pill: "absorb", notes: N() });
+  const s = D.slide({ num: "06", title: "Стабільний маршрут у межах розмови", pill: "absorb", notes: N() });
   D.flow(s, { x: MX, y: 2.1, w: 12.1, h: 0.8, size: 11, items: [
     { label: "питання 1 → сильна", tone: "crit" }, { label: "питання 2 → дешева", tone: "warn" }, { label: "питання 3 → сильна", tone: "crit" }] });
   s.addText("співрозмовник у користувача змінюється посеред розмови", { x: MX, y: 3.05, w: 12, h: 0.3, fontFace: F.body, fontSize: 12, italic: true, color: P.soft, margin: 0 });
@@ -193,13 +199,13 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "06", title: "«У нас одна модель» — усе одно є що маршрутизувати", pill: "absorb", notes: N() });
+  const s = D.slide({ num: "06", title: "Маршрутизація в системі з однією моделлю", pill: "absorb", notes: N() });
   D.table(s, { x: MX, y: 1.9, w: 12.1, colW: [2.8, 4.6, 4.7], rowH: 0.66, size: 11.5,
     head: ["що маршрутизуємо", "приклад рішення", "що дає"],
     rows: [
       { cells: ["max_tokens", "коротка відповідь на FAQ, довга на скаргу", "стеля вартості на клас запиту"] },
       { cells: ["temperature", "мінімальна для довідкових, вища для формулювань", "передбачуваність там, де потрібна"] },
-      { cells: ["Версія промпта", "ескалації — свій промпт, FAQ — свій", "той самий реєстр з уроку 2"] },
+      { cells: ["Версія промпта", "ескалації — свій промпт, FAQ — свій", "той самий реєстр з Теми 2"] },
       { cells: ["Набір інструментів", "read-only для загальних, повний для авторизованих", "менша поверхня для injection"] },
     ] });
   D.band(s, { x: MX, y: 5.4, w: 12.1, h: 1.0, tone: "card",
@@ -207,7 +213,7 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "07", title: "Fallback-порядок: політика, яку сьогодні оголосимо", pill: "absorb", notes: N() });
+  const s = D.slide({ num: "07", title: "Fallback: резервний маршрут після збою", pill: "absorb", notes: N() });
   D.flow(s, { x: MX + 1.5, y: 2.2, w: 9.3, h: 0.9, size: 12.5, items: [
     { label: "mock-strong", tone: "acc" }, { label: "mock-mini", tone: "good" }] });
   s.addText("у разі збою сильної — краще відповісти дешевшою, ніж не відповісти взагалі",
@@ -219,22 +225,23 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ num: "08", title: "Додати провайдера — без зміни коду", pill: "absorb", notes: N() });
-  D.code(s, { x: MX, y: 1.9, w: 12.1, h: 1.9, size: 12, lines: [
+  const s = D.slide({ num: "08", title: "Підключення нового провайдера через адаптер", pill: "absorb", notes: N() });
+  D.code(s, { x: MX, y: 1.9, w: 12.1, h: 2.2, size: 12, lines: [
     [{ t: "  - model_name: ", c: P.darktext }, { t: "azure-gpt-5", c: P.codeStr }],
     [{ t: "    litellm_params:", c: P.codeKey }],
-    [{ t: "      model: azure/gpt-5", c: P.darktext }],
+    [{ t: "      model: azure/<azure-deployment-name>", c: P.darktext }],
     [{ t: "      api_base: os.environ/AZURE_API_BASE", c: P.darktext }],
     [{ t: "      api_key:  os.environ/AZURE_API_KEY", c: P.darktext }],
+    [{ t: "      api_version: os.environ/AZURE_API_VERSION", c: P.darktext }],
   ] });
-  D.flow(s, { x: MX, y: 4.15, w: 12.1, h: 0.78, size: 11.5, items: [
+  D.flow(s, { x: MX, y: 4.4, w: 12.1, h: 0.78, size: 11.5, items: [
     { label: "+ блок у YAML", tone: "good" }, { label: "+ рядок у Route()" }, { label: "код виклику не змінився", tone: "acc" }] });
-  D.band(s, { x: MX, y: 5.2, w: 12.1, h: 1.2, tone: "warn", label: "Лайфхак",
+  D.band(s, { x: MX, y: 5.4, w: 12.1, h: 1.2, tone: "warn", label: "Порада",
     text: "Називайте моделі за роллю, а не за брендом: mock-mini, mock-strong. Тоді заміна провайдера — правка конфіга, а не пошук імені по всьому коду." });
 }
 
 {
-  const s = D.slide({ num: "09", title: "Третій маршрут: tier-система", pill: "absorb", opt: true, notes: N() });
+  const s = D.slide({ num: "09", title: "Tier-система маршрутизації", pill: "absorb", opt: true, notes: N() });
   [["FAQ-tier", "типові питання: найдешевша модель або заготовлені відповіді"],
    ["Standard-tier", "звичайний діалог: робоча модель"],
    ["Escalation-tier", "скарги, повернення, юридично чутливе: найсильніша"],
@@ -269,18 +276,20 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Зараз ви побачите — і навіщо", pill: "do", notes: N() });
+  const s = D.slide({ title: "Зараз Ви побачите — і навіщо", pill: "do", notes: N() });
   [["конфіг gateway", "mock-mini і mock-strong — дві «моделі» на одному mock"],
    ["Route() у сервісі", "точка рішення на десять рядків"],
    ["питання обох типів", "звичайні + ескалації («поверніть гроші, терміново»)"],
    ["розподіл у БД", "SELECT model, count(*) FROM requests GROUP BY model"],
-  ].forEach(([t, b], i) => D.tile(s, { x: MX + (i % 2) * 6.25, y: 1.9 + Math.floor(i / 2) * 1.8, w: 6.05, h: 1.6, badge: i + 1, title: t, body: b, tone: "good" }));
+  ].forEach(([t, b], i) => D.tile(s, { x: MX + (i % 2) * 4.15, y: 1.9 + Math.floor(i / 2) * 1.8, w: 3.95, h: 1.6, badge: i + 1, title: t, body: b, tone: "good" }));
+  D.windowMock(s, { x: 8.92, y: 1.9, w: 3.8, h: 3.4, caption: "psql · requests", lines: [
+    "SELECT model, count(*)", "  FROM requests", "  GROUP BY model;", "", { t: " mock-mini   |  7", c: "good" }, { t: " mock-strong |  3", c: "acc" }, "", { t: "трафік розведений ✓", c: "good" }] });
   D.band(s, { x: MX, y: 5.55, w: 12.1, h: 1.15, tone: "acc", label: "Навіщо",
-    text: "Побачити перший операційний доказ, що routing працює: не «код написаний», а «трафік розведений». Різниця між цими формулюваннями і є темою уроку." });
+    text: "Побачити перший операційний доказ, що routing працює: не «код написаний», а «трафік розведений». Різниця між цими формулюваннями — і є суть сьогоднішньої теми." });
 }
 
 {
-  const s = D.slide({ title: "Лабораторна: чотири частини + опційна", pill: "do", notes: N() });
+  const s = D.slide({ title: "Лабораторна робота: налаштуйте маршрутизацію та перевірте її на трафіку", pill: "do", notes: N() });
   [["Прочитати конфіг", "gateway/litellm-config.yaml: mock-mini і mock-strong", false],
    ["Написати роутер", "маркери → mock-strong, решта → mock-mini; MODEL лише дефолт", false],
    ["Побачити розподіл", "питання обох типів → SELECT model, count(*) GROUP BY model", false],
@@ -298,20 +307,23 @@ D.titleSlide({
 
 // ─── РОЗДІЛЮВАЧ · рефлексія ───
 {
-  D.divider({ big: "РЕФЛЕКСІЯ", sub: "що це довело · перевір себе · антипатерни тижня", notes: N() });
+  D.divider({ big: "РЕФЛЕКСІЯ", sub: "що це довело · перевірте себе · антипатерни маршрутизації", notes: N() });
 }
 
 {
   const s = D.slide({ title: "Що це довело", pill: "connect", notes: N() });
-  D.tile(s, { x: MX, y: 1.9, w: 3.9, h: 2.35, title: "Трафік розведений", body: "дві моделі, різні лічильники — доказ, а не «код написаний»", tone: "good" });
-  D.tile(s, { x: 4.72, y: 1.9, w: 3.9, h: 2.35, title: "Рішення читається", body: "уся політика в одній функції; кожен вибір — подія в лозі", tone: "acc" });
-  D.tile(s, { x: 8.82, y: 1.9, w: 3.9, h: 2.35, title: "Розширення дешеве", body: "«третій провайдер» = один YAML-блок і нуль рядків коду" });
-  D.band(s, { x: MX, y: 4.70, w: 12.1, h: 1.75, tone: "card",
-    text: "Це фундамент тижня «Routing + cost»: наступного уроку на те саме поле model ляже вартість кожного запиту — і розподіл трафіку стане розподілом грошей." });
+  D.tile(s, { x: MX, y: 1.9, w: 7.9, h: 1.15, title: "Трафік розведений", body: "дві моделі, різні лічильники — доказ, а не «код написаний»", tone: "good" });
+  D.tile(s, { x: MX, y: 3.2, w: 7.9, h: 1.15, title: "Рішення читається", body: "уся політика в одній функції; кожен вибір — подія в лозі", tone: "acc" });
+  D.tile(s, { x: MX, y: 4.5, w: 7.9, h: 1.15, title: "Розширення дешеве", body: "«третій провайдер» = один YAML-блок; у коді — лише рядок у Route()" });
+  D.windowMock(s, { x: 8.92, y: 1.9, w: 3.8, h: 3.75, caption: "gateway/litellm-config.yaml", lines: [
+    "model_list:", { t: "  - model_name: mock-mini", c: "good" }, { t: "  - model_name: mock-strong", c: "acc" }, { t: "  - model_name: azure-gpt-5", c: "warn" },
+    "    litellm_params:", "      model: azure/<deployment>", "      api_key: os.environ/…", "", { t: "service/: 0 рядків змінено", c: "good" }] });
+  D.band(s, { x: MX, y: 5.85, w: 12.1, h: 0.8, tone: "card",
+    text: "Це фундамент тижня «Routing + cost»: у наступній темі на те саме поле model ляже вартість кожного запиту — і розподіл трафіку стане розподілом грошей." });
 }
 
 {
-  const s = D.slide({ title: "Перевір себе", pill: "connect", notes: N() });
+  const s = D.slide({ title: "Перевірте себе", pill: "connect", notes: N() });
   s.addShape("roundRect", { x: MX, y: 1.95, w: 12.1, h: 4.00, rectRadius: 0.12, fill: { color: P.card }, line: { color: P.line, width: 1 } });
   D.checklist(s, { x: MX + 0.45, y: 2.3, w: 11.3, cols: 2, h: 3.20, size: 14, items: [
     "звичайне питання і ескалація дають різні моделі",
@@ -324,11 +336,11 @@ D.titleSlide({
 }
 
 {
-  const s = D.slide({ title: "Антипатерни тижня", pill: "connect", notes: N() });
+  const s = D.slide({ title: "Антипатерни маршрутизації", pill: "connect", notes: N() });
   [["Рішення про модель — у конфізі адаптера", "прапорці не переносяться між інструментами, механізми — так"],
    ["Жорстке ім'я моделі по всьому коду", "заміна провайдера перетворюється на пошук рядків"],
-   ["Роутинг за випадковим числом", "непередбачувано для користувача, невідтворювано для вас"],
-   ["Alias у проді", "модель оновлюється під вами без жодної вашої дії"],
+   ["Роутинг за випадковим числом", "непередбачувано для користувача, невідтворювано для Вас"],
+   ["Alias у проді", "модель оновлюється під Вами без жодної Вашої дії"],
   ].forEach(([t, b], i) => {
     const y = 2.0 + i * 1.0;
     s.addShape("roundRect", { x: MX, y, w: 12.1, h: 0.85, rectRadius: 0.1, fill: { color: P.card }, line: { color: P.line, width: 1 } });
@@ -347,8 +359,8 @@ D.titleSlide({
   D.tile(s, { x: 6.87, y: 1.9, w: 5.85, h: 2.4, title: "Опційно", tone: "warn",
     body: "• сформулювати tier-політику на три рівні і оцінити по лозі частку трафіку кожного" });
   s.addShape("roundRect", { x: MX, y: 4.6, w: 12.1, h: 1.6, rectRadius: 0.14, fill: { color: P.card }, line: { color: P.acc, width: 1.5 } });
-  s.addText("ДЗ тижня 2 — після наступного уроку", { x: MX + 0.3, y: 4.8, w: 11.5, h: 0.4, fontFace: F.body, fontSize: 15, bold: true, color: P.acc, margin: 0 });
-  s.addText("Воно об'єднує routing і cost: сьогоднішня частина вже у вас в руках, після уроку 4 додасться облік вартості — і тиждень здається одним PR. Критерії — у файлі ДЗ після наступного уроку.",
+  s.addText("ДЗ тижня 2 — після наступної теми", { x: MX + 0.3, y: 4.8, w: 11.5, h: 0.4, fontFace: F.body, fontSize: 15, bold: true, color: P.acc, margin: 0 });
+  s.addText("Воно об'єднує routing і cost: сьогоднішня частина вже у Вас в руках, після Теми 4 додасться облік вартості — і тиждень здається одним PR. Критерії — у файлі ДЗ після наступної теми.",
     { x: MX + 0.3, y: 5.25, w: 11.5, h: 0.8, fontFace: F.body, fontSize: 12.5, color: P.ink, valign: "top", margin: 0 });
 }
 
@@ -360,8 +372,8 @@ D.closingSlide({
     "маршрутизувати можна навіть з однією моделлю: max_tokens, temperature, промпт, інструменти",
     "fallback-порядок оголошуємо сьогодні — механізм з'явиться на тижні 4",
   ],
-  nextTitle: "Наступний крок → Урок 4 · Токеноміка і cost attribution",
-  nextBody: "Трафік розведений — тепер порахуємо, скільки він коштує. Наступного уроку на поле model ляже вартість кожного запиту: звідки беруться цифри, чому «звернення» дорожче за «виклик» і як за три GROUP BY знайти, куди пішов бюджет.",
+  nextTitle: "Наступний крок → Тема 4 · Токеноміка і cost attribution",
+  nextBody: "Трафік розведений — тепер порахуємо, скільки він коштує. У наступній темі на поле model ляже вартість кожного запиту: звідки беруться цифри, чому «звернення» дорожче за «виклик» і як за три GROUP BY знайти, куди пішов бюджет.",
   notes: N(),
 });
 

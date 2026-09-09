@@ -230,7 +230,7 @@ function createDeck({ lesson, week, fileTitle, notes: reader }) {
     // Праворуч — скляна «N» із ассетів шаблону (сл. 9 і 42). Вона впечена у фон
     // обкладинки, тож окремої фігури тут немає. Раніше на цьому місці стояли
     // мої власні концентричні рамки — у шаблоні такого елемента не існує.
-    s.addText(`ТИЖДЕНЬ ${week} · УРОК ${lesson} З 12`, { x: MX, y: 1.7, w: 8, h: 0.3, fontFace: F.mono, fontSize: 12, bold: true, color: DK.sub, charSpacing: 3, margin: 0 });
+    s.addText(`ТИЖДЕНЬ ${week} · ТЕМА ${lesson} З 12`, { x: MX, y: 1.7, w: 8, h: 0.3, fontFace: F.mono, fontSize: 12, bold: true, color: DK.sub, charSpacing: 3, margin: 0 });
     s.addText(title, { x: MX, y: 2.15, w: 9.0, h: 2.0, fontFace: F.display, fontSize: 36, color: DK.ink, valign: "top", lineSpacingMultiple: 1.02, margin: 0 });
     s.addText(lead, { x: MX, y: 4.5, w: 8.4, h: 1.2, fontFace: F.body, fontSize: 15, color: DK.sub, lineSpacingMultiple: 1.2, margin: 0 });
     let cx = MX;
@@ -389,7 +389,7 @@ function createDeck({ lesson, week, fileTitle, notes: reader }) {
     const s = newDarkSlide(); idx++;
     coverBg(s);
     wordmark(s);
-    s.addText(`ПІДСУМОК УРОКУ ${lesson}`, { x: MX, y: 0.95, w: 8, h: 0.3, fontFace: F.mono, fontSize: 11, bold: true, color: DK.sub, charSpacing: 3, margin: 0 });
+    s.addText(`ПІДСУМОК ТЕМИ ${lesson}`, { x: MX, y: 0.95, w: 8, h: 0.3, fontFace: F.mono, fontSize: 11, bold: true, color: DK.sub, charSpacing: 3, margin: 0 });
     summary.forEach((txt, i) => {
       const y = 1.5 + i * 0.72;
       s.addShape("ellipse", { x: MX, y: y + 0.1, w: 0.16, h: 0.16, fill: { color: DK.solid }, line: { type: "none" } });
@@ -509,6 +509,9 @@ function createDeck({ lesson, week, fileTitle, notes: reader }) {
   }
 
   // смуга-акцент: акцентна — суцільний фіолет + білий текст (сигнатура Neoversity)
+  // Повторювані типи плашок отримують іконку в кружечку — візуальний якір,
+  // за яким тип зчитується без читання підпису.
+  const BAND_ICONS = [["ПРИНЦИП", "◆"], ["ТИПОВА ПОМИЛКА", "✕"], ["ПОРАДА", "★"], ["НАВІЩО", "?"]];
   function band(s, { x, y, w, h = 1.05, label, text, tone = "acc" }) {
     const solid = tone === "acc";
     const c = t(tone);
@@ -519,8 +522,92 @@ function createDeck({ lesson, week, fileTitle, notes: reader }) {
     const bodyColor = solid ? P.onink : P.ink;
     const labelColor = solid ? P.onink : (tone === "card" ? P.soft : TONE_ON_CARD[tone] || P.soft);
     s.addShape("roundRect", { x, y, w, h, rectRadius: 0.12, fill: { color: bg }, line: solid ? { type: "none" } : { color: tone === "card" ? P.line : (TONE_ON_CARD[tone] || P.line), width: 1 } });
-    if (label) s.addText(label.toUpperCase(), { x: x + 0.24, y: y + 0.14, w: w - 0.48, h: 0.24, fontFace: F.mono, fontSize: 9.5, bold: true, color: labelColor, charSpacing: 1.5, margin: 0 });
-    s.addText(text, { x: x + 0.24, y: y + (label ? 0.42 : 0.16), w: w - 0.48, h: h - (label ? 0.56 : 0.32), fontFace: F.body, fontSize: 13, color: bodyColor, valign: "middle", lineSpacingMultiple: 1.12, margin: 0 });
+    const up = label ? label.toUpperCase() : "";
+    const icon = BAND_ICONS.find(([k]) => up.startsWith(k));
+    const ix = icon ? 0.50 : 0; // зсув тексту праворуч під іконку
+    if (icon) {
+      const d = 0.34, iy = y + h / 2 - d / 2;
+      const circleFill = solid ? P.onink : (tone === "card" ? P.soft : TONE_ON_CARD[tone] || P.soft);
+      const glyphColor = solid ? P.accsolid : "FFFFFF";
+      s.addShape("ellipse", { x: x + 0.20, y: iy, w: d, h: d, fill: { color: circleFill }, line: { type: "none" } });
+      s.addText(icon[1], { x: x + 0.20, y: iy, w: d, h: d, align: "center", valign: "middle", fontFace: "Arial", fontSize: 12, bold: true, color: glyphColor, margin: 0 });
+    }
+    if (label) s.addText(label.toUpperCase(), { x: x + 0.24 + ix, y: y + 0.14, w: w - 0.48 - ix, h: 0.24, fontFace: F.mono, fontSize: 9.5, bold: true, color: labelColor, charSpacing: 1.5, margin: 0 });
+    s.addText(text, { x: x + 0.24 + ix, y: y + (label ? 0.42 : 0.16), w: w - 0.48 - ix, h: h - (label ? 0.56 : 0.32), fontFace: F.body, fontSize: 13, color: bodyColor, valign: "middle", lineSpacingMultiple: 1.12, margin: 0 });
+  }
+
+  // Мокап консолі: віконна рамка з трьома «кнопками», підпис-адреса і сітка
+  // KPI-плиток 3×2. values — шість пар [підпис, значення]; значення "—" малюється
+  // тьмяним (точка А), решта — світлим (жива консоль). Мінімум ~3.6 × 2.4.
+  function consoleMock(s, { x, y, w, h = 2.6, caption = "Консоль · localhost:4200", values }) {
+    const bar = 0.34, innerLine = "2A2438";
+    s.addShape("roundRect", { x, y, w, h, rectRadius: 0.08, fill: { color: P.codebg }, line: { color: P.line, width: 1 } });
+    [P.oncrit, P.onblue, P.ongood].forEach((c, i) =>
+      s.addShape("ellipse", { x: x + 0.14 + i * 0.16, y: y + bar / 2 - 0.04, w: 0.08, h: 0.08, fill: { color: c }, line: { type: "none" } }));
+    s.addText(caption, { x: x + 0.66, y, w: w - 0.78, h: bar, fontFace: F.mono, fontSize: 8, color: P.dim, valign: "middle", margin: 0 });
+    s.addShape("line", { x, y: y + bar, w, h: 0, line: { color: innerLine, width: 0.75 } });
+    const gx = 0.12, gy = 0.10, cols = 3, rows = 2;
+    const tw = (w - gx * (cols + 1)) / cols, th = (h - bar - gy * (rows + 1)) / rows;
+    values.forEach(([lab, val], i) => {
+      const cx = x + gx + (i % cols) * (tw + gx), cy = y + bar + gy + Math.floor(i / cols) * (th + gy);
+      s.addShape("roundRect", { x: cx, y: cy, w: tw, h: th, rectRadius: 0.05, fill: { color: P.codebg }, line: { color: innerLine, width: 1 } });
+      s.addText(lab, { x: cx + 0.08, y: cy + 0.04, w: tw - 0.16, h: th * 0.26, fontFace: F.mono, fontSize: 7.5, color: P.dim, valign: "top", margin: 0 });
+      const dash = val === "—";
+      s.addText(val, { x: cx + 0.08, y: cy + th * 0.34, w: tw - 0.16, h: th * 0.58, fontFace: F.mono, fontSize: dash ? 15 : 13, bold: !dash, color: dash ? P.dim : P.darktext, valign: "middle", margin: 0 });
+    });
+  }
+
+  // Віконце термінала/лога/перевірок: темна рамка з підписом і моноширинними
+  // рядками; колір рядка — семантика (good/crit/warn/acc/dim або hex).
+  const MOCK_COLORS = { good: P.ongood, crit: P.oncrit, warn: P.onblue, acc: P.onacc, dim: P.dim, text: P.darktext };
+  function windowMock(s, { x, y, w, h, caption = "термінал", lines, size = 9.5 }) {
+    const bar = 0.34, innerLine = "2A2438";
+    s.addShape("roundRect", { x, y, w, h, rectRadius: 0.08, fill: { color: P.codebg }, line: { color: P.line, width: 1 } });
+    [P.oncrit, P.onblue, P.ongood].forEach((c, i) =>
+      s.addShape("ellipse", { x: x + 0.14 + i * 0.16, y: y + bar / 2 - 0.04, w: 0.08, h: 0.08, fill: { color: c }, line: { type: "none" } }));
+    s.addText(caption, { x: x + 0.66, y, w: w - 0.78, h: bar, fontFace: F.mono, fontSize: 8, color: P.dim, valign: "middle", margin: 0 });
+    s.addShape("line", { x, y: y + bar, w, h: 0, line: { color: innerLine, width: 0.75 } });
+    const pitch = size * 0.0255;
+    lines.forEach((ln, i) => {
+      const it = typeof ln === "string" ? { t: ln } : ln;
+      const col = MOCK_COLORS[it.c || "text"] || it.c;
+      s.addText(it.t, { x: x + 0.18, y: y + bar + 0.12 + i * pitch, w: w - 0.36, h: pitch, fontFace: F.mono, fontSize: size, bold: !!it.b, color: col, valign: "middle", margin: 0 });
+    });
+  }
+  // Мокап чату: бабли користувача (праворуч, фіолетові) і бота (ліворуч, темні),
+  // під баблом бота — маленький технічний підпис (що спрацювало).
+  function chatMock(s, { x, y, w, h, caption = "Чат · localhost:4200", msgs, size = 9.5 }) {
+    const bar = 0.34, innerLine = "2A2438", bw = w * 0.78, cpl = Math.max(12, Math.floor((bw - 0.24) * 13.5 * 9.5 / size));
+    s.addShape("roundRect", { x, y, w, h, rectRadius: 0.08, fill: { color: P.codebg }, line: { color: P.line, width: 1 } });
+    [P.oncrit, P.onblue, P.ongood].forEach((c, i) =>
+      s.addShape("ellipse", { x: x + 0.14 + i * 0.16, y: y + bar / 2 - 0.04, w: 0.08, h: 0.08, fill: { color: c }, line: { type: "none" } }));
+    s.addText(caption, { x: x + 0.66, y, w: w - 0.78, h: bar, fontFace: F.mono, fontSize: 8, color: P.dim, valign: "middle", margin: 0 });
+    s.addShape("line", { x, y: y + bar, w, h: 0, line: { color: innerLine, width: 0.75 } });
+    let cy = y + bar + 0.14;
+    msgs.forEach(m => {
+      const lines = Math.max(1, Math.ceil(m.text.length / cpl)), bh = 0.14 + lines * (size * 0.0205);
+      const user = m.who === "user", bx = user ? x + w - 0.12 - bw : x + 0.12;
+      s.addShape("roundRect", { x: bx, y: cy, w: bw, h: bh, rectRadius: 0.1, fill: { color: user ? P.accsolid : "1E1A2B" }, line: { type: "none" } });
+      s.addText(m.text, { x: bx + 0.12, y: cy, w: bw - 0.24, h: bh, fontFace: F.body, fontSize: size, color: user ? "FFFFFF" : P.darktext, valign: "middle", margin: 0 });
+      cy += bh + 0.05;
+      if (m.badge) {
+        s.addText(m.badge, { x: bx + 0.04, y: cy, w: bw, h: 0.2, fontFace: F.mono, fontSize: 7.5, color: MOCK_COLORS[m.tone || "dim"], valign: "middle", margin: 0 });
+        cy += 0.22;
+      }
+      cy += 0.06;
+    });
+  }
+  // Нумеровані рядки замість сітки плиток: коли праворуч стоїть мокап.
+  function rows(s, { x, y, w, items, rowH = 0.5, gap = 0.1, size = 13 }) {
+    items.forEach((it, i) => {
+      const yy = y + i * (rowH + gap), crit = it.tone === "crit", warn = it.tone === "warn";
+      const bg = crit ? P.crit : warn ? P.blue : P.accsolid;
+      s.addShape("ellipse", { x, y: yy + (rowH - 0.42) / 2, w: 0.42, h: 0.42, fill: { color: bg }, line: { type: "none" } });
+      s.addText(String(it.n !== undefined ? it.n : i + 1), { x, y: yy + (rowH - 0.42) / 2, w: 0.42, h: 0.42, align: "center", valign: "middle", fontFace: F.mono, fontSize: 12, bold: true, color: "FFFFFF", margin: 0 });
+      s.addText([{ text: it.title + "  ", options: { bold: true, fontSize: size, color: crit ? P.crit : P.ink } },
+                 { text: it.body || "", options: { fontSize: size - 2, color: P.soft } }],
+        { x: x + 0.6, y: yy, w: w - 0.6, h: rowH, fontFace: F.body, valign: "middle", margin: 0 });
+    });
   }
 
   function terms(s, { x, y, w, items, cols = 3, rowH = 1.15 }) {
@@ -626,7 +713,7 @@ function createDeck({ lesson, week, fileTitle, notes: reader }) {
 
   function save(deckPath, scriptPath) {
     assertNotesAligned();
-    const md = [`# Сценарій начитки · Урок ${lesson} · ${fileTitle}`, "",
+    const md = [`# Сценарій начитки · Тема ${lesson} · ${fileTitle}`, "",
       `Слайдів: ${script.length}. Начитка: ${script.reduce((a, s) => a + (s.notes || "").split(/\s+/).filter(Boolean).length, 0)} слів.`,
       "", "---", ""];
     script.forEach(sl => {
@@ -638,7 +725,7 @@ function createDeck({ lesson, week, fileTitle, notes: reader }) {
   }
 
   return { pres, P, F, W, H, MX, TONE, titleSlide, slide, divider, authorSlide, thanksSlide, closingSlide,
-           stat, tile, arrow, flow, bars, states, layers, timeline, band, code, table, checklist, terms,
+           stat, tile, arrow, flow, bars, states, layers, timeline, band, code, table, checklist, terms, consoleMock, windowMock, chatMock, rows,
            tick, cross, save };
 }
 
