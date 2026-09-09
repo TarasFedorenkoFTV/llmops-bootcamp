@@ -239,35 +239,6 @@
 
   .tail { height: 60vh; }
 
-  /* ------------------------------------------------------ відлік */
-  #lead {
-    position: absolute;
-    inset: 0;
-    z-index: 6;
-    display: none;
-    place-items: center;
-    background: rgba(20,23,28,.94);
-  }
-  #lead.on { display: grid; }
-  #lead div {
-    text-align: center;
-    font-family: var(--mono);
-  }
-  #lead b {
-    display: block;
-    font-size: 96px;
-    font-weight: 400;
-    color: var(--amber);
-    font-variant-numeric: tabular-nums;
-  }
-  #lead span {
-    font-family: var(--cond);
-    font-size: 13px;
-    letter-spacing: .16em;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
-
   /* --------------------------------------------------------- підвал */
   .foot {
     display: flex;
@@ -507,7 +478,6 @@
   <div id="reel"></div>
   <div class="fade bot"></div>
 
-  <div id="lead"><div><b>3</b><span>тиша перед словом</span></div></div>
 
   <div id="paste">
     <h2>Завантажити начитку</h2>
@@ -561,7 +531,6 @@
   const sizeIn = document.getElementById("size");
   const pastePane = document.getElementById("paste");
   const srcArea = document.getElementById("src");
-  const lead = document.getElementById("lead");
 
   let slides = [];        // [{el, num, title, words}]
   let spokenPxPerWord = 0;
@@ -572,7 +541,6 @@
   let lastFrame = 0;
   let lastSave = 0;
   let mirrored = false;
-  let counting = false;   // триває відлік 3-2-1
 
   function store(patch) {
     try {
@@ -756,27 +724,10 @@
     if (running) requestAnimationFrame(frame);
   }
 
-  // 3 секунди тиші перед словом — щоб на монтажі було що різати
-  function startWithLead() {
-    if (counting) return;
-    if (running) { toggle(false); return; }
-    counting = true;
-    let n = 3;
-    const b = lead.querySelector("b");
-    b.textContent = n;
-    lead.classList.add("on");
-    const tick = setInterval(() => {
-      n -= 1;
-      if (n <= 0) {
-        clearInterval(tick);
-        lead.classList.remove("on");
-        counting = false;
-        toggle(true);
-      } else {
-        b.textContent = n;
-      }
-    }, 1000);
+  function togglePlay() {
+    toggle();
   }
+
 
   function load(text, name) {
     reel.innerHTML = build(text);
@@ -805,7 +756,7 @@
   }
 
   // ------------------------------------------------------------ події
-  goBtn.addEventListener("click", startWithLead);
+  goBtn.addEventListener("click", togglePlay);
 
   const gear = document.getElementById("gear");
   gear.addEventListener("click", () => {
@@ -851,7 +802,7 @@
     if (!drag) return;
     const tap = drag.moved <= 8 && Date.now() - drag.at < 400;
     drag = null;
-    if (tap) startWithLead();
+    if (tap) togglePlay();
     else store({ offset: offset });
   });
   stage.addEventListener("pointercancel", () => { drag = null; });
@@ -899,7 +850,7 @@
     }
     if (e.target.matches("input, textarea")) return;
     switch (e.key) {
-      case " ": e.preventDefault(); startWithLead(); break;
+      case " ": e.preventDefault(); togglePlay(); break;
       case "ArrowUp": e.preventDefault(); wpmIn.value = Math.min(230, +wpmIn.value + 5); wpmIn.dispatchEvent(new Event("input")); break;
       case "ArrowDown": e.preventDefault(); wpmIn.value = Math.max(90, +wpmIn.value - 5); wpmIn.dispatchEvent(new Event("input")); break;
       case "ArrowRight": e.preventDefault(); gotoSlide(1); break;
