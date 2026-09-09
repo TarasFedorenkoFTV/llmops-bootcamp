@@ -121,7 +121,9 @@
   label.file input { display: none; }
 
   /* ---------------------------------------------------------- сцена */
-  .stage { position: relative; overflow: hidden; flex: 1; min-height: 0; }
+  /* touch-action: none — щоб вертикальне перетягування скрабило текст,
+     а не намагалось прокрутити сторінку */
+  .stage { position: relative; overflow: hidden; flex: 1; min-height: 0; touch-action: none; }
   .slate, .foot, .warn-strip { flex: none; }
 
   .rail {
@@ -384,6 +386,8 @@
 
   /* --------------------------------------------- телефон і планшет */
   .navbtn { display: none; font-size: 15px; padding: 9px 15px; }
+  .tool { font-size: 13px; padding: 8px 12px; }
+  #restart { font-size: 16px; line-height: 1; }
 
   /* на дотикових екранах клавіатури немає — потрібні кнопки */
   @media (pointer: coarse), (max-width: 760px) {
@@ -480,12 +484,15 @@
 
 <div class="foot">
   <span class="now" id="now">Текст не завантажено</span>
+  <button class="tool" id="back10" aria-label="Назад на 10 секунд">−10с</button>
   <button class="navbtn" id="prev" aria-label="Попередній слайд">◀</button>
   <button class="navbtn" id="next" aria-label="Наступний слайд">▶</button>
+  <button class="tool" id="restart" aria-label="Почати спочатку">⟲</button>
   <div class="keys">
     <span><kbd>Space</kbd> пуск / пауза</span>
     <span><kbd>↑</kbd><kbd>↓</kbd> темп</span>
     <span><kbd>←</kbd><kbd>→</kbd> слайд</span>
+    <span><kbd>Backspace</kbd> −10 с</span>
     <span><kbd>Home</kbd> на початок</span>
     <span><kbd>M</kbd> дзеркало</span>
     <span><kbd>F</kbd> екран</span>
@@ -748,12 +755,45 @@
   document.getElementById("prev").addEventListener("click", () => gotoSlide(-1));
   document.getElementById("next").addEventListener("click", () => gotoSlide(1));
 
-  // На телефоні клавіатури немає: тап по тексту = пуск / пауза
-  stage.addEventListener("click", (e) => {
+  // Відмотати на N секунд мовлення — рахуємо в тих самих пікселях на слово
+  function nudge(seconds) {
+    offset = Math.max(0, offset - spokenPxPerWord * (+wpmIn.value / 60) * seconds);
+    elapsed = Math.max(0, elapsed - seconds);
+    render();
+    store({ offset: offset });
+  }
+  document.getElementById("back10").addEventListener("click", () => nudge(10));
+  document.getElementById("restart").addEventListener("click", () => {
+    offset = 0; elapsed = 0; toggle(false); render(); store({ offset: 0 });
+  });
+
+  // Дотик: коротке торкання — пуск/пауза, перетягування — скраб по тексту.
+  // Клавіатури на телефоні немає, тож це єдиний спосіб відмотати точно.
+  let drag = null;
+  stage.addEventListener("pointerdown", (e) => {
     if (pastePane.classList.contains("on")) return;
     if (e.target.closest("button, a, input, select, textarea, label")) return;
-    startWithLead();
+    drag = { y: e.clientY, from: offset, at: Date.now(), moved: 0 };
+    try { stage.setPointerCapture(e.pointerId); } catch (err) { /* дарма */ }
   });
+  stage.addEventListener("pointermove", (e) => {
+    if (!drag) return;
+    const dy = e.clientY - drag.y;
+    drag.moved = Math.max(drag.moved, Math.abs(dy));
+    if (drag.moved > 8) {
+      if (running) toggle(false);
+      offset = Math.max(0, drag.from - dy);   // палець угору → текст іде далі
+      render();
+    }
+  });
+  stage.addEventListener("pointerup", () => {
+    if (!drag) return;
+    const tap = drag.moved <= 8 && Date.now() - drag.at < 400;
+    drag = null;
+    if (tap) startWithLead();
+    else store({ offset: offset });
+  });
+  stage.addEventListener("pointercancel", () => { drag = null; });
 
   wpmIn.addEventListener("input", () => {
     document.getElementById("wpm-out").textContent = wpmIn.value;
@@ -803,6 +843,7 @@
       case "ArrowDown": e.preventDefault(); wpmIn.value = Math.max(90, +wpmIn.value - 5); wpmIn.dispatchEvent(new Event("input")); break;
       case "ArrowRight": e.preventDefault(); gotoSlide(1); break;
       case "ArrowLeft": e.preventDefault(); gotoSlide(-1); break;
+      case "Backspace": e.preventDefault(); nudge(10); break;
       case "Home": e.preventDefault(); offset = 0; elapsed = 0; toggle(false); render(); break;
       case "m": case "M": case "ь": mirrored = !mirrored; document.body.classList.toggle("mirrored", mirrored); render(); break;
       case "f": case "F": case "а": document.getElementById("btn-full").click(); break;
