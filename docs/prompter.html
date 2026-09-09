@@ -1,3 +1,5 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Суфлер начитки LLMOps</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
@@ -497,6 +499,7 @@
   "use strict";
 
   const KEY = "llmops-prompter-v1";
+  const SIZE_KEY = window.innerWidth < 760 ? "sizeM" : "size";
   const BUDGET_MIN = 40; // регламент: одне відео не довше 40 хв
 
   const reel = document.getElementById("reel");
@@ -761,7 +764,7 @@
     document.getElementById("size-out").textContent = sizeIn.value;
     reel.style.fontSize = sizeIn.value + "px";
     requestAnimationFrame(() => { measure(); render(); });
-    store({ size: sizeIn.value });
+    store(SIZE_KEY === "sizeM" ? { sizeM: sizeIn.value } : { size: sizeIn.value });
   });
 
   document.getElementById("btn-paste").addEventListener("click", () => {
@@ -863,7 +866,11 @@
   // --------------------------------------------------------- старт
   const saved = restore();
   if (saved.wpm) { wpmIn.value = saved.wpm; document.getElementById("wpm-out").textContent = saved.wpm; }
-  if (saved.size) { sizeIn.value = saved.size; document.getElementById("size-out").textContent = saved.size; }
+  // Кегль запам'ятовується окремо для вузького екрана: 42 px, розумні на
+  // моніторі, на телефоні дають дев'ять символів у рядок.
+  const savedSize = SIZE_KEY === "sizeM" ? (saved.sizeM || 28) : (saved.size || 42);
+  sizeIn.value = savedSize;
+  document.getElementById("size-out").textContent = savedSize;
   reel.style.fontSize = sizeIn.value + "px";
 
   if (saved.segment) {
