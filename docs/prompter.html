@@ -384,6 +384,37 @@
     button, label.file { transition: none; }
   }
 
+  /* ------------------------------------ згортання панелі під читання */
+
+  /* Поки суфлер їде, весь екран належить тексту: слейт і підвал ідуть
+     геть, цифри лишаються в маленькому HUD. Пауза — і панелі назад. */
+  #hud {
+    position: absolute;
+    top: 10px; right: 14px;
+    z-index: 4;
+    display: none;
+    gap: 10px;
+    align-items: baseline;
+    font-family: var(--mono);
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+    background: rgba(20, 23, 28, .72);
+    border: 1px solid var(--edge);
+    border-radius: 3px;
+    padding: 4px 9px;
+    pointer-events: none;
+  }
+  body.running #hud { display: flex; }
+  body.running .slate, body.running .foot { display: none; }
+  #hud b { color: var(--speech); font-weight: 500; }
+  #hud s { text-decoration: none; color: var(--ok); }
+  #hud s.warn { color: var(--amber); }
+  #hud s.over { color: var(--over); }
+  #hud i { font-style: normal; color: var(--muted); }
+
+  .setup { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  #gear { display: none; font-size: 15px; line-height: 1; padding: 7px 11px; }
+
   /* --------------------------------------------- телефон і планшет */
   .navbtn { display: none; font-size: 15px; padding: 9px 15px; }
   .tool { font-size: 13px; padding: 8px 12px; }
@@ -395,19 +426,28 @@
     .foot .keys { display: none; }
   }
 
+  /* Вузький або низький екран: у слейті лишаються тільки цифри, «Пуск» і
+     ⚙; усе інше — налаштування, а не робота, тож ховається під шестерню.
+     Горизонтальний телефон — це саме «низький екран». */
+  @media (max-width: 760px), (max-height: 520px) {
+    .warn-strip { display: none; }          /* порада про Display Capture — для монітора */
+    .brand { display: none; }
+    #gear { display: inline-block; }
+    .setup { display: none; }
+    body.setup-open .setup { display: flex; width: 100%; }
+    .slate { gap: 9px; padding: 7px 10px; }
+    .readout { flex: 1; justify-content: space-between; gap: 8px; }
+    .stat u { font-size: 8.5px; letter-spacing: .1em; }
+    .stat b { font-size: 15px; }
+    .knob input[type=range] { width: 76px; }
+    button, label.file, #lesson { padding: 8px 11px; }
+    .foot { gap: 8px; padding: 7px 10px; }
+    #hud { top: 8px; right: 10px; font-size: 12px; }
+  }
+
   @media (max-width: 760px) {
-    .warn-strip { font-size: 11.5px; padding: 6px 10px; }
-    .slate { gap: 9px; padding: 8px 10px; }
-    .brand { width: 100%; margin-right: 0; }
-    .brand b { font-size: 13px; }
     .pick { width: 100%; }
     #lesson { flex: 1; max-width: none; }
-    .seg button { padding: 8px 10px; }
-    .readout { width: 100%; justify-content: space-between; gap: 8px; }
-    .stat b { font-size: 15px; }
-    .knob input[type=range] { width: 64px; }
-    button, label.file { padding: 8px 11px; }
-    .foot { gap: 8px; }
   }
 </style>
 
@@ -423,15 +463,6 @@
     <span id="docmeta">—</span>
   </div>
 
-  <div class="pick">
-    <select id="lesson" title="Урок"></select>
-    <div class="seg" role="group" aria-label="Частина уроку">
-      <button data-seg="all" aria-pressed="true">Усе</button>
-      <button data-seg="theory" aria-pressed="false">Теорія</button>
-      <button data-seg="practice" aria-pressed="false">Практика</button>
-    </div>
-  </div>
-
   <div class="readout">
     <div class="stat"><u>записано</u><b id="t-elapsed">0:00</b></div>
     <div class="stat"><u>лишилось</u><b id="t-left">—</b></div>
@@ -439,26 +470,40 @@
     <div class="stat"><u>слайд</u><b id="t-slide">—</b></div>
   </div>
 
-  <div class="knob">
-    темп
-    <input type="range" id="wpm" min="90" max="230" step="5" value="165">
-    <output id="wpm-out">165</output>
-  </div>
-  <div class="knob">
-    кегль
-    <input type="range" id="size" min="26" max="72" step="2" value="42">
-    <output id="size-out">42</output>
-  </div>
-
   <button class="go" id="go">Пуск</button>
-  <button id="btn-paste">Текст</button>
-  <label class="file">Файл<input type="file" id="file" accept=".md,.txt,text/markdown,text/plain"></label>
-  <button id="btn-full">Екран</button>
+  <button id="gear" aria-label="Налаштування" aria-expanded="false">⚙</button>
+
+  <div class="setup">
+    <div class="pick">
+      <select id="lesson" title="Урок"></select>
+      <div class="seg" role="group" aria-label="Частина уроку">
+        <button data-seg="all" aria-pressed="true">Усе</button>
+        <button data-seg="theory" aria-pressed="false">Теорія</button>
+        <button data-seg="practice" aria-pressed="false">Практика</button>
+      </div>
+    </div>
+
+    <div class="knob">
+      темп
+      <input type="range" id="wpm" min="90" max="230" step="5" value="165">
+      <output id="wpm-out">165</output>
+    </div>
+    <div class="knob">
+      кегль
+      <input type="range" id="size" min="26" max="72" step="2" value="42">
+      <output id="size-out">42</output>
+    </div>
+
+    <button id="btn-paste">Текст</button>
+    <label class="file">Файл<input type="file" id="file" accept=".md,.txt,text/markdown,text/plain"></label>
+    <button id="btn-full">Екран</button>
+  </div>
 </div>
 
 <div class="stage" id="stage">
   <div class="fade top"></div>
   <div class="rail"><i></i><i></i></div>
+  <div id="hud"><b id="h-elapsed">0:00</b><s id="h-total">—</s><i id="h-slide">—</i></div>
   <div id="reel"></div>
   <div class="fade bot"></div>
 
@@ -654,6 +699,13 @@
 
     const max = Math.max(1, reel.scrollHeight - stage.clientHeight * 0.6);
     document.getElementById("bar").style.width = Math.min(100, (offset / max) * 100) + "%";
+
+    // HUD дублює ті самі цифри, поки слейт і підвал приховані
+    document.getElementById("h-elapsed").textContent = mmss(elapsed);
+    const h = document.getElementById("h-total");
+    h.textContent = totalEl.textContent;
+    h.className = totalEl.className;
+    document.getElementById("h-slide").textContent = document.getElementById("t-slide").textContent;
   }
 
   function frame(ts) {
@@ -698,6 +750,8 @@
     lastFrame = 0;
     goBtn.textContent = running ? "Пауза" : "Пуск";
     goBtn.dataset.running = running ? "1" : "0";
+    document.body.classList.toggle("running", running);
+    if (running) document.body.classList.remove("setup-open");
     keepAwake(running);
     if (running) requestAnimationFrame(frame);
   }
@@ -752,6 +806,13 @@
 
   // ------------------------------------------------------------ події
   goBtn.addEventListener("click", startWithLead);
+
+  const gear = document.getElementById("gear");
+  gear.addEventListener("click", () => {
+    const open = document.body.classList.toggle("setup-open");
+    gear.setAttribute("aria-expanded", String(open));
+    requestAnimationFrame(() => { measure(); render(); });
+  });
   document.getElementById("prev").addEventListener("click", () => gotoSlide(-1));
   document.getElementById("next").addEventListener("click", () => gotoSlide(1));
 
