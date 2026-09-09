@@ -379,6 +379,30 @@
   @media (prefers-reduced-motion: reduce) {
     button, label.file { transition: none; }
   }
+
+  /* --------------------------------------------- телефон і планшет */
+  .navbtn { display: none; font-size: 15px; padding: 9px 15px; }
+
+  /* на дотикових екранах клавіатури немає — потрібні кнопки */
+  @media (pointer: coarse), (max-width: 760px) {
+    .navbtn { display: inline-block; }
+    .foot .keys { display: none; }
+  }
+
+  @media (max-width: 760px) {
+    .warn-strip { font-size: 11.5px; padding: 6px 10px; }
+    .slate { gap: 9px; padding: 8px 10px; }
+    .brand { width: 100%; margin-right: 0; }
+    .brand b { font-size: 13px; }
+    .pick { width: 100%; }
+    #lesson { flex: 1; max-width: none; }
+    .seg button { padding: 8px 10px; }
+    .readout { width: 100%; justify-content: space-between; gap: 8px; }
+    .stat b { font-size: 15px; }
+    .knob input[type=range] { width: 64px; }
+    button, label.file { padding: 8px 11px; }
+    .foot { gap: 8px; }
+  }
 </style>
 
 <div class="warn-strip" id="strip">
@@ -454,6 +478,8 @@
 
 <div class="foot">
   <span class="now" id="now">Текст не завантажено</span>
+  <button class="navbtn" id="prev" aria-label="Попередній слайд">◀</button>
+  <button class="navbtn" id="next" aria-label="Наступний слайд">▶</button>
   <div class="keys">
     <span><kbd>Space</kbd> пуск / пауза</span>
     <span><kbd>↑</kbd><kbd>↓</kbd> темп</span>
@@ -491,6 +517,7 @@
   let lastFrame = 0;
   let lastSave = 0;
   let mirrored = false;
+  let counting = false;   // триває відлік 3-2-1
 
   function store(patch) {
     try {
@@ -634,17 +661,42 @@
     requestAnimationFrame(frame);
   }
 
+  // Екран телефона гасне посеред дубля — тримаємо його, поки суфлер їде.
+  // Wake Lock є в Chrome/Android і Safari 16.4+; де немає — тихо мимо.
+  let wake = null;
+  function keepAwake(on) {
+    try {
+      if (on) {
+        if (!wake && "wakeLock" in navigator) {
+          navigator.wakeLock.request("screen")
+            .then((w) => { wake = w; w.addEventListener("release", () => { wake = null; }); })
+            .catch(() => { wake = null; });
+        }
+      } else if (wake) {
+        wake.release().catch(() => {});
+        wake = null;
+      }
+    } catch (e) { wake = null; }
+  }
+  // блокування знімається, коли сторінку згорнули — повертаємо його
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden && running) keepAwake(true);
+  });
+
   function toggle(on) {
     running = on === undefined ? !running : on;
     lastFrame = 0;
     goBtn.textContent = running ? "Пауза" : "Пуск";
     goBtn.dataset.running = running ? "1" : "0";
+    keepAwake(running);
     if (running) requestAnimationFrame(frame);
   }
 
   // 3 секунди тиші перед словом — щоб на монтажі було що різати
   function startWithLead() {
+    if (counting) return;
     if (running) { toggle(false); return; }
+    counting = true;
     let n = 3;
     const b = lead.querySelector("b");
     b.textContent = n;
@@ -654,6 +706,7 @@
       if (n <= 0) {
         clearInterval(tick);
         lead.classList.remove("on");
+        counting = false;
         toggle(true);
       } else {
         b.textContent = n;
@@ -689,6 +742,15 @@
 
   // ------------------------------------------------------------ події
   goBtn.addEventListener("click", startWithLead);
+  document.getElementById("prev").addEventListener("click", () => gotoSlide(-1));
+  document.getElementById("next").addEventListener("click", () => gotoSlide(1));
+
+  // На телефоні клавіатури немає: тап по тексту = пуск / пауза
+  stage.addEventListener("click", (e) => {
+    if (pastePane.classList.contains("on")) return;
+    if (e.target.closest("button, a, input, select, textarea, label")) return;
+    startWithLead();
+  });
 
   wpmIn.addEventListener("input", () => {
     document.getElementById("wpm-out").textContent = wpmIn.value;
