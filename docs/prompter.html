@@ -1,0 +1,762 @@
+<title>Суфлер начитки LLMOps</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    --ground: #14171c;
+    --surface: #1d222a;
+    --edge: #2b323c;
+    --speech: #eae4d8;
+    --amber: #f0a848;
+    --note: #7b93ab;
+    --note-bg: #1a2530;
+    --muted: #6b7380;
+    --over: #d9614a;
+    --ok: #66b894;
+    --sans: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+    --cond: "IBM Plex Sans Condensed", "IBM Plex Sans", system-ui, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--speech);
+    font-family: var(--sans);
+    height: 100vh;
+    overflow: hidden;
+    /* flex, не grid: смужку-попередження можна закрити, і рядки не поїдуть */
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ---------------------------------------------------------- слейт */
+  .slate {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    padding: 10px 18px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--edge);
+    font-family: var(--cond);
+  }
+
+  .brand {
+    display: flex;
+    align-items: baseline;
+    gap: 9px;
+    margin-right: auto;
+  }
+  .brand b {
+    font-weight: 600;
+    font-size: 15px;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+  }
+  .brand span {
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: .02em;
+  }
+
+  .readout { display: flex; align-items: center; gap: 18px; }
+
+  .stat { display: flex; flex-direction: column; gap: 1px; }
+  .stat u {
+    font-size: 9.5px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+  }
+  .stat b {
+    font-family: var(--mono);
+    font-size: 17px;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.1;
+  }
+  .stat b.warn { color: var(--amber); }
+  .stat b.over { color: var(--over); }
+  .stat b.ok { color: var(--ok); }
+
+  .knob {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: .02em;
+  }
+  .knob input[type=range] { width: 88px; accent-color: var(--amber); }
+  .knob output {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--speech);
+    font-variant-numeric: tabular-nums;
+    min-width: 3.4em;
+  }
+
+  button, label.file {
+    font-family: var(--cond);
+    font-size: 12.5px;
+    font-weight: 500;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    color: var(--speech);
+    background: transparent;
+    border: 1px solid var(--edge);
+    border-radius: 3px;
+    padding: 6px 11px;
+    cursor: pointer;
+  }
+  button:hover, label.file:hover { border-color: var(--muted); }
+  button.go { border-color: var(--amber); color: var(--amber); }
+  button.go[data-running="1"] { background: var(--amber); color: var(--ground); }
+  :focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+  label.file input { display: none; }
+
+  /* ---------------------------------------------------------- сцена */
+  .stage { position: relative; overflow: hidden; flex: 1; min-height: 0; }
+  .slate, .foot, .warn-strip { flex: none; }
+
+  .rail {
+    position: absolute;
+    left: 0; right: 0;
+    top: 38%;
+    display: flex;
+    justify-content: space-between;
+    pointer-events: none;
+    z-index: 3;
+  }
+  .rail i {
+    display: block;
+    width: 34px;
+    height: 2px;
+    background: var(--amber);
+    opacity: .85;
+  }
+  .rail i::after {
+    content: "";
+    display: block;
+    width: 100%;
+    height: 26px;
+    background: linear-gradient(to bottom, rgba(240,168,72,.16), transparent);
+  }
+
+  .fade {
+    position: absolute;
+    left: 0; right: 0;
+    height: 90px;
+    pointer-events: none;
+    z-index: 2;
+  }
+  .fade.top { top: 0; background: linear-gradient(var(--ground), transparent); }
+  .fade.bot { bottom: 0; background: linear-gradient(transparent, var(--ground)); }
+
+  #reel {
+    position: absolute;
+    left: 0; right: 0;
+    top: 0;
+    padding: 0 max(24px, calc((100% - 30ch) / 2));
+    will-change: transform;
+  }
+  body.mirrored #reel { transform-origin: center; }
+
+  #reel h1 {
+    font-family: var(--cond);
+    font-size: .58em;
+    font-weight: 600;
+    color: var(--amber);
+    letter-spacing: .01em;
+    text-wrap: balance;
+    margin: 0 0 .6em;
+  }
+
+  .slide-tag {
+    font-family: var(--cond);
+    font-size: .34em;
+    font-weight: 600;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-top: 1px solid var(--edge);
+    padding-top: .5em;
+    margin: 1.3em 0 .45em;
+    display: flex;
+    gap: .7em;
+    align-items: baseline;
+  }
+  .slide-tag em {
+    font-style: normal;
+    color: var(--amber);
+    font-family: var(--mono);
+    letter-spacing: 0;
+  }
+  .slide-tag s {
+    text-decoration: none;
+    margin-left: auto;
+    font-family: var(--mono);
+    letter-spacing: 0;
+    color: var(--muted);
+    opacity: .8;
+  }
+
+  .say {
+    margin: 0 0 .85em;
+    line-height: 1.45;
+    font-weight: 400;
+    text-wrap: pretty;
+  }
+
+  .note {
+    display: block;
+    margin: 0 0 .9em;
+    padding: .5em .7em .55em;
+    background: var(--note-bg);
+    border-left: 3px solid var(--note);
+    border-radius: 0 3px 3px 0;
+    color: var(--note);
+    font-size: .46em;
+    line-height: 1.4;
+  }
+  .note u {
+    display: block;
+    font-family: var(--cond);
+    font-size: .62em;
+    letter-spacing: .13em;
+    text-transform: uppercase;
+    text-decoration: none;
+    opacity: .75;
+    margin-bottom: .25em;
+  }
+
+  .tail { height: 60vh; }
+
+  /* ------------------------------------------------------ відлік */
+  #lead {
+    position: absolute;
+    inset: 0;
+    z-index: 6;
+    display: none;
+    place-items: center;
+    background: rgba(20,23,28,.94);
+  }
+  #lead.on { display: grid; }
+  #lead div {
+    text-align: center;
+    font-family: var(--mono);
+  }
+  #lead b {
+    display: block;
+    font-size: 96px;
+    font-weight: 400;
+    color: var(--amber);
+    font-variant-numeric: tabular-nums;
+  }
+  #lead span {
+    font-family: var(--cond);
+    font-size: 13px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* --------------------------------------------------------- підвал */
+  .foot {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 9px 18px;
+    background: var(--surface);
+    border-top: 1px solid var(--edge);
+    font-family: var(--cond);
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+  .foot .now {
+    color: var(--speech);
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .foot .keys { margin-left: auto; display: flex; gap: 13px; white-space: nowrap; }
+  .foot kbd {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--speech);
+    background: var(--ground);
+    border: 1px solid var(--edge);
+    border-radius: 3px;
+    padding: 1px 5px;
+  }
+  .bar {
+    position: absolute;
+    left: 0; bottom: 0;
+    height: 2px;
+    background: var(--amber);
+    width: 0;
+  }
+  .foot { position: relative; }
+
+  .warn-strip {
+    padding: 7px 18px;
+    background: #241d16;
+    border-bottom: 1px solid #3a2c1c;
+    color: var(--amber);
+    font-family: var(--cond);
+    font-size: 12px;
+    letter-spacing: .02em;
+  }
+  .warn-strip b { font-weight: 600; }
+  .warn-strip button { border: 0; padding: 0 0 0 10px; color: var(--muted); font-size: 11px; }
+
+  /* ------------------------------------------------------- вставка */
+  #paste {
+    position: absolute;
+    inset: 0;
+    z-index: 7;
+    display: none;
+    background: var(--ground);
+    padding: 26px max(24px, 8%);
+    overflow: auto;
+  }
+  #paste.on { display: block; }
+  #paste h2 {
+    font-family: var(--cond);
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin: 0 0 6px;
+  }
+  #paste p { font-size: 13.5px; color: var(--muted); margin: 0 0 14px; line-height: 1.55; max-width: 62ch; }
+  #paste code { font-family: var(--mono); color: var(--speech); font-size: 12.5px; }
+  #paste textarea {
+    width: 100%;
+    height: 46vh;
+    background: var(--surface);
+    color: var(--speech);
+    border: 1px solid var(--edge);
+    border-radius: 4px;
+    padding: 12px 14px;
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.6;
+    resize: vertical;
+  }
+  #paste .row { display: flex; gap: 10px; margin-top: 14px; align-items: center; flex-wrap: wrap; }
+
+  @media (prefers-reduced-motion: reduce) {
+    button, label.file { transition: none; }
+  }
+</style>
+
+<div class="warn-strip" id="strip">
+  <b>Суфлер тримай на екрані ноутбука.</b>
+  Display Capture у OBS знімає монітор <code>Odyssey G40B</code> цілком — усе, що лежить на ньому, потрапить у запис.
+  <button onclick="document.getElementById('strip').remove()">приховати</button>
+</div>
+
+<div class="slate">
+  <div class="brand">
+    <b id="docname">Начитка</b>
+    <span id="docmeta">—</span>
+  </div>
+
+  <div class="readout">
+    <div class="stat"><u>записано</u><b id="t-elapsed">0:00</b></div>
+    <div class="stat"><u>лишилось</u><b id="t-left">—</b></div>
+    <div class="stat"><u>прогноз / 40 хв</u><b id="t-total">—</b></div>
+    <div class="stat"><u>слайд</u><b id="t-slide">—</b></div>
+  </div>
+
+  <div class="knob">
+    темп
+    <input type="range" id="wpm" min="90" max="230" step="5" value="165">
+    <output id="wpm-out">165</output>
+  </div>
+  <div class="knob">
+    кегль
+    <input type="range" id="size" min="26" max="72" step="2" value="42">
+    <output id="size-out">42</output>
+  </div>
+
+  <button class="go" id="go">Пуск</button>
+  <button id="btn-paste">Текст</button>
+  <label class="file">Файл<input type="file" id="file" accept=".md,.txt,text/markdown,text/plain"></label>
+  <button id="btn-full">Екран</button>
+</div>
+
+<div class="stage" id="stage">
+  <div class="fade top"></div>
+  <div class="rail"><i></i><i></i></div>
+  <div id="reel"></div>
+  <div class="fade bot"></div>
+
+  <div id="lead"><div><b>3</b><span>тиша перед словом</span></div></div>
+
+  <div id="paste">
+    <h2>Завантажити начитку</h2>
+    <p>
+      Кнопка <code>Файл</code> відкриває <code>docs/decks/LNN-script.md</code> напряму з диска — нічого нікуди не
+      надсилається, файл читається у браузері. Або вставте текст нижче. Суфлер розпізнає заголовки
+      <code>## Слайд N · Назва</code> як точки переходу, а блоки <code>[Ведучому: …]</code> показує окремо
+      й не рахує в хронометраж, бо вголос вони не читаються.
+    </p>
+    <textarea id="src" spellcheck="false"></textarea>
+    <div class="row">
+      <button id="btn-load">Завантажити</button>
+      <button id="btn-cancel">Скасувати</button>
+      <span style="font-size:12px;color:var(--muted)">Останній текст і позиція зберігаються у цьому браузері.</span>
+    </div>
+  </div>
+</div>
+
+<div class="foot">
+  <span class="now" id="now">Текст не завантажено</span>
+  <div class="keys">
+    <span><kbd>Space</kbd> пуск / пауза</span>
+    <span><kbd>↑</kbd><kbd>↓</kbd> темп</span>
+    <span><kbd>←</kbd><kbd>→</kbd> слайд</span>
+    <span><kbd>Home</kbd> на початок</span>
+    <span><kbd>M</kbd> дзеркало</span>
+    <span><kbd>F</kbd> екран</span>
+  </div>
+  <div class="bar" id="bar"></div>
+</div>
+
+<script type="text/plain" id="sample">
+# Сценарій начитки · Урок 1 · LLMOps і архітектура production LLM-системи
+
+Слайдів: 31. Начитка: 4004 слів.
+
+## Слайд 1 · LLMOps і архітектура production LLM-системи
+
+Вітаю на першому уроці курсу. Викликати модель — три рядки коду, і саме тому LLM-прототипи народжуються за день. Але між «API відповів 200» і системою, якою можна керувати, лежить весь цей курс. Сьогодні розберемо сам об'єкт керування: що фізично летить у модель і повертається назад, у чому міряється рахунок, чому та сама модель відповідає щоразу інакше і якими способами виклик ламається. Потім піднімемо каркас капстоуна однією командою — і чесно зламаємо його, щоб побачити, скільки роботи попереду. Курс триває шість тижнів, дванадцять уроків; кожен тиждень закриває одне операційне питання — механізмом, а не порадою. Це перший урок тижня «Основа + промпти».
+
+## Слайд 2 · Автор та викладач
+
+Коротко про те, хто веде курс, — щоб ви розуміли, звідки береться кожне «так робіть» і кожне «так не робіть». Вісім років в IT: почав із QA Automation, далі бекенд, останні роки — AI Engineering у production. Основне: я один із перших інженерів Creatio.ai — AI-напряму Creatio, де LLM-фічі доїхали до реальних користувачів ще до того, як GenAI став мейнстрімом. Наскрізно збирав RAG/Q&A систему: .NET API, Python ML на LangChain, OpenAI та Azure OpenAI, Elasticsearch як vector store. Саме звідти й тема курсу: надійність, спостережуваність і вартість LLM у production — не з статей, а зі своїх інцидентів. [Ведучому: не читайте булети вголос — вони на слайді. Скажіть одну фразу про те, чому саме ви це розповідаєте, і йдіть далі: слайд не про вас, а про довіру до матеріалу.]
+
+## Слайд 3 · Що ви зможете після уроку
+
+Домовимось про результат уроку — конкретними діями, а не «зрозуміти» чи «ознайомитись». Після сьогоднішнього заняття ви зможете: підняти стек капстоуна однією командою і оглянути обидві його половини — чат і консоль оператора; намалювати з пам'яті шлях запиту від UI через сервіс і адаптер до mock і лога; читати відповідь моделі як оператор — дивитися не лише на текст, а на finish_reason і usage; пояснити, чому temperature=0 не дає повторюваності і що з цього випливає для перевірки якості; назвати дві категорії відмов, яких HTTP-моніторинг не бачить у принципі; і знайти свій запит у таблиці requests, чесно відповівши, яких полів там бракує. Кожен пункт ви перевірите руками ще сьогодні — у лабораторній.
+
+## Слайд 4 · Маршрут на сьогодні
+
+Маршрут такий. Перша половина уроку — розтин об'єкта керування: чому 200 — це не «працює», контракт виклику, токени, недетермінізм із латентністю і таксономія відмов. Без цього фундаменту решта курсу перетворюється на набір рецептів. Друга половина — каркас капстоуна: архітектура з п'яти компонентів, unified log і mock-провайдер; окремим опційним блоком — реальний ключ. Потім лабораторна на п'ять кроків, антипатерни тижня і домашнє завдання. [Ведучому: блоки 01–05 — найдовший відрізок курсу без коду, ~10 хвилин на таблицях. На блоці токенів дай врізку живого екрана консолі з «—», на таксономії відмов веди курсором по рядках, інакше картинка «повисне».]
+
+## Слайд 5 · Курс складається з шести тижнів
+
+Уся програма — шість тижнів, по два уроки. Логіка одна: кожен наступний тиждень кладе новий шар на той самий контур керування, а не починає з чистого аркуша. Тиждень 1 — основа й промпти. Другий — маршрутизація моделей і вартість. Третій — кеш і виклик інструментів. Четвертий — надійність і безпека. П'ятий — спостережуваність і evals. Шостий — CI-гейти й фінальна operating model. Тобто те, що ви піднімете сьогодні, доживе до дванадцятого уроку — воно не викидається. [Ведучому: не перелічуйте всі шість уголос — покажіть на слайді і назвіть лише принцип «шар на той самий контур». Деталі кожного тижня — у своєму уроці.]
+
+## Слайд 6 · Терміни, якими користуватимемось
+
+Перш ніж занурюватись, домовимось про шість слів, які сьогодні звучатимуть постійно. Токен — частинка тексту, якою модель міряє і вхід, і вихід; саме в токенах рахується рахунок, а не в запитах. Системний промпт — інструкція моделі, як поводитися; вона їде в кожному запиті і вже наступного уроку переїде в реєстр версій. finish_reason — поле відповіді, яке каже, чому модель зупинилася: сама завершила думку, вперлася в стелю довжини чи попросила інструмент. usage — блок із кількістю токенів входу й виходу, єдине джерело правди про гроші. Контур керування, англійською control plane, — це наш сервіс: шар, який ухвалює рішення, на відміну від шару, який виконує виклик. І mock-провайдер — фейкова модель, сумісна за API зі справжньою: вона вміє падати на замовлення і реагувати на промпт, тому весь курс проходиться без ключа. Якщо якесь із цих слів зараз незнайоме — нормально, кожне розберемо на місці; тут вони лише щоб не спотикатися.
+
+## Слайд 7 · ТЕОРІЯ
+
+Далі 9 блоків теорії — від чому демо збирається за день, а прод не збирається ніколи до розширеного стека з реальним ключем. Руками поки не робимо нічого: стенд буде в другій половині уроку, і без цих блоків він виглядав би набором команд без причини. [Ведучому: розділювач — пауза на кілька секунд; підпис під словом уголос не читайте.]
+
+## Слайд 8 · Чому демо за день — а прод ніколи?
+
+Викликати модель — три рядки коду. Запит пішов, 200 повернувся, демо готове, всі задоволені. Саме тому LLM-прототипи народжуються за день — і саме тому більшість із них ніколи не доживає до проду. Ось чотири питання, на які ті три рядки не відповідають. Гроші: скільки ця фіча коштує на тиждень, на якій задачі бюджет згорає дарма, і хто це помітить — сьогодні чи в рахунку наприкінці місяця? Надійність: що станеться, коли провайдер ляже на 20 хвилин у робочий час, а коли поверне ліміт запитів у пік трафіку? Якість: хто помітить, що відповіді стали гіршими після «маленької» правки промпта? Промпт не проходить компіляцію — це «просто текст», який тихо змінює поведінку системи. І видимість: куди дивитися, коли користувач каже «бот верзе дурниці», а всі графіки зелені? Кожен тиждень курсу закриває одне з цих питань — механізмом, а не порадою.
+</script>
+
+<script>
+  "use strict";
+
+  const KEY = "llmops-prompter-v1";
+  const BUDGET_MIN = 40; // регламент: одне відео не довше 40 хв
+
+  const reel = document.getElementById("reel");
+  const stage = document.getElementById("stage");
+  const goBtn = document.getElementById("go");
+  const wpmIn = document.getElementById("wpm");
+  const sizeIn = document.getElementById("size");
+  const pastePane = document.getElementById("paste");
+  const srcArea = document.getElementById("src");
+  const lead = document.getElementById("lead");
+
+  let slides = [];        // [{el, num, title, words}]
+  let spokenPxPerWord = 0;
+  let totalWords = 0;
+  let offset = 0;         // прокрутка, px
+  let running = false;
+  let elapsed = 0;        // секунди мовлення
+  let lastFrame = 0;
+  let lastSave = 0;
+  let mirrored = false;
+
+  function store(patch) {
+    try {
+      const cur = JSON.parse(localStorage.getItem(KEY) || "{}");
+      localStorage.setItem(KEY, JSON.stringify(Object.assign(cur, patch)));
+    } catch (e) { /* приватне вікно чи заблоковані дані */ }
+  }
+  function restore() {
+    try { return JSON.parse(localStorage.getItem(KEY) || "{}"); } catch (e) { return {}; }
+  }
+
+  const esc = (s) => s.replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
+  const countWords = (s) => (s.trim().match(/[^\s]+/g) || []).length;
+  const mmss = (sec) => {
+    sec = Math.max(0, Math.round(sec));
+    const m = Math.floor(sec / 60);
+    return m + ":" + String(sec % 60).padStart(2, "0");
+  };
+
+  // Розмітка начитки: # титул, ## Слайд N · Назва, [Ведучому: …] — не читати
+  function build(text) {
+    const lines = text.replace(/\r/g, "").split("\n");
+    let html = "";
+    let para = [];
+
+    const flush = () => {
+      if (!para.length) return;
+      const block = para.join(" ").trim();
+      para = [];
+      if (!block) return;
+      // вказівки ведучому виносимо з мовного потоку
+      const parts = block.split(/(\[[^\]]*\])/g);
+      for (const p of parts) {
+        if (!p.trim()) continue;
+        if (p.startsWith("[") && p.endsWith("]")) {
+          html += '<span class="note"><u>не читати</u>' + esc(p.slice(1, -1)) + "</span>";
+        } else {
+          html += '<p class="say">' + esc(p.trim()) + "</p>";
+        }
+      }
+    };
+
+    for (const raw of lines) {
+      const line = raw.trim();
+      if (line === "---") { flush(); continue; }
+      if (line.startsWith("## ")) {
+        flush();
+        const body = line.slice(3).trim();
+        const m = body.match(/^Слайд\s+(\d+)\s*[·—-]\s*(.*)$/i);
+        const num = m ? m[1] : "";
+        const title = m ? m[2] : body;
+        html += '<div class="slide-tag" data-slide="' + esc(num) + '" data-title="' + esc(title) +
+                '">' + (num ? "<em>" + esc(num) + "</em>" : "") + "<span>" + esc(title) + "</span><s></s></div>";
+        continue;
+      }
+      if (line.startsWith("# ")) { flush(); html += "<h1>" + esc(line.slice(2)) + "</h1>"; continue; }
+      if (!line) { flush(); continue; }
+      para.push(line);
+    }
+    flush();
+    return html + '<div class="tail"></div>';
+  }
+
+  function measure() {
+    // px на одне вимовлене слово — беремо тільки мовні абзаци, вказівки не рахуємо
+    let px = 0, words = 0;
+    reel.querySelectorAll("p.say").forEach((p) => {
+      px += p.getBoundingClientRect().height + parseFloat(getComputedStyle(p).marginBottom);
+      words += countWords(p.textContent);
+    });
+    totalWords = words;
+    spokenPxPerWord = words ? px / words : 0;
+
+    slides = [];
+    const tags = [...reel.querySelectorAll(".slide-tag")];
+    tags.forEach((el) => {
+      let w = 0;
+      let n = el.nextElementSibling;
+      while (n && !n.classList.contains("slide-tag")) {
+        if (n.matches("p.say")) w += countWords(n.textContent);
+        n = n.nextElementSibling;
+      }
+      slides.push({ el, num: el.dataset.slide, title: el.dataset.title, words: w });
+      const wpm = +wpmIn.value;
+      el.querySelector("s").textContent = w ? "~" + mmss((w / wpm) * 60) : "";
+    });
+  }
+
+  function wordsBefore(px) {
+    return spokenPxPerWord ? px / spokenPxPerWord : 0;
+  }
+
+  function render() {
+    reel.style.transform = "translateY(" + (-offset) + "px)" + (mirrored ? " scaleX(-1)" : "");
+
+    const wpm = +wpmIn.value;
+    const spoken = Math.min(totalWords, wordsBefore(offset));
+    const left = Math.max(0, totalWords - spoken);
+    const leftSec = (left / wpm) * 60;
+
+    document.getElementById("t-elapsed").textContent = mmss(elapsed);
+    document.getElementById("t-left").textContent = totalWords ? mmss(leftSec) : "—";
+
+    const totalEl = document.getElementById("t-total");
+    if (totalWords) {
+      const proj = elapsed + leftSec;
+      totalEl.textContent = mmss(proj);
+      totalEl.className = proj > BUDGET_MIN * 60 ? "over" : proj > BUDGET_MIN * 60 * 0.85 ? "warn" : "ok";
+    } else {
+      totalEl.textContent = "—";
+      totalEl.className = "";
+    }
+
+    // активний слайд — той, чия шапка вже пройшла лінію читання
+    const line = stage.clientHeight * 0.38;
+    let cur = null, idx = 0;
+    slides.forEach((s, i) => {
+      if (s.el.offsetTop - offset <= line) { cur = s; idx = i + 1; }
+    });
+    document.getElementById("t-slide").textContent = slides.length ? idx + "/" + slides.length : "—";
+    document.getElementById("now").textContent = cur
+      ? (cur.num ? "Слайд " + cur.num + " · " : "") + cur.title
+      : (slides.length ? "Титул" : "Текст не завантажено");
+
+    const max = Math.max(1, reel.scrollHeight - stage.clientHeight * 0.6);
+    document.getElementById("bar").style.width = Math.min(100, (offset / max) * 100) + "%";
+  }
+
+  function frame(ts) {
+    if (!running) return;
+    if (!lastFrame) lastFrame = ts;
+    const dt = Math.min(0.25, (ts - lastFrame) / 1000);
+    lastFrame = ts;
+    elapsed += dt;
+    offset += spokenPxPerWord * (+wpmIn.value / 60) * dt;
+    const max = reel.scrollHeight - stage.clientHeight * 0.35;
+    if (offset >= max) { offset = max; toggle(false); }
+    render();
+    // позицію зберігаємо раз на секунду, а не щокадру
+    if (ts - lastSave > 1000) { lastSave = ts; store({ offset: offset }); }
+    requestAnimationFrame(frame);
+  }
+
+  function toggle(on) {
+    running = on === undefined ? !running : on;
+    lastFrame = 0;
+    goBtn.textContent = running ? "Пауза" : "Пуск";
+    goBtn.dataset.running = running ? "1" : "0";
+    if (running) requestAnimationFrame(frame);
+  }
+
+  // 3 секунди тиші перед словом — щоб на монтажі було що різати
+  function startWithLead() {
+    if (running) { toggle(false); return; }
+    let n = 3;
+    const b = lead.querySelector("b");
+    b.textContent = n;
+    lead.classList.add("on");
+    const tick = setInterval(() => {
+      n -= 1;
+      if (n <= 0) {
+        clearInterval(tick);
+        lead.classList.remove("on");
+        toggle(true);
+      } else {
+        b.textContent = n;
+      }
+    }, 1000);
+  }
+
+  function load(text, name) {
+    reel.innerHTML = build(text);
+    document.getElementById("docname").textContent = name || "Начитка";
+    offset = 0; elapsed = 0; toggle(false);
+    requestAnimationFrame(() => {
+      measure();
+      document.getElementById("docmeta").textContent =
+        totalWords.toLocaleString("uk-UA") + " слів · " + slides.length + " слайдів · ~" +
+        mmss((totalWords / +wpmIn.value) * 60) + " на темпі " + wpmIn.value;
+      render();
+    });
+    store({ text: text, name: name || "Начитка", offset: 0 });
+  }
+
+  function gotoSlide(dir) {
+    const line = stage.clientHeight * 0.38;
+    const tops = slides.map((s) => s.el.offsetTop - line);
+    let target;
+    if (dir > 0) target = tops.find((t) => t > offset + 4);
+    else target = [...tops].reverse().find((t) => t < offset - 4);
+    if (target === undefined) target = dir > 0 ? offset : 0;
+    offset = Math.max(0, target);
+    render();
+    store({ offset: offset });
+  }
+
+  // ------------------------------------------------------------ події
+  goBtn.addEventListener("click", startWithLead);
+
+  wpmIn.addEventListener("input", () => {
+    document.getElementById("wpm-out").textContent = wpmIn.value;
+    measure(); render(); store({ wpm: wpmIn.value });
+  });
+
+  sizeIn.addEventListener("input", () => {
+    document.getElementById("size-out").textContent = sizeIn.value;
+    reel.style.fontSize = sizeIn.value + "px";
+    requestAnimationFrame(() => { measure(); render(); });
+    store({ size: sizeIn.value });
+  });
+
+  document.getElementById("btn-paste").addEventListener("click", () => {
+    srcArea.value = restore().text || "";
+    pastePane.classList.add("on");
+    srcArea.focus();
+  });
+  document.getElementById("btn-cancel").addEventListener("click", () => pastePane.classList.remove("on"));
+  document.getElementById("btn-load").addEventListener("click", () => {
+    if (srcArea.value.trim()) load(srcArea.value, "Вставлений текст");
+    pastePane.classList.remove("on");
+  });
+
+  document.getElementById("file").addEventListener("change", (e) => {
+    const f = e.target.files && e.target.files[0];
+    if (!f) return;
+    const r = new FileReader();
+    r.onload = () => { load(String(r.result), f.name.replace(/\.md$/i, "")); pastePane.classList.remove("on"); };
+    r.readAsText(f, "utf-8");
+  });
+
+  document.getElementById("btn-full").addEventListener("click", () => {
+    if (document.fullscreenElement) document.exitFullscreen();
+    else document.documentElement.requestFullscreen().catch(() => {});
+  });
+
+  window.addEventListener("keydown", (e) => {
+    if (pastePane.classList.contains("on")) {
+      if (e.key === "Escape") pastePane.classList.remove("on");
+      return;
+    }
+    if (e.target.matches("input, textarea")) return;
+    switch (e.key) {
+      case " ": e.preventDefault(); startWithLead(); break;
+      case "ArrowUp": e.preventDefault(); wpmIn.value = Math.min(230, +wpmIn.value + 5); wpmIn.dispatchEvent(new Event("input")); break;
+      case "ArrowDown": e.preventDefault(); wpmIn.value = Math.max(90, +wpmIn.value - 5); wpmIn.dispatchEvent(new Event("input")); break;
+      case "ArrowRight": e.preventDefault(); gotoSlide(1); break;
+      case "ArrowLeft": e.preventDefault(); gotoSlide(-1); break;
+      case "Home": e.preventDefault(); offset = 0; elapsed = 0; toggle(false); render(); break;
+      case "m": case "M": case "ь": mirrored = !mirrored; document.body.classList.toggle("mirrored", mirrored); render(); break;
+      case "f": case "F": case "а": document.getElementById("btn-full").click(); break;
+    }
+  });
+
+  window.addEventListener("resize", () => { measure(); render(); });
+
+  // --------------------------------------------------------- старт
+  const saved = restore();
+  if (saved.wpm) { wpmIn.value = saved.wpm; document.getElementById("wpm-out").textContent = saved.wpm; }
+  if (saved.size) { sizeIn.value = saved.size; document.getElementById("size-out").textContent = saved.size; }
+  reel.style.fontSize = sizeIn.value + "px";
+
+  load(saved.text || document.getElementById("sample").textContent,
+       saved.name || "L01 · слайди 1–8 (зразок)");
+
+  if (saved.offset) {
+    requestAnimationFrame(() => { offset = saved.offset; render(); });
+  }
+</script>
