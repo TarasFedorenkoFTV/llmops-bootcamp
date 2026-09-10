@@ -380,6 +380,21 @@
     button, label.file { transition: none; }
   }
 
+  /* --------------------------------------------- режим смуги */
+
+  /* Камера стоїть над монітором, тож текст у центрі екрана — це погляд
+     на 13.7° вниз, і в кадрі видно опущені очі. Смуга з фіксованою лінією
+     читання ставиться впритул під камеру: 4° замість 14°, і око не їздить
+     по рядках, бо рядок завжди в одному місці. */
+  body.strip .stage { flex: none; height: var(--strip-h, 190px); border-bottom: 1px solid var(--edge); }
+  body.strip .rail { top: 50%; }
+  body.strip .fade { height: 34px; }
+  body.strip .foot { display: none; }
+  body.strip #reel { padding: 0 26px; }
+  body.strip .note, body.strip .pause, body.strip .seg-tag s { display: none; }
+  body.strip #hud { top: auto; bottom: 8px; right: 10px; }
+  body.strip .slide-tag { margin: .5em 0 .3em; border-top: 0; padding-top: 0; }
+
   /* ------------------------------------ згортання панелі під читання */
 
   /* Поки суфлер їде, весь екран належить тексту: слейт і підвал ідуть
@@ -492,6 +507,7 @@
 
     <button id="btn-paste">Текст</button>
     <label class="file">Файл<input type="file" id="file" accept=".md,.txt,text/markdown,text/plain"></label>
+    <button id="btn-strip" aria-pressed="false">Смуга</button>
     <button id="btn-full">Екран</button>
   </div>
 </div>
@@ -537,6 +553,7 @@
     <span><kbd>PgUp</kbd><kbd>PgDn</kbd> сегмент</span>
     <span><kbd>Backspace</kbd> −10 с</span>
     <span><kbd>Home</kbd> на початок</span>
+    <span><kbd>S</kbd> смуга</span>
     <span><kbd>M</kbd> дзеркало</span>
     <span><kbd>F</kbd> екран</span>
   </div>
@@ -549,6 +566,8 @@
   "use strict";
 
   const KEY = "llmops-prompter-v1";
+  // частка висоти сцени, на якій стоїть лінія читання
+  const lineY = () => stage.clientHeight * (document.body.classList.contains("strip") ? 0.5 : 0.38);
   const SIZE_KEY = window.innerWidth < 760 ? "sizeM" : "size";
   const BUDGET_MIN = 40; // регламент: одне відео не довше 40 хв
 
@@ -718,7 +737,7 @@
     }
 
     // активний слайд — той, чия шапка вже пройшла лінію читання
-    const line = stage.clientHeight * 0.38;
+    const line = lineY();
     let cur = null, idx = 0;
     slides.forEach((s, i) => {
       if (s.el.offsetTop - offset <= line) { cur = s; idx = i + 1; }
@@ -810,7 +829,7 @@
   }
 
   function gotoSeg(dir) {
-    const line = stage.clientHeight * 0.38;
+    const line = lineY();
     const tops = segments.map((x) => x.el.offsetTop - line);
     let t = dir > 0 ? tops.find((v) => v > offset + 4)
                     : [...tops].reverse().find((v) => v < offset - 4);
@@ -821,7 +840,7 @@
   }
 
   function gotoSlide(dir) {
-    const line = stage.clientHeight * 0.38;
+    const line = lineY();
     const tops = slides.map((s) => s.el.offsetTop - line);
     let target;
     if (dir > 0) target = tops.find((t) => t > offset + 4);
@@ -834,6 +853,21 @@
 
   // ------------------------------------------------------------ події
   goBtn.addEventListener("click", togglePlay);
+
+  // Смуга: кілька рядків під камерою замість повного екрана
+  const stripBtn = document.getElementById("btn-strip");
+  function stripH() {
+    document.documentElement.style.setProperty("--strip-h", (+sizeIn.value * 3.6) + "px");
+  }
+  function setStrip(on) {
+    document.body.classList.toggle("strip", on);
+    stripBtn.setAttribute("aria-pressed", String(on));
+    stripBtn.dataset.running = on ? "1" : "0";
+    stripH();
+    requestAnimationFrame(() => { measure(); render(); });
+    store({ strip: on });
+  }
+  stripBtn.addEventListener("click", () => setStrip(!document.body.classList.contains("strip")));
 
   const gear = document.getElementById("gear");
   gear.addEventListener("click", () => {
@@ -894,6 +928,7 @@
   sizeIn.addEventListener("input", () => {
     document.getElementById("size-out").textContent = sizeIn.value;
     reel.style.fontSize = sizeIn.value + "px";
+    stripH();
     requestAnimationFrame(() => { measure(); render(); });
     store(SIZE_KEY === "sizeM" ? { sizeM: sizeIn.value } : { size: sizeIn.value });
   });
@@ -938,6 +973,8 @@
       case "ArrowLeft": e.preventDefault(); gotoSlide(-1); break;
       case "Backspace": e.preventDefault(); nudge(10); break;
       case "Home": e.preventDefault(); offset = 0; elapsed = 0; toggle(false); render(); break;
+      case "s": case "S": case "і": e.preventDefault();
+        setStrip(!document.body.classList.contains("strip")); break;
       case "m": case "M": case "ь": mirrored = !mirrored; document.body.classList.toggle("mirrored", mirrored); render(); break;
       case "f": case "F": case "а": document.getElementById("btn-full").click(); break;
     }
@@ -1007,6 +1044,8 @@
   sizeIn.value = savedSize;
   document.getElementById("size-out").textContent = savedSize;
   reel.style.fontSize = sizeIn.value + "px";
+  stripH();
+  if (saved.strip) setStrip(true);
 
   // «theory»/«practice» — з попередньої версії, коли різали по ПРАКТИКА
   if (saved.segment && ["all", "v1", "v2"].includes(saved.segment)) {
