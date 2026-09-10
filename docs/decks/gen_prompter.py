@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
-"""Перезашиває начитки docs/decks/L*-script.md у docs/prompter.html.
+"""Перезашиває режисерські сценарії docs/decks/L*-video.md у docs/prompter.html.
 
-Навіщо: суфлер тримає копію начиток усередині сторінки, щоб працювати на
+Навіщо: суфлер тримає копію сценаріїв усередині сторінки, щоб працювати на
 пристрої без репозиторію — телефон чи планшет під камерою. Після кожної
-правки LNN-script.md копію треба оновити цим скриптом.
+правки LNN-video.md копію треба оновити цим скриптом.
+
+Джерело — саме режисерські файли, а не LNN-script.md: у них точна межа
+«# Відео 1/2», сегменти запису з оцінкою часу, імена цільових файлів і
+рядки-вказівки, які вголос не читаються.
 
     python docs/decks/gen_prompter.py
 
@@ -24,9 +28,9 @@ CLOSE_TAG = "</script>"
 
 
 def main():
-    scripts = sorted(glob.glob(os.path.join(HERE, "L*-script.md")))
+    scripts = sorted(glob.glob(os.path.join(HERE, "L*-video.md")))
     if not scripts:
-        sys.exit("не знайдено жодного L*-script.md у " + HERE)
+        sys.exit("не знайдено жодного L*-video.md у " + HERE)
     if not os.path.exists(PAGE):
         sys.exit("немає сторінки суфлера: " + PAGE)
 
@@ -34,7 +38,10 @@ def main():
     for path in scripts:
         lid = os.path.basename(path).split("-")[0]
         text = io.open(path, encoding="utf-8").read()
-        title = text.split("\n", 1)[0].replace("# Сценарій начитки · ", "").strip()
+        title = text.split("\n", 1)[0].lstrip("# ")
+        for pre in ("Сценарій запису · ", "Сценарій начитки · "):
+            title = title.replace(pre, "")
+        title = title.strip()
         lessons.append({"id": lid, "title": title, "text": text})
 
     # "<" -> <, щоб жодне </script у начитці не закрило блок
