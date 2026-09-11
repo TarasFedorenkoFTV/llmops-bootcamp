@@ -275,6 +275,28 @@
     margin-bottom: .25em;
   }
 
+  /* Зупинка на межі слайда: прокрутка сама стає на паузу, коли заголовок
+     нового слайда доходить до лінії читання — щоб перемкнути слайд і не
+     читати наосліп. Далі тап по тексту або Space. */
+  #slidestop {
+    position: absolute;
+    left: 50%;
+    top: calc(38% + 2.2em);
+    transform: translateX(-50%);
+    z-index: 5;
+    font-family: var(--cond);
+    font-size: 13px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--ground);
+    background: var(--amber);
+    border-radius: 3px;
+    padding: .45em .9em;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+  body.strip #slidestop { top: auto; bottom: 6px; font-size: 11px; }
+
   .tail { height: 60vh; }
 
   /* --------------------------------------------------------- підвал */
@@ -513,8 +535,8 @@
 
     <div class="knob">
       темп
-      <input type="range" id="wpm" min="90" max="230" step="5" value="165">
-      <output id="wpm-out">165</output>
+      <input type="range" id="wpm" min="90" max="230" step="5" value="130">
+      <output id="wpm-out">130</output>
     </div>
     <div class="knob">
       кегль
@@ -533,6 +555,7 @@
   <div class="fade top"></div>
   <div class="rail"><i></i><i></i></div>
   <div id="hud"><b id="h-elapsed">0:00</b><s id="h-total">—</s><i id="h-slide">—</i></div>
+  <div id="slidestop" hidden>перемкни слайд і торкнись тексту</div>
   <div id="reel"></div>
   <div class="fade bot"></div>
 
@@ -606,6 +629,8 @@
   let lastFrame = 0;
   let lastSave = 0;
   let mirrored = false;
+  let curIdx = 0;         // номер слайда під лінією читання, оновлює render()
+  let resumedAt = 0;      // час останнього пуску, щоб не спинятись одразу
 
   function store(patch) {
     try {
@@ -779,6 +804,7 @@
     slides.forEach((s, i) => {
       if (s.el.offsetTop - offset <= line) { cur = s; idx = i + 1; }
     });
+    curIdx = idx;
     document.getElementById("t-slide").textContent = slides.length ? idx + "/" + slides.length : "—";
     let curSeg = null;
     segments.forEach((x) => { if (x.el.offsetTop - offset <= line) curSeg = x; });
@@ -807,7 +833,16 @@
     offset += spokenPxPerWord * (+wpmIn.value / 60) * dt;
     const max = reel.scrollHeight - stage.clientHeight * 0.35;
     if (offset >= max) { offset = max; toggle(false); }
+    const wasIdx = curIdx;
     render();
+    // Заголовок нового слайда дійшов до лінії читання — зупиняємось, щоб
+    // перемкнути слайд. Півтори секунди після старту не рахуються: інакше
+    // пуск із самого початку одразу впирався б у перший слайд.
+    if (curIdx > wasIdx && ts - resumedAt > 1500) {
+      toggle(false);
+      document.getElementById("slidestop").hidden = false;
+      return;
+    }
     // позицію зберігаємо раз на секунду, а не щокадру
     if (ts - lastSave > 1000) { lastSave = ts; store({ offset: offset }); }
     requestAnimationFrame(frame);
@@ -843,7 +878,11 @@
     document.body.classList.toggle("running", running);
     if (running) document.body.classList.remove("setup-open");
     keepAwake(running);
-    if (running) requestAnimationFrame(frame);
+    if (running) {
+      resumedAt = performance.now();
+      document.getElementById("slidestop").hidden = true;
+      requestAnimationFrame(frame);
+    }
   }
 
   function togglePlay() {
