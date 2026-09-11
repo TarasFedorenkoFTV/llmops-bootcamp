@@ -38,10 +38,11 @@ TERMS = [
 ]
 
 
-def speech(path):
-    """Рядки, які справді звучать."""
+def speech_from_lines(lines):
+    """Те саме, але з готового списку рядків — щоб міг використати
+    gen_prompter.py і числа в суфлері збігалися з числами тут."""
     out = []
-    for line in io.open(path, encoding="utf-8").read().replace("\r", "").split("\n"):
+    for line in lines:
         s = line.strip()
         if not s or s.startswith(("#", "|", "---")):
             continue
@@ -50,6 +51,23 @@ def speech(path):
         out.append(s)
     text = "\n".join(out)
     return re.sub(r"\[[^\]]*\]", " ", text)      # вказівки всередині рядка
+
+
+def speech(path):
+    """Рядки, які справді звучать."""
+    return speech_from_lines(
+        io.open(path, encoding="utf-8").read().replace("\r", "").split("\n"))
+
+
+def metrics(text_lines):
+    """Метрики §1 специфікації для набору рядків: {words, dash, contrast}."""
+    body = speech_from_lines(text_lines)
+    words = len(re.findall(r"[^\s]+", body))
+    out = {"words": words}
+    for name, pat, target, _why in RULES[:2]:
+        key = "dash" if "тире" in name else "contrast"
+        out[key] = round(len(re.findall(pat, body)) * 1000.0 / words, 1) if words else 0.0
+    return out
 
 
 def check(path, show=False):

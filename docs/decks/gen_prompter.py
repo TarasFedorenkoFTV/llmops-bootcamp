@@ -15,6 +15,7 @@
 сторінки не торкається. Запускати можна з будь-якої директорії.
 """
 import glob
+import re
 import io
 import json
 import os
@@ -27,6 +28,31 @@ OPEN_TAG = '<script type="application/json" id="lessons">'
 CLOSE_TAG = "</script>"
 
 
+def load_checker():
+    """docs/check_speech.py як модуль — щоб метрики в суфлері рахувалися тим
+    самим кодом, що й у перевірці. Інакше числа в двох місцях розійдуться:
+    у JavaScript \\b працює лише для латиниці й на кирилиці не спрацьовує."""
+    import importlib.util
+    p = os.path.join(REPO, "docs", "check_speech.py")
+    spec = importlib.util.spec_from_file_location("check_speech", p)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def segment_metrics(check, text):
+    """{назва сегмента: {words, dash, contrast}} — по тих самих правилах."""
+    lines = text.replace("\r", "").split("\n")
+    marks = [i for i, l in enumerate(lines)
+             if re.match(r"^##\s+.*Сегмент\s+\d+", l.strip(), re.I)]
+    out = {}
+    for k, i in enumerate(marks):
+        end = marks[k + 1] if k + 1 < len(marks) else len(lines)
+        name = re.sub(r"\s*\([^)]*\)\s*$", "", lines[i].lstrip("# ").strip())
+        out[name] = check.metrics(lines[i + 1:end])
+    return out
+
+
 def main():
     scripts = sorted(glob.glob(os.path.join(HERE, "L*-video.md")))
     if not scripts:
@@ -34,6 +60,7 @@ def main():
     if not os.path.exists(PAGE):
         sys.exit("немає сторінки суфлера: " + PAGE)
 
+    check = load_checker()
     lessons = []
     for path in scripts:
         lid = os.path.basename(path).split("-")[0]
@@ -42,7 +69,8 @@ def main():
         for pre in ("Сценарій запису · ", "Сценарій начитки · "):
             title = title.replace(pre, "")
         title = title.strip()
-        lessons.append({"id": lid, "title": title, "text": text})
+        lessons.append({"id": lid, "title": title, "text": text,
+                        "style": segment_metrics(check, text)})
 
     # "<" -> <, щоб жодне </script у начитці не закрило блок
     payload = json.dumps(lessons, ensure_ascii=False).replace("<", "\\u003c")
