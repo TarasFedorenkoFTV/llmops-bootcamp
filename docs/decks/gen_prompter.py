@@ -72,8 +72,15 @@ def main():
         lessons.append({"id": lid, "title": title, "text": text,
                         "style": segment_metrics(check, text)})
 
+    # Пороги теж їдуть із перевірки, а не вписуються в сторінку руками:
+    # інакше вони розходяться щоразу, коли ціль калібрується.
+    limits = {}
+    for name, _pat, target, _why in check.RULES[:2]:
+        limits["dash" if "тире" in name else "contrast"] = target
+
     # "<" -> <, щоб жодне </script у начитці не закрило блок
-    payload = json.dumps(lessons, ensure_ascii=False).replace("<", "\\u003c")
+    payload = json.dumps({"limits": limits, "lessons": lessons},
+                         ensure_ascii=False).replace("<", "\\u003c")
 
     html = io.open(PAGE, encoding="utf-8").read()
     start = html.find(OPEN_TAG)
